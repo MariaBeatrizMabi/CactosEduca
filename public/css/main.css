@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+:root {
+    --primary-color: #0D5413;
+    --secondary-color: #76AA3B;
+    --grap-color: #EFFFF3;
+    --white-color: #FFFFFF;
+    --black-color: #253138;
+    --black-frap-color: #25313870;
+    --blue-color: #008BD0;
+    --yellow-color: #FFCB00;
+}
+
+body {
+    background-image: url('/public/assets/BackgroundCactus.png');
+    background-size: 100vh 100vw;
+    background-size: cover;
+}
+
+.am5-layer-30 {
+  display: none !important;
+  visibility: hidden !important;
+}
