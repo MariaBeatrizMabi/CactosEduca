@@ -19,8 +19,10 @@ const props = defineProps({
     color: white;
 
     width: 84%;
-    height: 5%;
-    padding: 0.5rem 0;
+    height: 3rem;
+    justify-content: center;
+    display: flex;
+    align-items: center;
     
     font-size: 11px;
     font-weight: 400;

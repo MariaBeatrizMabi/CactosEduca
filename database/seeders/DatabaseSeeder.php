@@ -37,5 +37,7 @@ class DatabaseSeeder extends Seeder
             'type' => 'school',
             'password' => bcrypt('school') 
         ]);
+
+        $this->call(CountySeeder::class);
     }
 }

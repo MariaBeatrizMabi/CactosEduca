@@ -17,7 +17,6 @@ import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
                 <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" valueCard="1030" :ref="CardValue"></CardComponent>
                 <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="1.566"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" valueCard="1.932"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" valueCard="3.455"></CardComponent>
             </div>
 
             <TitleComponent title="Escolas Cadastradas"/>

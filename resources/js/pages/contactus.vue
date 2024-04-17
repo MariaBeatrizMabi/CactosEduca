@@ -46,7 +46,7 @@ import TitleComponent from '../components/title.vue'
 .contact-section {
   display: flex;
   height: 100vh;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.397);
 
   & .contact-content {
     display: flex;

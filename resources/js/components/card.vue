@@ -22,11 +22,6 @@ import('/public/assets/' + props.imageCard).then(image => {
 }).catch(error => {
     console.error('Erro ao carregar a imagem do card:', error);
 });
-
-console.log(props.valueCard)
-
-
-
 </script>
 
 <template>

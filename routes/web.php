@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactsController;
-
+use App\Http\Controllers\SchoolDetails;
+use App\Models\County;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,8 +21,30 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('login');
+
+
 Route::post('/login', 'App\Http\Controllers\LoginController@Auth')->name('Auth');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/ContactUs', [ContactsController::class, 'index'])->name('ContactUs');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/ContactUs', [ContactsController::class, 'index'])->name('ContactUs');
+    Route::get('/Management', [ContactsController::class, 'index'])->name('management');
+    Route::get('/SchoolDetails', [SchoolDetails::class, 'index'])->name('SchoolDetails');
+
+    Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoollController@index')->name('management_school.index');
+    Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoollController@create')->name('management_school.create');
+    Route::put('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@update')->name('management_school.update');
+    Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@show')->name('management_school.show');
+    Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@delete')->name('management_school.delete');
+
+
+    Route::get('/counties', function () {
+        return County::all();
+    });
+
+    Route::post('/logout', function () {
+        Auth::logout();
+        return redirect('/');
+    })->name('logout');
+});

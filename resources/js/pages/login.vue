@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router'; // Importar o useRouter para redirecionamento
+import { useRouter } from 'vue-router';
 const acess_cod = ref('');
 const password = ref('');
-const router = useRouter(); // Instanciar o useRouter
+const router = useRouter(); 
+import InputComponentPassword from '../components/inputPassword.vue'
+
+
 const login = () => {
     axios.post('/login', {
         acess_cod: acess_cod.value,

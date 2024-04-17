@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../../resources/js/pages/login.vue';
 import Dashboard from '../../resources/js/pages/dashboard.vue';
 import ContactUs from '../../resources/js/pages/contactus.vue';
+import Management from '../../resources/js/pages/management.vue';
+import SchoolDetails from '../../resources/js/pages/Filters.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -13,19 +15,42 @@ const router = createRouter({
         {
             path: '/dashboard',
             component: Dashboard,
-            meta: { requiresAuth: true } // Esta rota requer autenticação
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/schoolDetails',
+            component: SchoolDetails,
+            meta: { requiresAuth: true }
         },
         {
             path: '/contactus',
             component: ContactUs,
-            meta: { requiresAuth: true } // Esta rota requer autenticação
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/management',
+            component: Management,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/schoolDetails/:city',
+            name: 'SchoolDetailsByCity',
+            component: SchoolDetails,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/schoolDetails/:city/:schoolName',
+            name: 'SchoolDetailsByCityAndSchool',
+            component: SchoolDetails,
+            props: true,
+            meta: { requiresAuth: true }
         }
     ]
 });
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        // Verifique se o usuário está autenticado, caso contrário, redirecione para a página de login
         if (!isAuthenticated()) {
             next({ path: '/', query: { redirect: to.fullPath } });
         } else {
@@ -37,8 +62,6 @@ router.beforeEach((to, from, next) => {
 });
 
 function isAuthenticated() {
-    // Lógica para verificar se o usuário está autenticado
-    // Retorna true se autenticado, caso contrário, retorna false
     return true
 }
 
