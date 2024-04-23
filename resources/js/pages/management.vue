@@ -43,7 +43,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 8rem;
+            margin: 8rem 0;
         }
     }
 </style>

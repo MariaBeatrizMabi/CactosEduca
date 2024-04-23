@@ -18,11 +18,9 @@ use Illuminate\Support\Facades\Auth;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 Route::get('/', function () {
     return view('welcome');
 })->name('login');
-
 
 Route::post('/login', 'App\Http\Controllers\LoginController@Auth')->name('Auth');
 
@@ -30,14 +28,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/ContactUs', [ContactsController::class, 'index'])->name('ContactUs');
     Route::get('/Management', [ContactsController::class, 'index'])->name('management');
-    Route::get('/SchoolDetails', [SchoolDetails::class, 'index'])->name('SchoolDetails');
+    
+    Route::get('/schoolDetails', [SchoolDetails::class, 'index'])->name('index');
+    Route::get('/Filters', [SchoolDetails::class, 'filteredScreen'])->name('filteredScreen');
+    
+    Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
+    ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
+    ->name('SchoolDetailsByCityAndSchool');
 
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoollController@index')->name('management_school.index');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoollController@create')->name('management_school.create');
     Route::put('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@update')->name('management_school.update');
     Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@show')->name('management_school.show');
     Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@delete')->name('management_school.delete');
-
 
     Route::get('/counties', function () {
         return County::all();

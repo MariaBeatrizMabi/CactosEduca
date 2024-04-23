@@ -3,18 +3,15 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 
-
-
 export default {
   name: 'Chart',
   mounted() {
-    function createChart(div, chartData) {
 
 /* Chart code */
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-// let root = am5.Root.new("chartdiv");
-  var root = am5.Root.new(div);
+let root = am5.Root.new("chartdiv");
+
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
@@ -216,10 +213,8 @@ series4.appear(1000);
 
 chart.appear(1000, 100);
 
+},
 }
-}
-}
-
 </script>
 
 <template>

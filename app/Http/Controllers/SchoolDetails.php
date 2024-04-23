@@ -9,4 +9,15 @@ class SchoolDetails extends Controller
     public function index() {
         return view('schoolDetails');
     }
+
+    public function indexFiltered($city, $schoolName) {
+        return view('schoolDetails', [
+            'city' => $city,
+            'schoolName' => $schoolName
+        ]);
+    }
+
+    public function filteredScreen() {
+        return view('schoolDetails');
+    }
 }

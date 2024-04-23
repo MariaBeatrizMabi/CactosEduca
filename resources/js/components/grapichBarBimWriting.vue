@@ -7,19 +7,12 @@ export default {
   name: 'Chart',
   mounted() {
 
-/* Chart code */
-// Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
-let root = am5.Root.new("chartdiv");
+let root = am5.Root.new("chartdiv2");
 
-// Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-// Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
 let chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,
   panY: true,
@@ -33,13 +26,10 @@ let chart = root.container.children.push(am5xy.XYChart.new(root, {
     labelText: "{nameValue}"
   })
 }));
-// Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+
 let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", true);
 
-// Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 let xRenderer = am5xy.AxisRendererX.new(root, { 
   minGridDistance: 30, 
   minorGridEnabled: true
@@ -72,8 +62,6 @@ let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: yRenderer
 }));
 
-// Create series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 let series = chart.series.push(am5xy.ColumnSeries.new(root, {
   name: "Series 1",
   xAxis: xAxis,
@@ -170,7 +158,6 @@ series4.columns.template.adapters.add("stroke", function (stroke, target) {
   return chart.get("colors").getIndex(series4.columns.indexOf(target));
 });
 
-// Set data
 let data = [{
   nameValue: "1° Bimestre",
   value: 5,
@@ -218,7 +205,7 @@ chart.appear(1000, 100);
 </script>
 
 <template>
-  <div class="hello" id="chartdiv" ref="chartdiv">
+  <div class="hello" id="chartdiv2" ref="chartdiv">
   </div>
 </template>
 

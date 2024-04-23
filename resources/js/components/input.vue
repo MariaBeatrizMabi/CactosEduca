@@ -40,7 +40,7 @@ import { ref, defineEmits, onMounted } from 'vue';
                 <path :d="props.icon"/>
             </svg>
             <hr>
-                <input autocomplete="off" :disabled="props.disabled" v-model="props.value" :placeholder="props.placeholderValue" :type="props.typeValue">
+                <input :disabled="props.disabled" v-model="props.value" :placeholder="props.placeholderValue" :type="props.typeValue">
         </div>
     </div>
 </template>
@@ -59,7 +59,7 @@ import { ref, defineEmits, onMounted } from 'vue';
         & input {
             width: 100%;
             padding: 1rem;
-            border-radius: 0 3rem 3rem 0;
+            border-radius: 3rem;
             border: 0;
             border-left: 0;
             background-color: var(--grap-color);

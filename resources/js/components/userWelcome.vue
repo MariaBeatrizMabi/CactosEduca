@@ -1,11 +1,17 @@
 <script setup>
-
+import menuMobile from '/resources/js/components/mobileMenu.vue'
 </script>
 
 <template>
     <div class="welcome-component">
-        <p>Que bom ter você aqui, admin</p>
-        <img src="/public/assets/userIcon.png">
+    <div class="mobile-menu">
+        <menuMobile></menuMobile>
+    </div>
+
+        <div class="welcome-title">
+            <p>Que bom ter você aqui, admin</p>
+            <img src="/public/assets/userIcon.png">
+        </div>
     </div>
 </template>
 
@@ -27,5 +33,33 @@
             font-size: 18px;
             font-weight: 500;
         }
+
+        & .welcome-title{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        & .mobile-menu{
+            display: none;
+        }
     }
+
+
+@media (max-width: 900px) {
+    .welcome-component{
+        width: 100vw;
+        border-radius: 0;
+        display: flex;
+        justify-content: space-between;
+        border-top: 0 ;
+        border-left: 0 ;
+        border-right: 0 ;
+        border-bottom: 2px solid var(--secondary-color);
+
+        & .mobile-menu{
+            display: flex;
+        }
+    }
+}
 </style>

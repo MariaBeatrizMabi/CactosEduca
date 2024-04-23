@@ -28,8 +28,8 @@ class ManagementSchoollController extends Controller
     
         $school = ManagementSchooll::create([
             'name' => $request->input('name'),
+            'adress' => $request->input('adress'),
             'city' => $request->input('city'),
-            'address' => $request->input('address'),
             'acess_cod' => $request->input('acess_cod'),
             'zip_code' => $request->input('zip_code'),
             'type' => $request->input('type'),
@@ -46,8 +46,8 @@ class ManagementSchoollController extends Controller
     {
         $managementSchooll->update([
             'name' => $request->input('name'),
+            'adress' => $request->input('adress'),
             'city' => $request->input('city'),
-            'address' => $request->input('address'),
             'acess_cod' => $request->input('acess_cod'),
             'zip_code' => $request->input('zip_code'),
             'type' => $request->input('type'),

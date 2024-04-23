@@ -54,7 +54,7 @@ onMounted(async () => {
             <hr>
                 <select :disabled="props.disabled" v-model="props.value" :placeholder="props.placeholderValue" :type="props.typeValue">
                     <option value="" disabled selected>Selecione sua opção</option>
-                    <option v-for="county in counties" :key="county.name" :value="county.id">{{ county.name }}</option>
+                    <option v-for="county in counties" :key="county.name" :value="county.name">{{ county.name }}</option>
                 </select>
         </div>
     </div>

@@ -3,7 +3,8 @@ import Login from '../../resources/js/pages/login.vue';
 import Dashboard from '../../resources/js/pages/dashboard.vue';
 import ContactUs from '../../resources/js/pages/contactus.vue';
 import Management from '../../resources/js/pages/management.vue';
-import SchoolDetails from '../../resources/js/pages/Filters.vue';
+import Filters from '../../resources/js/pages/Filters.vue';
+import SchoolDetails from '../../resources/js/pages/schoolDetails.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -18,8 +19,8 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/schoolDetails',
-            component: SchoolDetails,
+            path: '/Filters',
+            component: Filters,
             meta: { requiresAuth: true }
         },
         {
@@ -35,17 +36,17 @@ const router = createRouter({
         {
             path: '/schoolDetails/:city',
             name: 'SchoolDetailsByCity',
-            component: SchoolDetails,
+            component: Filters,
             props: true,
             meta: { requiresAuth: true }
         },
         {
             path: '/schoolDetails/:city/:schoolName',
             name: 'SchoolDetailsByCityAndSchool',
-            component: SchoolDetails,
+            component: SchoolDetails, // Corrigido para apontar para o componente SchoolDetails
             props: true,
             meta: { requiresAuth: true }
-        }
+        },
     ]
 });
 
@@ -64,5 +65,6 @@ router.beforeEach((to, from, next) => {
 function isAuthenticated() {
     return true
 }
+
 
 export default router;

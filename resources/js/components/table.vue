@@ -88,7 +88,7 @@ async function ShowSchoolData(id) {
         formDataShow.value = {
             id: response.data.id,
             name: response.data.name,
-            address: response.data.address,
+            adress: response.data.adress,
             city: response.data.city,
             zip_code: response.data.zip_code,
             acess_cod: response.data.acess_cod,
@@ -150,7 +150,7 @@ async function fetchSchoolData(id) {
         formDataUpdate.value = {
             id: response.data.id,
             name: response.data.name,
-            address: response.data.address,
+            adress: response.data.adress,
             city: response.data.city,
             zip_code: response.data.zip_code,
             acess_cod: response.data.acess_cod,
@@ -255,8 +255,8 @@ onMounted(
                         />
                 </div>
                 <h2>Localização da escola</h2>
-                <div class="modal-content-address">
-                    <SelectComponent
+                <div class="modal-content-adress">
+                    <InputComponent
                         disabled="true" 
                         labelTitle="Múnicipio da escola" 
                         placeholderValue="Digite o múnicipio"  
@@ -277,8 +277,8 @@ onMounted(
                         labelTitle="Bairro" 
                         placeholderValue="Digite o bairro da escola"  
                         icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
-                        :value="formDataShow.address"
-                        @input="formDataShow.address = $event.target.value" 
+                        :value="formDataShow.adress"
+                        @input="formDataShow.adress = $event.target.value" 
                     />
             </div>
        </div>
@@ -326,7 +326,7 @@ onMounted(
                     </div>
                 </div>
                 <h2>Localização da escola</h2>
-                <div class="modal-content-address">
+                <div class="modal-content-adress">
                     <SelectComponent 
                         labelTitle="Múnicipio da escola" 
                         placeholderValue="Digite o múnicipio"  
@@ -349,8 +349,8 @@ onMounted(
                         placeholderValue="Digite o bairro da escola"  
                         icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
                         RightAction="display: none;"
-                        :value="formDataAdd.address"
-                        @input="formDataAdd.address = $event.target.value" 
+                        :value="formDataAdd.adress"
+                        @input="formDataAdd.adress = $event.target.value" 
                     />
             </div>
        </div>
@@ -397,7 +397,7 @@ onMounted(
                         />
                 </div>
                 <h2>Localização da escola</h2>
-                <div class="modal-content-address">
+                <div class="modal-content-adress">
                     <SelectComponent 
                         labelTitle="Múnicipio da escola" 
                         placeholderValue="Digite o múnicipio"  
@@ -416,8 +416,8 @@ onMounted(
                         labelTitle="Bairro" 
                         placeholderValue="Digite o bairro da escola"  
                         icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
-                        :value="formDataUpdate.address"
-                        @input="formDataUpdate.address = $event.target.value" 
+                        :value="formDataUpdate.adress"
+                        @input="formDataUpdate.adress = $event.target.value" 
                     />
             </div>
        </div>
@@ -473,11 +473,13 @@ onMounted(
     <table>
         <tr>
             <th>Nome</th>
+            <th>Endereço</th>
             <th>Código de acesso</th>
             <th>Ações</th>
         </tr>
         <tr v-for="(data, index) in formData" :key="index">
             <td> {{ data.name }}</td>
+            <td> {{ data.city }} </td>
             <td> {{ data.acess_cod }} </td>
             <td>
                 <div class="actions">
@@ -517,7 +519,7 @@ onMounted(
     width: 100%;
 }
 
-.modal-content-address {
+.modal-content-adress {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     width: 100%;

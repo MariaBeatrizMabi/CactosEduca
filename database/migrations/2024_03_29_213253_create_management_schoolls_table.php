@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('management_schoolls', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->string('city')->foreignId('name')->constrained('county');
-            $table->string('address');
+            $table->string('city', 255);
+            $table->foreignId('address')->constrained('county');
             $table->string('acess_cod')->unique();
             $table->integer('zip_code');
             $table->enum('type',['admin','admin_seduc','school','teacher']);

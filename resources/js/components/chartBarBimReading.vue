@@ -1,12 +1,12 @@
 <script setup>
-import GrapichBarBim from '/resources/js/components/grapichBarBimReading.vue';
+import GrapichBarBimReading from '/resources/js/components/grapichBarBimReading.vue';
 import PieChart from '/resources/js/components/pieChart.vue';
 
-    const props = defineProps({
-        titleGrapichCard: {
-            type: String
-        }
-    })
+const props = defineProps({
+    titleGrapichCard: {
+        type: String
+    }
+});
 </script>
 
 <template>
@@ -18,7 +18,7 @@ import PieChart from '/resources/js/components/pieChart.vue';
                 </div>
             </div>
             <div class="grapich">
-                <GrapichBarBim></GrapichBarBim>
+                <GrapichBarBimReading></GrapichBarBimReading>
             </div>
         </div>
         
