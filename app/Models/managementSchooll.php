@@ -9,7 +9,7 @@ class managementSchooll extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'adress', 'city', 'zip_code', 'acess_cod', 'password', 'type', 'user_id'];
+    protected $fillable = ['name', 'address', 'city', 'zip_code', 'acess_cod', 'password', 'type', 'user_id'];
     
     public function user() {
         return $this->belongsTo(User::class); 

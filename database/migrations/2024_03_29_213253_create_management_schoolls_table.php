@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->string('city', 255);
-            $table->foreignId('address')->constrained('county');
+            $table->string('address');
             $table->string('acess_cod')->unique();
             $table->integer('zip_code');
             $table->enum('type',['admin','admin_seduc','school','teacher']);
