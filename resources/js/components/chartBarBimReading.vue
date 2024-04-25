@@ -1,6 +1,6 @@
 <script setup>
 import GrapichBarBimReading from '/resources/js/components/grapichBarBimReading.vue';
-import PieChart from '/resources/js/components/pieChart.vue';
+import PieChart from '/resources/js/components/piechartReading.vue';
 
 const props = defineProps({
     titleGrapichCard: {

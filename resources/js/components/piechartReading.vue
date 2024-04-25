@@ -7,7 +7,7 @@ import * as am5percent from '@amcharts/amcharts5/percent'; // Importe o módulo 
 export default {
   name: 'Chart',
   mounted() {
-let root = am5.Root.new("pieWriting");
+let root = am5.Root.new("chartdivpie");
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -43,23 +43,27 @@ series.states.create("hidden", {
 // Set data
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
 series.data.setAll([{
-  nameValue: "Ortográfico",
+  nameValue: "com fluência",
   value: 5,      
   sliceColor: "#0D5413"
 }, {
-  nameValue: "Alfabético",
+  nameValue: "sem fluência",
   value: 3,
   sliceColor: "#76AA3B"
 }, {
-  nameValue: "Silábico alfabético",
+  nameValue: "Leitor de frases",
   value: 4,
   sliceColor: "#FFCB00"
 }, {
-  nameValue: "Silábico",
+  nameValue: "Leitor de palavras",
   value: 3,
   sliceColor: "#FF5C00"
 }, {
-  nameValue: "Pré-silábico",
+  nameValue: "Leitor de silábas",
+  value: 7,
+  sliceColor: "#008BD0"
+}, {
+  nameValue: "Não leitor",
   value: 8,
   sliceColor: "#FF0000"
 }]);
@@ -105,7 +109,7 @@ series.appear(1000, 100);
 </script>
 
 <template>
-  <div class="hello" id="pieWriting" ref="pieWriting">
+  <div class="hello" id="chartdivpie" ref="chartdivpie">
   </div>
 </template>
 

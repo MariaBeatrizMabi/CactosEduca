@@ -105,4 +105,12 @@ onMounted(async () => {
             }
         }
     }
+
+    @media (max-width: 700px) {
+    .input-component {
+        & select {
+            padding: 0.8rem 1rem 0.8rem 1rem;
+        }
+    }
+}
 </style>

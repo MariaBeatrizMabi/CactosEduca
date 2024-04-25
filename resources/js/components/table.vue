@@ -26,6 +26,18 @@ const props = defineProps({
     }
 })
 
+function resetForm() {
+    formDataAdd.value = {
+        name: '',
+        address: '',
+        city: '',
+        zip_code: '',
+        acess_cod: '',
+        password: '',
+        type: 'school'
+    };
+}
+
 let formData = ref({
     id: '',
     name: '',
@@ -103,22 +115,27 @@ async function ShowSchoolData(id) {
 
 
 function openModal() {
+    resetForm();
     showModal.value = true;
 }
 
 function closeModal() {
+    resetForm();
     showModalUpdated.value = false;
 }
 
 function closeModalAdd() {
+    resetForm();
     showModal.value = false;
 }
 
 function closeModalShow() {
+    resetForm(); 
     showModalData.value = false;
 }
 
 function closeModalDeleted() {
+    resetForm();
     deletedModal.value = false;
 }
 
@@ -183,7 +200,7 @@ async function updateDataForm(dataToUpdate) {
 
 async function deletedModalShow(id) {
     deletedModal.value = true;
-
+    resetForm();
     const response = await axios.get(`/ManagementSchool/${id}`);
 
     idToDeleted.value = id;
@@ -312,6 +329,7 @@ onMounted(
                         :value="formDataAdd.acess_cod"
                         RightAction="display: none;"
                         @input="formDataAdd.acess_cod = $event.target.value" 
+                        autocomplete="new-text"
                     />
                     <div class="input-password">
                         <InputComponentPassword 
@@ -473,13 +491,13 @@ onMounted(
     <table>
         <tr>
             <th>Nome</th>
-            <th>Endereço</th>
+            <th class="address">Endereço</th>
             <th>Código de acesso</th>
             <th>Ações</th>
         </tr>
         <tr v-for="(data, index) in formData" :key="index">
             <td> {{ data.name }}</td>
-            <td> {{ data.city }} </td>
+            <td class="address"> {{ data.city }} </td>
             <td> {{ data.acess_cod }} </td>
             <td>
                 <div class="actions">
@@ -788,5 +806,83 @@ tr:nth-child(even) {
             fill: rgb(255, 255, 255);            
         }
     }
+}
+
+@media (max-width: 700px) {
+.modal-content-details {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+.modal-content-address{
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.deleted-title{
+    font-size: 16px;
+}
+
+.modal-end-deleted {
+   & .close-modal-deleted {
+        margin: 1rem 0;
+        width: 70%;
+    }
+}
+
+.modal-background-deleted {
+  & .modal-content {
+    height: 35%;
+  }
+}
+
+.modal-end, .modal-end-deleted {
+    flex-direction: column;
+    align-items: center;
+        & a {
+            margin: 1rem 0;
+            display: flex;
+            align-items: end;
+            width: 70%;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        & .close-modal {
+            width: 70%;
+            margin-right: 0 !important;
+            margin: 1rem 0;
+        }
+    }
+    .address {
+    display: none;
+}
+}
+
+@media (max-width: 550px) {
+    .actions {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+
+    & .show {
+        padding: 1rem;
+    }
+
+    & .edit {
+        padding: 1rem;
+    }
+
+    & .deleted {
+        padding: 1rem;
+    }
+    }
+}
+
+.modal-background-deleted {
+  & .modal-content {
+    height: 55% !important;
+  }
 }
 </style>

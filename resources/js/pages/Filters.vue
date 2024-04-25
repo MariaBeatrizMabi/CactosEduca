@@ -71,7 +71,7 @@
                 </a>
             </div>
 
-            <ButtonComponent  v-for="(cityName, index) in city" :key="index" :TextValue="cityName" @click="showSchools(cityName)"/>        
+            <ButtonComponent v-for="(cityName, index) in city" :key="index" :TextValue="cityName" @click="showSchools(cityName)"/>        
         </div>
 
         <div v-if="schoolSelected" class="register-content">
@@ -140,4 +140,41 @@
             }
         }
     }
+
+    @media (max-width: 900px) {
+        .searcheble {
+        & .seacheble-camp{
+            width: 60% !important;
+        }
+
+        & .send-searche {
+            width: 35%;
+        }
+    }
+}
+
+@media (max-width: 500px) {
+    .school-register{
+        & .register-content{
+        padding: 0 3rem;
+        gap: 3rem;
+
+        & h1{
+            text-align: center;
+        }
+    }
+    }
+        .searcheble {
+            display: flex;
+            flex-direction: column !important;
+            margin: 0;
+        & .seacheble-camp{
+            width: 100% !important;
+        }
+
+        & .send-searche {
+            width: 100%;
+        }
+    }
+}
 </style>

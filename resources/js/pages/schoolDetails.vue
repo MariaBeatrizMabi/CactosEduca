@@ -20,90 +20,90 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
                 </a>
             </div>
             <div class="tableContent">
-   <div class="table-container">
+   <div class="table-container" style="overflow-x: auto;">
     <div class="titleTable">
         <h1>Escolas cadastrados - turma 01 | Ensino fundamental</h1>
     </div>
     <table>
         <tr>
             <th>Nome</th>
-            <th>Sexo</th>   
             <th>Matrícula</th>
-            <th>Data de matrícula</th>
-            <th>Data de nascimento</th>
-            <th>Etapa</th>
+            <th class="registration">Data de matrícula</th>
+            <th>Última Nota - Leitura</th>
+            <th>Última Nota - Escrita</th>
+            <th class="stage">Etapa</th>
         </tr>
         <tr>
             <td> ANNY BEATRYZ SANTOS </td>
-            <td> F </td>
             <td> 3113 </td>
-            <td> 04/01/2024 </td>
-            <td> 13/09/2017 </td>
-            <td> 1° ano </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> leitor de silabas </td>
+            <td> pré-silábico </td>
+            <td class="stage"> 1° ano </td>
         </tr>
         <tr>
             <td> GABRIEL SCHNEIDER COGO </td>
-            <td> M </td>
             <td> 3114 </td>
-            <td> 04/01/2024 </td>
-            <td> 06/11/2017 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> leitor de palavras </td>
+            <td> silábico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> JOÃO MIGUEL FRAGA DA SILVA </td>
-            <td> M </td>
             <td> 3115 </td>
-            <td> 04/01/2024 </td>
-            <td> 15/08/2017 </td>
-            <td> 1° ano </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> não leitor </td>
+            <td> Pré-silábico </td>
+            <td class="stage"> 1° ano </td>
         </tr>
         <tr>
             <td> LUIZ FERNANDO NUNES DA SILVA  </td>
-            <td> M </td>
             <td> 3117 </td>
-            <td> 04/01/2024 </td>
-            <td> 29/04/2017 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> leitor de texto sem fluência </td>
+            <td> alfabético </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> PAULO DANIEL DE SOUZA  </td>
-            <td> M </td>
             <td> 3118 </td>
-            <td> 04/01/2024 </td>
-            <td> 23/10/2017 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> leitor de texto sem fluência </td>
+            <td> silábico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> VANDENBERG ENZO DE SOUZA PEREIRA  </td>
-            <td> M </td>
             <td> 3119 </td>
-            <td> 04/01/2024 </td>
-            <td> 02/06/2017 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 04/01/2024 </td>
+            <td> leitor de texto com fluência </td>
+            <td> ortográfico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> GABRIEL DA ROCHA BROCOLI </td>
-            <td> M </td>
             <td> 3237 </td>
-            <td> 08/02/2024 </td>
-            <td> 13/11/2016 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 08/02/2024 </td>
+            <td> leitor de texto sem fluência </td>
+            <td> ortográfico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> MARIA VITORIA DE ALENCAR SILVA </td>
-            <td> F </td>
             <td> 3241 </td>
-            <td> 14/02/2024 </td>
-            <td> 21/10/2017 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 14/02/2024 </td>
+            <td> leitor de texto com fluência </td>
+            <td> ortográfico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
         <tr>
             <td> MIGUEL AMADEUS DA SILVA BOEING </td>
-            <td> M </td>
             <td> 3313 </td>
-            <td> 14/03/2024 </td>
-            <td> 22/03/2018 </td>
-            <td> 1° ano  </td>
+            <td class="registration"> 14/03/2024 </td>
+            <td> não leitor </td>
+            <td> pré-silábico </td>
+            <td class="stage"> 1° ano  </td>
         </tr>
     </table>
    </div>
@@ -118,7 +118,7 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
     </div>
 </template>
 
-<style>
+<style scoped>
 .dashboard {
     display: flex;
 
@@ -169,4 +169,37 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
         }
     }
 
+@media (max-width: 1270px){
+    .cards{
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .titleTable{
+        font-size: 9px;
+    }
+
+    .stage, .registration {
+        display: none;
+    }
+}
+
+
+@media (max-width: 550px) {
+        .searcheble {
+            display: flex;
+            flex-direction: column !important;
+            margin: 2rem 0;
+        & .seacheble-camp{
+            width: 100% !important;
+        }
+
+        & .send-searche {
+            width: 100%;
+        }
+    }
+}
 </style>

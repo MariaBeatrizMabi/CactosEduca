@@ -13,21 +13,21 @@
 </script>
 
 <template>
-    <div class="modal-background">
+    <div class="modal-background-deleted">
         <div class="modal-content">
             <div class="modal-title">
-                <h1>{{ props.Titlevalue }}</h1>
+                <h1>TESTE</h1>
                 <hr>
             </div>
             <div class="modal-body">
-                <slot></slot>
+                <h1>TESTE</h1>
             </div>
         </div>
     </div>
 </template>
 
-<style>
-    .modal-background {
+<style >
+    .modal-background-deleted {
         left: 0 !important;
         top: 0 !important;
 
@@ -48,19 +48,20 @@
             display: flex;
             flex-direction: column;
             background-color: white;
+            height: 20%;
             width: 70%;
-            border-radius: 5rem 5rem;
+            border-radius: 5rem;
 
             & .modal-title {
                 width: 100%;
                 padding: 0.5rem 0;
                 text-align: center;
                 & h1 {
-                    color: var(--primary-color);
+                    color: var(--black-color);
                     margin: 1rem 0;
                 }
                 & hr {
-                    background-color: var(--primary-color);
+                    background-color: var(--black-color);
                     height: 2px;
                     border: 0;
                 }
@@ -70,18 +71,11 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin: 2rem 0 0 0;
-                height: 100%;
-                width: 100%;
+                margin: 0 !important;
                 background-color: white;
-                border-radius:  0 0 5rem 5rem;
+                border-radius: 0 0 5rem 5rem;
+                width: 100%;
         }
     }
-}
-
-.modal-background {
-  & .modal-content {
-    width: 90%;
-  }
 }
 </style>

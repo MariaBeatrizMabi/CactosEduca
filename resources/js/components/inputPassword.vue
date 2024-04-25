@@ -100,4 +100,12 @@ function togglePasswordVisibility() {
             border: 1px solid var(--primary-color);
         }
     }
+
+    @media (max-width: 700px) {
+    .input-component {
+        & input {
+            padding: 0.8rem 1rem 0.8rem 1rem;
+        }
+    }
+}
 </style>

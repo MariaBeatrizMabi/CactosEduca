@@ -62,4 +62,16 @@ import menuMobile from '/resources/js/components/mobileMenu.vue'
         }
     }
 }
+
+@media (max-width: 470px) {
+    .welcome-component {
+        padding: 1rem;
+        & p {
+            font-size: 14px;
+        }
+        & img {
+            width: 24px;
+        }
+    }
+}
 </style>

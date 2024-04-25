@@ -14,10 +14,10 @@ import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
         <UserWelcomeComponet class="welcome-component"></UserWelcomeComponet>
             <TitleComponent title="Análise Geral"/>
             <div class="Cards-container">
-                <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" valueCard="1030" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="1.566"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" valueCard="1.932"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" valueCard="3.455"></CardComponent>
+                <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" valueCard="120" :ref="CardValue"></CardComponent>
+                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="253"></CardComponent>
+                <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" valueCard="310"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" valueCard="1.021"></CardComponent>
             </div>
 
             <TitleComponent title="Escolas Cadastradas"/>
@@ -32,18 +32,20 @@ import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
 
 <style scoped>
 .dashboard {
+    height: 100vh;
     display: flex;
 
     & .dashboard-content{
         display: flex;
         align-items: center;
+        margin: 7rem 0 0 0;
         width: 100%;
         flex-direction: column;
 
         & .Cards-container {
+            width: 90%;
             display: flex;
             margin: 3rem 0;
-            width: 90vw;
             justify-content: space-evenly;
         }
     }

@@ -32,7 +32,7 @@ import TitleComponent from '../components/title.vue'
                 </svg>
                 Acesse clicando aqui: <a href="https://editoracactos.com.br/">Cactus Educa</a></p>
 
-              <h4>A Cactus editora agradeçe seu contato.  </h4>
+              <h4>A Cactos editora agradeçe seu contato.  </h4>
             </div>
             <img src="/public/assets/AnimateGroupGif.gif">
 
@@ -42,7 +42,7 @@ import TitleComponent from '../components/title.vue'
     </div>
   </template>
 
-<style>
+<style scoped>
 .contact-section {
   display: flex;
   height: 100vh;
