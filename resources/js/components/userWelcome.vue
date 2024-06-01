@@ -1,5 +1,22 @@
 <script setup>
-import menuMobile from '/resources/js/components/mobileMenu.vue'
+import menuMobile from '/resources/js/components/mobileMenu.vue';
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
+
+const acess_cod = ref('');
+
+const getUser = () => {
+    axios.get('/loginUser').then(response => {   
+        acess_cod.value = response.data.name;
+    }).catch(error => {
+        console.log("ERROR");
+    });
+}
+
+onMounted(() => {
+    getUser()
+})
+
 </script>
 
 <template>
@@ -9,7 +26,7 @@ import menuMobile from '/resources/js/components/mobileMenu.vue'
     </div>
 
         <div class="welcome-title">
-            <p>Que bom ter você aqui, admin</p>
+            <p>Que bom ter você aqui, {{ acess_cod }}</p>
             <img src="/public/assets/userIcon.png">
         </div>
     </div>

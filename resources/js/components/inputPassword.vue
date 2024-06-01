@@ -51,7 +51,7 @@ function togglePasswordVisibility() {
     .input-component {
         display: flex;
         flex-direction: column;
-
+        width: 100%;
         & label {
             font-size: 14px;
             margin-bottom: 3px;

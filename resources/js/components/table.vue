@@ -882,7 +882,7 @@ tr:nth-child(even) {
 
 .modal-background-deleted {
   & .modal-content {
-    height: 55% !important;
+    height: 50% !important;
   }
 }
 </style>

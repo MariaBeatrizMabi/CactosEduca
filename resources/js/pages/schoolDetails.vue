@@ -110,10 +110,10 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
 
     </div>
             <UserWelcomeComponet class="welcome-component"></UserWelcomeComponet>
-            <TitleComponent title="Análise geral média escolas - Leitura"/>
-            <ChartBarBimReading titleGrapichCard="Nível geral das escolas - Leitura" />
-            <TitleComponent title="Análise geral média escolas - Escrita"/>
-            <ChartBarBimWriting titleGrapichCard="Nível geral das escolas - Leitura" />
+            <TitleComponent title="Análise geral média turmas - Leitura"/>
+            <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
+            <TitleComponent title="Análise geral média turmas - Escrita"/>
+            <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
         </div>
     </div>
 </template>

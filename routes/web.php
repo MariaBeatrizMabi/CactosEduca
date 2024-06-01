@@ -50,4 +50,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Auth::logout();
         return redirect('/');
     })->name('logout');
+
+    Route::get('/loginUser', 'App\Http\Controllers\LoginController@GetAuth')->name('GetAuth');
 });

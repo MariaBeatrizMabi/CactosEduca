@@ -7,19 +7,13 @@ export default {
   name: 'Chart',
   mounted() {
 
-/* Chart code */
-// Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 let root = am5.Root.new("chartdiv");
 
-// Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-// Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+
 let chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,
   panY: true,
@@ -33,10 +27,9 @@ let chart = root.container.children.push(am5xy.XYChart.new(root, {
     labelText: "{nameValue}"
   })
 }));
-// Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+
 let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
-cursor.lineY.set("visible", true);
+cursor.lineY.set("visible", false);
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/

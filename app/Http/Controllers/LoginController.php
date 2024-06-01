@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // Importe a classe Hash
+use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -22,6 +23,15 @@ class LoginController extends Controller
                     return response()->json(['success' => true, 'type' => $login->type, 'redirect' => '/dashboard']);
                 }
             }
+        }
+
+        return response()->json(['success' => false], 401);
+    }
+
+    public function GetAuth(Request $request) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            return response()->json(['success' => true, 'name' => $user->user_name, 'type' => $user->type]);
         }
 
         return response()->json(['success' => false], 401);

@@ -1,7 +1,7 @@
 <script setup>
 import GrapichBarBimWriting from '/resources/js/components/grapichBarBimWriting.vue';
 import PieChart from '/resources/js/components/piechartWriting.vue';
-
+import Subtitle from './subtitleGrapichWriting.vue';
     const props = defineProps({
         titleGrapichCard: {
             type: String
@@ -19,6 +19,7 @@ import PieChart from '/resources/js/components/piechartWriting.vue';
             </div>
             <div class="grapich">
                 <GrapichBarBimWriting></GrapichBarBimWriting>
+                <Subtitle></Subtitle>
             </div>
         </div>
         
@@ -30,6 +31,7 @@ import PieChart from '/resources/js/components/piechartWriting.vue';
             </div>
             <div class="grapich">
                 <PieChart></PieChart>
+                <Subtitle></Subtitle>
             </div>
         </div>
     </div>  
@@ -70,6 +72,7 @@ import PieChart from '/resources/js/components/piechartWriting.vue';
         & .grapich {
             width: 100%;
             display: flex;
+            flex-direction: column;
             padding: 1rem;
             border-radius: 0 0 1rem 1rem;
             background-color: white;
@@ -105,6 +108,7 @@ import PieChart from '/resources/js/components/piechartWriting.vue';
             width: 100%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             padding: 1rem;
             border-radius: 0 0 1rem 1rem;
             background-color: white;
@@ -122,5 +126,4 @@ import PieChart from '/resources/js/components/piechartWriting.vue';
        
     }
 }
-
 </style>

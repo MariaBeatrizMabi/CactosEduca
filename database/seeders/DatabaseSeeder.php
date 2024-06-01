@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create([
             'user_name' => 'Admin',
-            'acess_cod' => 'adminCactusEduca',
+            'acess_cod' => 'CactosAdmin',
             'type' => 'admin',
             'password' => bcrypt('12345678') 
         ]);

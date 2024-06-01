@@ -25,7 +25,7 @@ import('/public/assets/' + props.imageCard).then(image => {
 </script>
 
 <template>
-    <div class="">
+    <div class="card">
         <div class="card-content">
             <div class="gif-spot">
                 <img :src="imageSrc" class="gif" alt="">
@@ -44,7 +44,9 @@ import('/public/assets/' + props.imageCard).then(image => {
         flex-direction: column;
 
         background-color: var(--grap-color);
-        padding: 3rem;
+        padding: 3rem 0;
+        width: 18rem;
+        max-width: 18rem;
 
         background-image: url('/public/assets/cardDetail.png');
         background-repeat: no-repeat;

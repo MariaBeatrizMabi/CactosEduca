@@ -7,6 +7,7 @@ const password = ref('');
 const router = useRouter(); 
 import InputComponentPassword from '../components/inputPassword.vue'
 
+const showWrongMessage = ref(false); 
 
 const login = () => {
     axios.post('/login', {
@@ -15,21 +16,27 @@ const login = () => {
     }).then(response => {   
         console.log('Tipo de usuário:', response.data.type);
         if (response.data.type === 'admin') {
-            console.log("Olá admin")
-            router.push('/dashboard'); // Redirecionar para a rota de admin
-
+            router.push('/dashboard'); 
         }
         else if (response.data.type === 'admin_seduc') {
             console.log("Olá seduc")
         }
         else if (response.data.type === 'teacher') {
+            router.push('/dashboard'); 
             console.log("Olá professor")
         }
         else if (response.data.type === 'school') {
+            router.push('/dashboard'); 
             console.log("Olá escola")
-        }
+        } 
     }).catch(error => {
-        console.error('Credenciais inválidas', error);
+        if (acess_cod.value === '') {
+            console.log("Digite um código de acesso")
+        }  else if (password.value === '') {
+            console.log("Digite uma senha")
+        } else {
+            showWrongMessage.value = true;
+        }
     });
 }
 </script>
@@ -53,16 +60,17 @@ const login = () => {
                                         <path fill="#0d5413" d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/>
                                     </svg>
                                     <hr>
-                                    <input v-model="acess_cod" placeholder="Digite o seu usuário" type="text">                                    </div>
+                                    <input v-model="acess_cod" placeholder="Digite o seu usuário" type="text" required>                                    </div>
 
                                 <label class="label-passworld" for="password">Senha:</label>
                                 <div class="icon-password">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                     <path fill="#0d5413" d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></svg>
                                     <hr>
-                                        <input v-model="password" placeholder="Digite a sua senha" type="password">
+                                        <input v-model="password" placeholder="Digite a sua senha" type="password" required>
                                     </div>
                             </div>
+                                <h5 class="text-red" :class="{'wrong-acess': true, 'hidden': !showWrongMessage}">Usuário ou senha incorreto</h5>
                             <button class="button-submit-login" type="submit" >Entrar</button>
                     </div>
                 </form>
@@ -72,7 +80,6 @@ const login = () => {
             <div class="container">
                 <div class="content">
                         <img class="wave-right-top" src="/public/assets/waveRightTop.svg">
-
                     <div class="description">
                         <h1>Tenha acesso à análise dos dados de diversos alunos e contribua para a melhoria de seu desempenho.</h1>
                         <img class="image-animate" src="/public/assets/animate.gif" alt="" srcset="">
@@ -89,6 +96,10 @@ const login = () => {
 </template>
 
 <style scoped>
+    .text-red {
+        color: red;
+    }
+
     .content {
         width: 100vw;
         height: 100vh;
@@ -378,4 +389,7 @@ const login = () => {
     }
 }
 
+.hidden {
+    display: none;
+}
 </style>

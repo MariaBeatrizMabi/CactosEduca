@@ -48,7 +48,7 @@ import { ref, defineEmits, onMounted } from 'vue';
     .input-component {
         display: flex;
         flex-direction: column;
-
+        
         & label {
             font-size: 14px;
             margin-bottom: 3px;
