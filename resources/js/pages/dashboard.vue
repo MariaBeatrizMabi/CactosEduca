@@ -7,20 +7,68 @@ import CardComponent from '/resources/js/components/card.vue';
 import CardgrapichComponent from '/resources/js/components/cardGraphic.vue';
 import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
 
-const userType = ref('');
+const userType = ref({
+    id: null,
+    type: '',
+});
 
-const getUserType = () => {
-    axios.get('/loginUser').then(response => {
-        userType.value = response.data.type;
-    }).catch(error => {
-        console.log("ERROR", error);
-    });
+const filteredTeachers = ref([]);
+const TeacherCount = ref([]);
+const SchoolCount = ref([]);
+const teachers = ref([]);
+const school = ref([]);
+
+const getUserType = async () => {
+    try {
+        const response = await axios.get('/loginUser');
+        userType.value.type = response.data.type;
+        userType.value.id = response.data.id;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
 }
 
-onMounted(() => {
-    getUserType();
+const fetchTeachers = async () => {
+    try {
+        const response = await axios.get('/Teachers');
+        teachers.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+const fetchSchool = async () => {
+    try {
+        const response = await axios.get('/ManagementSchool');
+        school.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+const countTeachersBySchoolId = () => {
+    return teachers.value.filter(teacher => teacher.school_id === userType.value.id);
+}
+
+const countAllTeachers = () => {
+    return teachers.value.length;
+}
+
+const countAllSchool = () => {
+    return school.value.length;
+}
+
+onMounted(async () => {
+    await getUserType();
+    await fetchTeachers();
+    await fetchSchool()
+    SchoolCount.value = countAllSchool();
+    TeacherCount.value = countAllTeachers();
+    filteredTeachers.value = countTeachersBySchoolId();
 });
+
 </script>
+
 
 <template>
     <div class="dashboard">
@@ -29,20 +77,20 @@ onMounted(() => {
         <UserWelcomeComponet class="welcome-component"></UserWelcomeComponet>
             <TitleComponent title="Análise Geral"/>
             
-            <div class="Cards-container" v-if="userType === 'admin'">
-                <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" valueCard="120" :ref="CardValue"></CardComponent>
+            <div class="Cards-container" v-if="userType.type === 'admin'">
+                <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" :valueCard="SchoolCount" :ref="CardValue"></CardComponent>
                 <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="253"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" valueCard="310"></CardComponent>
+                <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" :valueCard="TeacherCount"></CardComponent>
                 <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" valueCard="1.021"></CardComponent>
             </div>
 
-            <div class="Cards-container" v-else-if="userType === 'school'">
+            <div class="Cards-container" v-else-if="userType.type === 'school'">
                 <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="120" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Professores Cadastrados" valueCard="253"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Professores Cadastrados"  :valueCard="filteredTeachers.length"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Alunos Cadastradas" valueCard="1.021"></CardComponent>
             </div>
 
-            <div class="Cards-container" v-else-if="userType === 'teacher'">
+            <div class="Cards-container" v-else-if="userType.type === 'teacher'">
                 <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="120" :ref="CardValue"></CardComponent>
                 <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" valueCard="253"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Meus Alunos" valueCard="1.021"></CardComponent>
@@ -52,17 +100,17 @@ onMounted(() => {
                 <CardComponent imageCard="teacher.gif" titleCard="Usuário não encontrado" valueCard="0"></CardComponent>
             </div>
 
-            <div class="fullWidth" v-if="userType === 'admin'">
+            <div class="fullWidth" v-if="userType.type === 'admin'">
                 <TitleComponent title="Escolas Cadastradas"/>
                 <CardgrapichComponent titleGrapichCard="Cadastrados Por Múnicipio" ></CardgrapichComponent>
             </div>
 
-            <div class="fullWidth" v-if="userType === 'school'">
+            <div class="fullWidth" v-if="userType.type === 'school'">
                 <TitleComponent title="Escolas Cadastradas"/>
                 <CardgrapichComponent titleGrapichCard="Alunos por turmas" ></CardgrapichComponent>
             </div>
 
-            <div class="fullWidth" v-if="userType === 'teacher'">
+            <div class="fullWidth" v-if="userType.type === 'teacher'">
                 <!-- <TitleComponent title="Escolas Cadastradas"/> -->
                 <!-- <CardgrapichComponent titleGrapichCard="Alunos por turma" ></CardgrapichComponent> -->
             </div>

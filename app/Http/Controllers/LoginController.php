@@ -31,7 +31,7 @@ class LoginController extends Controller
     public function GetAuth(Request $request) {
         if (Auth::check()) {
             $user = Auth::user();
-            return response()->json(['success' => true, 'name' => $user->user_name, 'type' => $user->type]);
+            return response()->json(['success' => true, 'id' => $user->id, 'name' => $user->user_name, 'type' => $user->type]);
         }
 
         return response()->json(['success' => false], 401);

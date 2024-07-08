@@ -1,12 +1,29 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import Grapich from '/resources/js/components/grapich.vue';
 import PieChart from '/resources/js/components/pieChart.vue';
 
-    const props = defineProps({
-        titleGrapichCard: {
-            type: String
-        }
-    })
+const userType = ref('');
+
+const props = defineProps({
+    titleGrapichCard: {
+        type: String
+    }
+});
+
+const getUserType = () => {
+    axios.get('/loginUser').then(response => {
+        userType.value = response.data.type;
+    }).catch(error => {
+        console.log("ERROR", error);
+    });
+}
+
+onMounted(() => {
+    getUserType();
+});
+    
 </script>
 
 <template>
@@ -22,7 +39,7 @@ import PieChart from '/resources/js/components/pieChart.vue';
             </div>
         </div>
         
-        <div class="card-grapich">
+        <div class="card-grapich" v-if="userType === 'admin'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -30,6 +47,39 @@ import PieChart from '/resources/js/components/pieChart.vue';
             </div>
             <div class="grapich">
                 <PieChart></PieChart>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-else-if="userType === 'school'">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <PieChart></PieChart>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-else-if="userType === 'teacher'">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <PieChart></PieChart>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-else>
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <h1 class="user-not-Found">Tipo de usuário não encontrado</h1>
             </div>
         </div>
     </div>  

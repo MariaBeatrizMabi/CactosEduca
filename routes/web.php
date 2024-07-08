@@ -42,6 +42,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@show')->name('management_school.show');
     Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@delete')->name('management_school.delete');
 
+    Route::get('/Teachers', 'App\Http\Controllers\TeacherController@index')->name('teacher');
+    Route::get('/Teachers/{id}', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');
+    Route::post('/TeacherCreate', 'App\Http\Controllers\TeacherController@create')->name('teacher.create');
+    Route::put('/Teachers/{id}', 'App\Http\Controllers\TeacherController@update')->name('teacher.update');
+    Route::delete('/Teachers/{id}', 'App\Http\Controllers\TeacherController@delete')->name('teacher.delete');
+
     Route::get('/counties', function () {
         return County::all();
     });

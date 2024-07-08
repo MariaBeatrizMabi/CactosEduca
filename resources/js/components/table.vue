@@ -179,7 +179,6 @@ async function fetchSchoolData(id) {
         console.error(error);
     }
 }
-
  
 async function updateDataForm(dataToUpdate) {
     const id = idToUpdate.value; 
@@ -229,7 +228,6 @@ async function deleted() {
         console.error(error)
     }
 }
-
 
 onMounted(
     isLoading.value = true,
@@ -684,7 +682,6 @@ onMounted(
 .showModalInfo {
     display: flex;
     align-items: end;
-    width: 13rem;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
     justify-content: center;
@@ -880,9 +877,9 @@ tr:nth-child(even) {
     }
 }
 
-.modal-background-deleted {
+/* .modal-background-deleted {
   & .modal-content {
     height: 50% !important;
   }
-}
+} */
 </style>

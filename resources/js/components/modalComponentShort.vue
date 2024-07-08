@@ -30,7 +30,8 @@
     .modal-background-deleted {
         left: 0 !important;
         top: 0 !important;
-
+        z-index: 1;
+        
         margin: 0 auto !important;
 
         position: absolute !important;

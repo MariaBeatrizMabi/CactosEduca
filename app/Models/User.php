@@ -15,6 +15,7 @@ class User extends Authenticatable
     protected $table = 'users';
 
     protected $fillable = [
+        'id',
         'user_name',
         'acess_cod',
         'type',
@@ -32,12 +33,12 @@ class User extends Authenticatable
     ];
 
     public function school() {
-        return $this->belongsTo(ManagementSchooll::class, 'id');
+        return $this->belongsTo(managementSchooll::class, 'id');
     }
     
     public function managementSchools()
     {
-        return $this->hasMany(ManagementSchooll::class, 'user_id');
+        return $this->hasMany(managementSchooll::class, 'user_id');
     }
 
     protected static function boot()

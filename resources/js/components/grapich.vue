@@ -13,7 +13,6 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-
 let chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,
   panY: true,
@@ -31,8 +30,6 @@ let chart = root.container.children.push(am5xy.XYChart.new(root, {
 let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false);
 
-// Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 let xRenderer = am5xy.AxisRendererX.new(root, { 
   minGridDistance: 30, 
   minorGridEnabled: true
@@ -65,8 +62,6 @@ let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: yRenderer
 }));
 
-// Create series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 let series = chart.series.push(am5xy.ColumnSeries.new(root, {
   name: "Series 1",
   xAxis: xAxis,
@@ -90,7 +85,6 @@ series.columns.template.adapters.add("stroke", function (stroke, target) {
   return chart.get("colors").getIndex(series.columns.indexOf(target));
 });
 
-// Set data
 let data = [{
   nameValue: "Fortaleza",
   value: 5

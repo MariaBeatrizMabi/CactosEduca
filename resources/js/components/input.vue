@@ -1,6 +1,4 @@
 <script setup>
-import { ref, defineEmits, onMounted } from 'vue';
-
     const props = defineProps({
         labelTitle: {
             type: String,
