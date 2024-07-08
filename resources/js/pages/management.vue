@@ -452,7 +452,7 @@ onMounted(() => {
             <TitleComponent title="Cadastro de Professores" />
             <TableSchoolComponent 
             TitleValue="Cadastrados" 
-            :TableHeader="['Professor', 'Acesso']"
+            :TableHeader="['id', 'Professor', 'Acesso']"
             :TableContent="formDataPreview"
             :TableActions="true"
             :TableActionVisibility="true"
