@@ -9,12 +9,11 @@
             required: true
         }
     })
-
 </script>
 
 <template>
     <div class="modal-background-deleted">
-        <div class="modal-content">
+        <div class="modal-content-deleted">
             <div class="modal-title">
                 <h1>{{ props.Titlevalue }}</h1>
                 <hr>
@@ -45,11 +44,10 @@
         justify-content: center;
         align-items: center;
         
-        & .modal-content{
+        & .modal-content-deleted{
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 20%;
             width: 70%;
             border-radius: 5rem;
 

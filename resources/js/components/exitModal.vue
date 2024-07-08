@@ -13,8 +13,8 @@
 </script>
 
 <template>
-    <div class="modal-background-deleted">
-        <div class="modal-content">
+    <div class="modal-background-exit">
+        <div class="modal-content-exit">
             <div class="modal-title">
                 <h1>TESTE</h1>
                 <hr>
@@ -27,7 +27,7 @@
 </template>
 
 <style >
-    .modal-background-deleted {
+    .modal-background-exit {
         left: 0 !important;
         top: 0 !important;
 
@@ -44,11 +44,11 @@
         justify-content: center;
         align-items: center;
         
-        & .modal-content{
+        & .modal-content-exit{
             display: flex;
             flex-direction: column;
             background-color: white;
-            height: 20%;
+            /* height: 20%; */
             width: 70%;
             border-radius: 5rem;
 
@@ -78,4 +78,5 @@
         }
     }
 }
+
 </style>

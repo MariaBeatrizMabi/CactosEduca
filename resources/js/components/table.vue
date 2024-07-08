@@ -876,10 +876,4 @@ tr:nth-child(even) {
     }
     }
 }
-
-/* .modal-background-deleted {
-  & .modal-content {
-    height: 50% !important;
-  }
-} */
 </style>
