@@ -5,7 +5,7 @@ import MenuComponent from '../components/menu.vue';
 import TitleComponent from '../components/title.vue';
 import userWelcomeComponent from '../components/userWelcome.vue';
 import TableComponent from '../components/table.vue';
-import TableSchoolComponent from '../components/tableSchool.vue';
+import tableComponentComponent from '../components/tableComponent.vue';
 
 import ModalComponent from '../components/modal.vue'
 import InputComponent from '../components/input.vue'
@@ -18,6 +18,7 @@ const emit = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
 const userType = ref('');
 const userID = ref('');
 const showModalCreation = ref(false);
+const ShowModalClassCreation = ref(false);
 const isLoading = ref(false);
 
 const showModalData = ref();
@@ -35,11 +36,18 @@ const formDataAdd = ref({
     type: 'teacher'
 })
 
-let formDataPreview = ref({
+let formDataTeachersPreview = ref({
     id: '',
     name: '',
     acess_cod: '',
     password: '',
+})
+
+let formDataClassPreview = ref({
+    id: '',
+    name: '',
+    acess_cod: '',
+    password: '',  
 })
 
 let formDataVisualize = ref({
@@ -56,10 +64,12 @@ let formDataUpdate = ref({
     password: '',
 })
 
-const OpenModalCreation = () => {
+const OpenModalTeachersCreation = () => {
     showModalCreation.value = true;
-    if (showModalCreation.value) {
-    }
+};
+
+const OpenModalClassCreation = () => {
+    ShowModalClassCreation.value = true;
 };
 
 function resetForm() {
@@ -92,15 +102,31 @@ const getUserType = () => {
     });
 }
 
-async function getTableData() {
+async function getTableTeacherData() {
     try {
         const response = await axios('/Teachers');
 
-        formDataPreview.value = response.data.map(take => ({
+        formDataTeachersPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
             acess_cod: take.acess_cod,
         }));
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getTableClassData() {
+    try {
+        const response = await axios('/ClassSchool');
+
+        formDataClassPreview.value = response.data.map(take => ({
+            id: take.id,
+            name: take.name,
+            acess_cod: take.acess_cod,
+        }));
+
     } catch (error) {
         console.error(error);
     }
@@ -111,7 +137,25 @@ async function submitForm() {
         isLoading.value = true;  
         await axios.post('/TeacherCreate', formDataAdd.value);
         
-        getTableData()
+        getTableTeacherData()
+        
+        ShowModalClassCreation.value = false;
+
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 800);
+    } catch (error) {
+        console.error(error)
+        isLoading.value = false;
+    }
+}
+
+async function submitFormClass() {
+    try {
+        isLoading.value = true;  
+        await axios.post('/ClassCreate', formDataAdd.value);
+        
+        getTableClassData();
         
         showModalCreation.value = false;
 
@@ -124,7 +168,7 @@ async function submitForm() {
     }
 }
 
-async function ShowSchoolData(id) {
+async function ShowSchoolTeachersData(id) {
     showModalData.value = true;
     try {
         const response = await axios.get(`/Teachers`);
@@ -148,23 +192,7 @@ async function ShowSchoolData(id) {
     }
 }
 
-// async function updateDataForm(dataToUpdate) {
-//     const id = idToUpdate.value; 
-//     try {
-//         showModalUpdated.value = false;
-//         isLoading.value = true;
-    
-//         getTableData() 
-    
-//         setTimeout(() => {
-//             isLoading.value = false;
-//         }, 800);
-//     } catch (error) {
-//         console.error(error);
-//     }
-// }
-
-async function UpdateSchoolData(id) {
+async function UpdateSchoolTeachersData(id) {
     updateModalData.value = true;
     try {
         const response = await axios.get(`/Teachers/${id}`);
@@ -199,7 +227,7 @@ async function updateDataForm() {
         updateModalData.value = false;
         isLoading.value = true;
 
-        getTableData(); 
+        getTableTeacherData(); 
 
         setTimeout(() => {
             isLoading.value = false;
@@ -209,7 +237,7 @@ async function updateDataForm() {
     }
 }
 
-async function deletedModalShow(id) {
+async function deletedModalTeachersShow(id) {
     deletedModal.value = true;
     resetForm();
     try {
@@ -236,7 +264,7 @@ async function deleted() {
         isLoading.value = true;
         console.log(response);
 
-        getTableData()
+        getTableTeacherData()
         setTimeout(() => {
             isLoading.value = false;
         }, 800);
@@ -270,7 +298,8 @@ function closeModalUpdated() {
 
 onMounted(() => {
     getUserType();
-    getTableData();
+    getTableTeacherData();
+    getTableClassData();
 });
 </script>
 
@@ -419,6 +448,45 @@ onMounted(() => {
             </div>
         </ModalComponent>
 
+        <ModalComponent v-if="ShowModalClassCreation" Titlevalue="Cadastro de turmas">
+            <div class="modal-body-size">
+                <h2>Detalhes sobre a turma</h2>
+                <div class="modal-content-details">
+                    <InputComponent 
+                        labelTitle="Nome da turma" 
+                        placeholderValue="Nome da turma"  
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        :value="formDataAdd.name"
+                        typeValue="text"
+                        @input="formDataAdd.name = $event.target.value" 
+                   />
+                   <InputComponent 
+                        labelTitle="Professor responsável da turma" 
+                        placeholderValue="Professor responsável da turma"  
+                        icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
+                        :value="formDataAdd.acess_cod"
+                        RightAction="display: none;"
+                        @input="formDataAdd.acess_cod = $event.target.value" 
+                        autocomplete="new-text"
+                    />
+                </div>
+       </div>
+       <div class="modal-end">
+                <a class="close-modal" @click="closeModalAdd()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <a class="school-add" @click="submitFormClass()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                    </svg>
+                    Cadastrar Turma
+                </a>
+            </div>
+        </ModalComponent>
+
         <ModalComponentDeleted v-if="deletedModal" Titlevalue="Apagar professor">
     <h1 class="deleted-title">
         Você realmente deseja apagar o professor<strong>{{ formDataVisualize.name }}</strong>? Esta é uma ação permanente que não poderá ser desfeita
@@ -438,8 +506,6 @@ onMounted(() => {
         </a>
     </div>
 </ModalComponentDeleted>
-
-
         <userWelcomeComponent />
         <MenuComponent />
 
@@ -450,38 +516,41 @@ onMounted(() => {
 
         <div class="register-content" v-else-if="userType === 'school'">
             <TitleComponent title="Cadastro de Professores" />
-            <TableSchoolComponent 
+            <tableComponentComponent 
             TitleValue="Cadastrados" 
-            :TableHeader="['id', 'Professor', 'Acesso']"
-            :TableContent="formDataPreview"
+            :TableHeader="['Professor', 'Acesso']"
+            :TableContent="formDataTeachersPreview"
             :TableActions="true"
             :TableActionVisibility="true"
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Professor'"
-            :OpenAddModal="OpenModalCreation"
-            @viewDetails="ShowSchoolData"
-            @updateAction="UpdateSchoolData"
-            @deletedAction="deletedModalShow"
-        ></TableSchoolComponent>
-        </div>
+            :OpenAddModal="OpenModalTeachersCreation"
+            @viewDetails="ShowSchoolTeachersData"
+            @updateAction="UpdateSchoolTeachersData"
+            @deletedAction="deletedModalTeachersShow"
+        ></tableComponentComponent>
+
+        <TitleComponent title="Cadastro de Turmas"/>
+        <tableComponentComponent 
+            TitleValue="Cadastrados" 
+            :TableHeader="['Turma', 'Professor responsável']"
+            :TableContent="formDataClassPreview"
+            :TableActions="true"
+            :TableActionVisibility="true"
+            :TableAddButton="true"
+            :ButtonTitle="'Adicionar Turma'"
+            :OpenAddModal="OpenModalClassCreation"
+            @viewDetails="ShowSchoolTeachersData"
+            @updateAction="UpdateSchoolTeachersData"
+            @deletedAction="deletedModalTeachersShow"
+        ></tableComponentComponent>
     </div>
+   
+    </div>
+
 </template>
 
 <style scoped>
-    .school-register{
-        display: flex;
-        height: 100vh;
-        width: 100%;
-
-        & .register-content {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 8rem 0;
-        }
-    }
-    
     .modal-background {
         z-index: 9999;
     }

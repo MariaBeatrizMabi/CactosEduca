@@ -1,5 +1,5 @@
 <script setup>
-import { defineEmits, ref, onMounted, defineProps } from 'vue';
+import { defineEmits, ref, defineProps } from 'vue';
 import LoadingComponent from '../components/loading.vue'
 
 const isLoading = ref(false);
@@ -67,7 +67,7 @@ const emits = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
             </thead>
             <tbody>
                 <tr v-for="(row, rowIndex) in TableContent" :key="rowIndex">
-                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
+                    <td v-for="(cell, cellIndex) in Object.entries(row).filter(([key]) => key !== 'id')" :key="cellIndex">{{ cell[1] }}</td>
                     <td v-if="TableActions">
                         <div class="actions">
                             <div class="show" @click="$emit('viewDetails', row.id)">
@@ -92,3 +92,10 @@ const emits = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
         </table>
     </div>
 </template>
+
+<style>
+
+.tableContent {
+    margin: 0 0 3rem 0 !important;
+}
+</style>

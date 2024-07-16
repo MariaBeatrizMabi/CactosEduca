@@ -48,6 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/Teachers/{id}', 'App\Http\Controllers\TeacherController@update')->name('teacher.update');
     Route::delete('/Teachers/{id}', 'App\Http\Controllers\TeacherController@delete')->name('teacher.delete');
 
+    Route::get('/ClassSchool', 'App\Http\Controllers\ManagementClassController@index')->name('class');
+
     Route::get('/counties', function () {
         return County::all();
     });
