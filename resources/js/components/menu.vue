@@ -142,6 +142,20 @@ a {
     text-decoration: none;
 }
 
+.school-register{
+    display: flex;
+    height: 100vh;
+    width: 100%;
+
+    & .register-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 8rem 0;
+    }
+}
+
 .sidebar {
     top: 0;
     left: 0;
@@ -331,5 +345,5 @@ ul {
             }
     }
 }
-
+    
 </style>
