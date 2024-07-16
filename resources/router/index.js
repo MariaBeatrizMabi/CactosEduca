@@ -5,6 +5,7 @@ import ContactUs from '../../resources/js/pages/contactus.vue';
 import Management from '../../resources/js/pages/management.vue';
 import Filters from '../../resources/js/pages/Filters.vue';
 import SchoolDetails from '../../resources/js/pages/schoolDetails.vue';
+import StudentForm from '../../resources/js/pages/StudentForm.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -47,6 +48,13 @@ const router = createRouter({
             props: true,
             meta: { requiresAuth: true }
         },
+        {
+            path: '/student',
+            name: 'Student',
+            component: StudentForm,
+            props: true,
+            meta: { requiresAuth: true }
+        }
     ]
 });
 

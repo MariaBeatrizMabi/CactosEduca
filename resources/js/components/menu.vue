@@ -12,10 +12,10 @@ function openExitModal() {
 
 const logout = () => {
     showExitModal();
-    axios.post('/logout') 
+    axios.post('/logout')
         .then(response => {
             ExitModal
-            window.location.href = '/'; 
+            window.location.href = '/';
         })
         .catch(error => {
             console.error('Erro ao fazer logout:', error);
@@ -56,7 +56,7 @@ function closeModalExit() {
                     <svg fill="red" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                         <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/>
                     </svg>
-                    Sair 
+                    Sair
                 </a>
             </div>
     </ModalComponentExit>
@@ -78,7 +78,6 @@ function closeModalExit() {
                 </span>
 
                 <div class="text header-text">
-                    
                 </div>
             </div>
         </header>
@@ -98,7 +97,7 @@ function closeModalExit() {
                     <li class="nav-link">
                             <svg width="25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <path fill="#0D5413" d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/>
-                            </svg> 
+                            </svg>
                             <span class="text nav-text">Dashboard</span>
                     </li>
                 </a>
@@ -205,7 +204,7 @@ nav{
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    align-items: center;    
+    align-items: center;
     transition: 0.3s;
 }
 
@@ -230,7 +229,7 @@ header {
         background-color: var(--grap-color);
         cursor: pointer;
         fill: var(--primary-color);
-    }                    
+    }
 }
 
 .logo{
@@ -346,5 +345,5 @@ ul {
             }
     }
 }
-    
+
 </style>
