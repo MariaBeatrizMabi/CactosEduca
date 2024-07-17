@@ -12,6 +12,7 @@ import InputComponent from '../components/input.vue'
 import InputComponentPassword from '../components/inputPassword.vue'
 import LoadingComponent from '../components/loading.vue'
 import ModalComponentDeleted from '../components/modalComponentShort.vue';
+import SelectComponent from '../components/select.vue'
 
 const emit = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
 
@@ -22,19 +23,11 @@ const ShowModalClassCreation = ref(false);
 const isLoading = ref(false);
 
 const showModalData = ref();
+const showModalClassData = ref();
 const updateModalData = ref();
 const idToUpdate = ref(null);
 const deletedModal = ref();
 const idToDeleted = ref(null);
-
-const formDataAdd = ref({
-    name: '',
-    school_id: userID.value,
-    group_id: '',
-    acess_cod: '',
-    password: '',
-    type: 'teacher'
-})
 
 let formDataTeachersPreview = ref({
     id: '',
@@ -50,11 +43,32 @@ let formDataClassPreview = ref({
     password: '',  
 })
 
+const formDataTeacherAdd = ref({
+    name: '',
+    school_id: userID.value,
+    group_id: '',
+    acess_cod: '',
+    password: '',
+    type: 'teacher'
+})
+
+const formDataClassAdd = ref({
+    name: '',
+    school_id: userID.value,
+    teacher_id: '',
+})
+
 let formDataVisualize = ref({
     id: '',
     name: '',
     acess_cod: '',
     password: '',
+})
+
+let formDataClassVisualize = ref({
+    name: '',
+    school_id: userID.value,
+    teacher_id: '',
 })
 
 let formDataUpdate = ref({
@@ -73,7 +87,7 @@ const OpenModalClassCreation = () => {
 };
 
 function resetForm() {
-    formDataAdd.value = {
+    formDataTeacherAdd.value = {
         name: '',
         school_id: userID.value,
         group_id: '',
@@ -83,18 +97,32 @@ function resetForm() {
     };
 }
 
+function resetFormClass() {
+    formDataTeacherAdd.value = {
+        name: '',
+        school_id: userID.value,
+        teacher_id: '',
+    };
+}
+
 const getUserType = () => {
     axios.get('/loginUser').then(response => {
         userType.value = response.data.type;
         userID.value = response.data.id;
 
-         formDataAdd.value = {
+         formDataTeacherAdd.value = {
             name: '',
             school_id: userID.value,
             group_id: '',
             acess_cod: '',
             password: '',
             type: 'teacher'
+        };
+
+        formDataClassAdd.value = {
+            name: '',
+            school_id: userID.value,
+            teacher_id: '',
         };
 
     }).catch(error => {
@@ -120,11 +148,10 @@ async function getTableTeacherData() {
 async function getTableClassData() {
     try {
         const response = await axios('/ClassSchool');
-
         formDataClassPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
-            acess_cod: take.acess_cod,
+            teacher_name: take.teacher ? take.teacher.name : '',
         }));
 
     } catch (error) {
@@ -135,7 +162,7 @@ async function getTableClassData() {
 async function submitForm() {
     try {
         isLoading.value = true;  
-        await axios.post('/TeacherCreate', formDataAdd.value);
+        await axios.post('/TeacherCreate', formDataTeacherAdd.value);
         
         getTableTeacherData()
         
@@ -153,11 +180,11 @@ async function submitForm() {
 async function submitFormClass() {
     try {
         isLoading.value = true;  
-        await axios.post('/ClassCreate', formDataAdd.value);
+        await axios.post('/ClassSchoolCreate', formDataClassAdd.value);
         
         getTableClassData();
-        
-        showModalCreation.value = false;
+
+        ShowModalClassCreation.value = false;
 
         setTimeout(() => {
             isLoading.value = false;
@@ -192,11 +219,30 @@ async function ShowSchoolTeachersData(id) {
     }
 }
 
+async function ShowSchoolClassData(id) {
+    showModalClassData.value = true;
+    try {
+        const response = await axios.get(`/ClassSchool`);
+
+        const classData = response.data.find(classData => classData.id === id);
+        console.log();
+        if (classData) {
+            formDataClassVisualize.value = {
+                name: classData.name,
+                teacher_id: classData.teacher_id,
+            };
+        } else {
+            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 async function UpdateSchoolTeachersData(id) {
     updateModalData.value = true;
     try {
         const response = await axios.get(`/Teachers/${id}`);
-        console.log("CLICK", response);
 
         const teacher = response.data.find(teacher => teacher.id === id);
 
@@ -283,11 +329,13 @@ function closeModalDeleted() {
 
 function closeModalAdd() {
     showModalCreation.value = false;
+    ShowModalClassCreation.value = false;
     resetForm();
 }
 
 function closeModal() {
     showModalData.value = false;
+    showModalClassData.value = false;
     resetForm();
 }
 
@@ -406,17 +454,17 @@ onMounted(() => {
                         labelTitle="Digite o nome completo do professor" 
                         placeholderValue="Nome do professor"  
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
-                        :value="formDataAdd.name"
+                        :value="formDataTeacherAdd.name"
                         typeValue="text"
-                        @input="formDataAdd.name = $event.target.value" 
+                        @input="formDataTeacherAdd.name = $event.target.value" 
                    />
                    <InputComponent 
                         labelTitle="Acesso" 
                         placeholderValue="Digite o acesso da escola"  
                         icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
-                        :value="formDataAdd.acess_cod"
+                        :value="formDataTeacherAdd.acess_cod"
                         RightAction="display: none;"
-                        @input="formDataAdd.acess_cod = $event.target.value" 
+                        @input="formDataTeacherAdd.acess_cod = $event.target.value" 
                         autocomplete="new-text"
                     />
                     <div class="input-password">
@@ -424,8 +472,8 @@ onMounted(() => {
                         labelTitle="Senha de acesso" 
                         placeholderValue="Senha"  
                         icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
-                        :value="formDataAdd.password"
-                        @input="formDataAdd.password = $event.target.value" 
+                        :value="formDataTeacherAdd.password"
+                        @input="formDataTeacherAdd.password = $event.target.value" 
                         typeValue="password"
                         RightAction="display: flex;"
                         />
@@ -448,45 +496,6 @@ onMounted(() => {
             </div>
         </ModalComponent>
 
-        <ModalComponent v-if="ShowModalClassCreation" Titlevalue="Cadastro de turmas">
-            <div class="modal-body-size">
-                <h2>Detalhes sobre a turma</h2>
-                <div class="modal-content-details">
-                    <InputComponent 
-                        labelTitle="Nome da turma" 
-                        placeholderValue="Nome da turma"  
-                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
-                        :value="formDataAdd.name"
-                        typeValue="text"
-                        @input="formDataAdd.name = $event.target.value" 
-                   />
-                   <InputComponent 
-                        labelTitle="Professor responsável da turma" 
-                        placeholderValue="Professor responsável da turma"  
-                        icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
-                        :value="formDataAdd.acess_cod"
-                        RightAction="display: none;"
-                        @input="formDataAdd.acess_cod = $event.target.value" 
-                        autocomplete="new-text"
-                    />
-                </div>
-       </div>
-       <div class="modal-end">
-                <a class="close-modal" @click="closeModalAdd()">
-                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
-                    </svg>
-                    Cancelar
-                </a>
-                <a class="school-add" @click="submitFormClass()">
-                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
-                    </svg>
-                    Cadastrar Turma
-                </a>
-            </div>
-        </ModalComponent>
-
         <ModalComponentDeleted v-if="deletedModal" Titlevalue="Apagar professor">
     <h1 class="deleted-title">
         Você realmente deseja apagar o professor<strong>{{ formDataVisualize.name }}</strong>? Esta é uma ação permanente que não poderá ser desfeita
@@ -505,7 +514,85 @@ onMounted(() => {
             Apagar Professor
         </a>
     </div>
-</ModalComponentDeleted>
+        </ModalComponentDeleted>
+
+        <ModalComponent v-if="showModalClassData" Titlevalue="Visualização de professores">
+            <div class="modal-body-size">
+                <h2>Detalhes sobre o professor</h2>
+                <div class="modal-content-details">
+                    <InputComponent 
+                        labelTitle="Nome da turma" 
+                        placeholderValue="Nome da turma"  
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        :value="formDataClassVisualize.name"
+                        typeValue="text"
+                        @input="formDataClassVisualize.name = $event.target.value" 
+                   />
+                   <SelectComponent 
+                        labelTitle="Professor responsável da turma" 
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="Teachers"
+                        typeValue="select"
+                        :value="formDataClassVisualize.teacher_id"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataClassVisualize.teacher_id = $event.target.value" 
+                        />
+                </div>
+                <div class="modal-content-address">
+                 
+            </div>
+       </div>
+       <div class="modal-end">
+            <a style="margin-right: 5rem;" class="close-modal" @click="closeModal()">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                </svg>
+                Fechar 
+            </a>
+        </div>
+    </ModalComponent>
+
+        <ModalComponent v-if="ShowModalClassCreation" Titlevalue="Cadastro de turmas">
+            <div class="modal-body-size">
+                <h2>Detalhes sobre a turma</h2>
+                <div class="modal-content-details">
+                    <InputComponent 
+                        labelTitle="Nome da turma" 
+                        placeholderValue="Nome da turma"  
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        :value="formDataClassAdd.name"
+                        typeValue="text"
+                        @input="formDataClassAdd.name = $event.target.value" 
+                   />
+                   <SelectComponent 
+                        labelTitle="Professor responsável da turma" 
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="Teachers"
+                        typeValue="select"
+                        :value="formDataClassAdd.teacher_id"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataClassAdd.teacher_id = $event.target.value" 
+                        />
+                </div>
+       </div>
+       <div class="modal-end">
+                <a class="close-modal" @click="closeModalAdd()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <a class="school-add" @click="submitFormClass()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                    </svg>
+                    Cadastrar Turma
+                </a>
+            </div>
+        </ModalComponent>
+
         <userWelcomeComponent />
         <MenuComponent />
 
@@ -532,6 +619,7 @@ onMounted(() => {
 
         <TitleComponent title="Cadastro de Turmas"/>
         <tableComponentComponent 
+        class="tableClass"
             TitleValue="Cadastrados" 
             :TableHeader="['Turma', 'Professor responsável']"
             :TableContent="formDataClassPreview"
@@ -540,7 +628,7 @@ onMounted(() => {
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Turma'"
             :OpenAddModal="OpenModalClassCreation"
-            @viewDetails="ShowSchoolTeachersData"
+            @viewDetails="ShowSchoolClassData"
             @updateAction="UpdateSchoolTeachersData"
             @deletedAction="deletedModalTeachersShow"
         ></tableComponentComponent>
@@ -558,4 +646,5 @@ onMounted(() => {
     .modal-end > .school-add {
         width: 16rem;
     }
+
 </style>

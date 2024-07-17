@@ -153,6 +153,7 @@ a {
         flex-direction: column;
         align-items: center;
         margin: 8rem 0;
+        height: 100vh;
     }
 }
 
@@ -160,8 +161,6 @@ a {
     top: 0;
     left: 0;
     width: 170px;
-    background-color: var(--grap-color);
-    border-right: 2px solid var(--secondary-color);
     transition: 0.3s;
     & .text {
     display: none;
@@ -177,6 +176,8 @@ a {
   height: 100%;
   justify-content: space-evenly;
   position: fixed;
+  background-color: var(--grap-color);
+  border-right: 2px solid var(--secondary-color);
 }
 
 .sidebar-expanded {

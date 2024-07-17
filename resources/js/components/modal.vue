@@ -33,7 +33,7 @@
 
         margin: 0 auto !important;
 
-        position: absolute !important;
+        position: fixed !important;
 
         height: 100vh !important;
         width: 100vw !important;

@@ -2,6 +2,9 @@
 import { ref, defineEmits, onMounted } from 'vue';
 import axios from 'axios';
 
+const router = ref([]);
+const routerPath = ref(null);
+
 const props = defineProps({
     labelTitle: {
         type: String,
@@ -30,14 +33,21 @@ const props = defineProps({
         type: String,
         required: false
     },
+    routerPath: {
+        type: String,
+        required: true
+    },
+    valueField: {
+        type: String,
+        required: true,
+        default: 'name'
+    }
 })
-
-const counties = ref([]);
 
 onMounted(async () => {
     try {
-        const response = await axios.get('/counties');
-        counties.value = response.data;
+        const response = await axios.get(`/${props.routerPath}`);
+        router.value = response.data;
     } catch (error) {
         console.error('Erro ao buscar os condados:', error);
     }
@@ -52,9 +62,11 @@ onMounted(async () => {
                 <path :d="props.icon"/>
             </svg>
             <hr>
-                <select :disabled="props.disabled" v-model="props.value" :placeholder="props.placeholderValue" :type="props.typeValue">
+            <select :disabled="props.disabled" v-model="props.value" :placeholder="props.placeholderValue" :type="props.typeValue">
                     <option value="" disabled selected>Selecione sua opção</option>
-                    <option v-for="county in counties" :key="county.name" :value="county.name">{{ county.name }}</option>
+                    <option v-for="routerData in router" :key="routerData[props.valueField]" :value="routerData[props.valueField]">
+                        {{ routerData.name }}
+                    </option>
                 </select>
         </div>
     </div>

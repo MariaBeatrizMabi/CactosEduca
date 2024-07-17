@@ -12,7 +12,7 @@ class ManagementClassController extends Controller
 {
     public function index()
     {
-        $class = ClassModel::all();
+        $class = ClassModel::with('teacher')->get();
         return response()->json($class);
     }
 
