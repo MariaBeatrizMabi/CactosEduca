@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ClassSchool', 'App\Http\Controllers\ManagementClassController@index')->name('class');
     Route::get('/ClassSchool/{id}', 'App\Http\Controllers\ManagementClassController@index')->name('class.index');
     Route::post('/ClassSchoolCreate', 'App\Http\Controllers\ManagementClassController@create')->name('class.create');
+    Route::put('/ClassSchoolUpdate/{id}', 'App\Http\Controllers\ManagementClassController@update')->name('class.update');
 
     Route::get('/counties', function () {
         return County::all();

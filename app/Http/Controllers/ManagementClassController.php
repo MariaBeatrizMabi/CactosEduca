@@ -38,30 +38,23 @@ class ManagementClassController extends Controller
         }
     }
 
-//      public function update(Request $request, ManagementSchooll $managementSchooll, User $user)
-//     {
-//         $managementSchooll->update([
-//             'name' => $request->input('name'),
-//             'address' => $request->input('address'),
-//             'city' => $request->input('city'),
-//             'acess_cod' => $request->input('acess_cod'),
-//             'zip_code' => $request->input('zip_code'),
-//             'type' => $request->input('type'),
-//             'password' => $request->input('password'),
-//         ]);
+    public function update(Request $request, ClassModel $school)
+    {
+        try {
+            $school->update([
+                'name' => $request->input('name'),
+                'school_id' => $request->input('school_id'),
+                'teacher_id' => $request->input('teacher_id'),
+            ]);
 
-//         $user = User::find($managementSchooll->user_id);
+            Log::info('Dados da escola atualizados:', $school->toArray());
 
-//         if ($user) {
-//             $user->update([
-//                 'user_name' => $request->input('name'), 
-//                 'acess_cod' => $request->input('acess_cod'),
-//                 'password' => $request->input('password'),
-//             ]);
-//         }
-
-//         return response()->json(['message' => 'Escola atualizada com sucesso'], 200);
-//     }
+            return response()->json(['message' => 'Escola atualizada com sucesso'], 200);
+        } catch (\Exception $e) {
+            Log::error('Erro ao atualizar escola: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar escola'], 500);
+        }
+    }
 
 //     public function delete(ManagementSchooll $managementSchooll) {
 //         if (!$managementSchooll) {

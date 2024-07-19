@@ -24,7 +24,8 @@ const isLoading = ref(false);
 
 const showModalData = ref();
 const showModalClassData = ref();
-const updateModalData = ref();
+const updateModalTeacherData = ref();
+const updateModalClassData = ref();
 const idToUpdate = ref(null);
 const deletedModal = ref();
 const idToDeleted = ref(null);
@@ -77,6 +78,13 @@ let formDataUpdate = ref({
     acess_cod: '',
     password: '',
 })
+
+let formDataClassUpdated = ref({
+    name: '',
+    school_id: userID.value,
+    teacher_id: '',
+})
+
 
 const OpenModalTeachersCreation = () => {
     showModalCreation.value = true;
@@ -225,7 +233,6 @@ async function ShowSchoolClassData(id) {
         const response = await axios.get(`/ClassSchool`);
 
         const classData = response.data.find(classData => classData.id === id);
-        console.log();
         if (classData) {
             formDataClassVisualize.value = {
                 name: classData.name,
@@ -240,7 +247,7 @@ async function ShowSchoolClassData(id) {
 }
 
 async function UpdateSchoolTeachersData(id) {
-    updateModalData.value = true;
+    updateModalTeacherData.value = true;
     try {
         const response = await axios.get(`/Teachers/${id}`);
 
@@ -265,15 +272,56 @@ async function UpdateSchoolTeachersData(id) {
     }
 }
 
+async function UpdateSchoolClassData(id) {
+    updateModalClassData.value = true;
+    try {
+        const response = await axios.get(`/ClassSchool/${id}`);
+
+        const classData = response.data.find(classData => classData.id === id);
+
+        idToUpdate.value = id;
+
+        if (classData) {
+            formDataClassUpdated.value = {
+                name: classData.name,
+                teacher_id: classData.teacher_id,
+            };
+        } else {
+            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 async function updateDataForm() {
     const id = idToUpdate.value; 
     try {
         const response = await axios.put(`/Teachers/${id}`, formDataUpdate.value); 
 
-        updateModalData.value = false;
+        updateModalTeacherData.value = false;
         isLoading.value = true;
 
         getTableTeacherData(); 
+
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 800);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function updateClassDataForm() {
+    const id = idToUpdate.value; 
+    try {
+        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formDataClassUpdated.value); 
+
+        updateModalClassData.value = false;
+        isLoading.value = true;
+
+        getTableClassData(); 
 
         setTimeout(() => {
             isLoading.value = false;
@@ -308,7 +356,6 @@ async function deleted() {
         var response = await axios.delete(`/Teachers/${id}`); 
         deletedModal.value = false;
         isLoading.value = true;
-        console.log(response);
 
         getTableTeacherData()
         setTimeout(() => {
@@ -340,7 +387,8 @@ function closeModal() {
 }
 
 function closeModalUpdated() {
-    updateModalData.value = false;
+    updateModalTeacherData.value = false;
+    updateModalClassData.value = false;
     resetForm();
 }
 
@@ -398,7 +446,7 @@ onMounted(() => {
         </div>
     </ModalComponent>
 
-    <ModalComponent v-if="updateModalData" Titlevalue="Visualização de professores">
+    <ModalComponent v-if="updateModalTeacherData" Titlevalue="Visualização de professores">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">
@@ -440,6 +488,49 @@ onMounted(() => {
                     <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
                 </svg>
                 Atualizar Professores
+            </a>
+        </div>
+    </ModalComponent>
+
+    <ModalComponent v-if="updateModalClassData" Titlevalue="Atualização de turmas">
+            <div class="modal-body-size">
+                <h2>Detalhes sobre o turma</h2>
+                <div class="modal-content-details">
+                    <InputComponent 
+                        labelTitle="Nome da turma" 
+                        placeholderValue="Nome da turma"  
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        :value="formDataClassUpdated.name"
+                        typeValue="text"
+                        @input="formDataClassUpdated.name = $event.target.value" 
+                   />
+                   <SelectComponent 
+                        labelTitle="Professor responsável da turma" 
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="Teachers"
+                        typeValue="select"
+                        :value="formDataClassUpdated.teacher_id"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataClassUpdated.teacher_id = $event.target.value" 
+                        />
+                </div>
+                <div class="modal-content-address">
+                 
+            </div>
+       </div>
+       <div class="modal-end">
+            <a style="margin-right: 5rem;" class="close-modal" @click="closeModalUpdated()">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                </svg>
+                Fechar 
+            </a>
+            <a class="school-add" @click="updateClassDataForm()">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                </svg>
+                Atualizar Turmas
             </a>
         </div>
     </ModalComponent>
@@ -629,7 +720,7 @@ onMounted(() => {
             :ButtonTitle="'Adicionar Turma'"
             :OpenAddModal="OpenModalClassCreation"
             @viewDetails="ShowSchoolClassData"
-            @updateAction="UpdateSchoolTeachersData"
+            @updateAction="UpdateSchoolClassData"
             @deletedAction="deletedModalTeachersShow"
         ></tableComponentComponent>
     </div>
