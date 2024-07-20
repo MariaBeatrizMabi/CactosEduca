@@ -47,13 +47,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/Teachers/{id}', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');
     Route::post('/TeacherCreate', 'App\Http\Controllers\TeacherController@create')->name('teacher.create');
     Route::put('/Teachers/{id}', 'App\Http\Controllers\TeacherController@update')->name('teacher.update');
-    Route::delete('/Teachers/{id}', 'App\Http\Controllers\TeacherController@delete')->name('teacher.delete');
+    Route::delete('/TeachersDeleted/{id}', 'App\Http\Controllers\TeacherController@delete')->name('teacher.delete');
 
     Route::get('/ClassSchool', 'App\Http\Controllers\ManagementClassController@index')->name('class');
     Route::get('/ClassSchool/{id}', 'App\Http\Controllers\ManagementClassController@index')->name('class.index');
     Route::post('/ClassSchoolCreate', 'App\Http\Controllers\ManagementClassController@create')->name('class.create');
     Route::put('/ClassSchoolUpdate/{id}', 'App\Http\Controllers\ManagementClassController@update')->name('class.update');
+    Route::delete('/ClassSchoolDelete/{id}', 'App\Http\Controllers\ManagementClassController@delete')->name('class.delete');
 
+    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
+    Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
+    
     Route::get('/counties', function () {
         return County::all();
     });

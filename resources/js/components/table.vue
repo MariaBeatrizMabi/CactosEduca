@@ -672,6 +672,7 @@ onMounted(
     width: 84%;
     display: flex;
     flex-direction: column;
+    padding: 0 0 5rem 0;
     justify-content: start;
 }
 

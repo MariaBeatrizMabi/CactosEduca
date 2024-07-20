@@ -16,40 +16,40 @@ class ManagementSchoollController extends Controller
     }
 
     public function create(Request $request)
-{
-    try {
-        $user = User::create([
-            'user_name' => $request->input('name'), 
-            'acess_cod' => $request->input('acess_cod'),
-            'type' => 'school', 
-            'password' => $request->input('password'),
-        ]);
-    
-        Log::info('Dados do usuário:', $user->toArray());
-    
-        $school = ManagementSchooll::create([
-            'name' => $request->input('name'),
-            'address' => $request->input('address'),
-            'city' => $request->input('city'),
-            'acess_cod' => $request->input('acess_cod'),
-            'zip_code' => $request->input('zip_code'),
-            'type' => $request->input('type'),
-            'password' => $request->input('password'),
-            'user_id' => $user->id,
-        ]);
-    
-        Log::info('Dados da escola:', $school->toArray());
-    
-        return response()->json(['message' => 'Escola criada com sucesso'], 201);
-    } catch (\Exception $e) {
-        if (isset($user)) {
-            $user->delete();
-        }
+    {
+        try {
+            $user = User::create([
+                'user_name' => $request->input('name'), 
+                'acess_cod' => $request->input('acess_cod'),
+                'type' => 'school', 
+                'password' => $request->input('password'),
+            ]);
+        
+            Log::info('Dados do usuário:', $user->toArray());
+        
+            $school = ManagementSchooll::create([
+                'name' => $request->input('name'),
+                'address' => $request->input('address'),
+                'city' => $request->input('city'),
+                'acess_cod' => $request->input('acess_cod'),
+                'zip_code' => $request->input('zip_code'),
+                'type' => $request->input('type'),
+                'password' => $request->input('password'),
+                'user_id' => $user->id,
+            ]);
+        
+            Log::info('Dados da escola:', $school->toArray());
+        
+            return response()->json(['message' => 'Escola criada com sucesso'], 201);
+        } catch (\Exception $e) {
+            if (isset($user)) {
+                $user->delete();
+            }
 
-        Log::error('Erro ao criar escola: ' . $e->getMessage());
-        return response()->json(['message' => 'Erro ao criar escola'], 500);
+            Log::error('Erro ao criar escola: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao criar escola'], 500);
+        }
     }
-}
 
      public function update(Request $request, ManagementSchooll $managementSchooll, User $user)
     {
