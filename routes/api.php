@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('teachers')->name('teachers.')->group(function () {
+    Route::get('/{teacher}', [TeacherController::class, 'show']);
+    Route::put('/{teacher}', [TeacherController::class, 'update']);
+    Route::delete('/{teacher}', [TeacherController::class, 'delete']);
 });
