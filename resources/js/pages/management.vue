@@ -41,7 +41,7 @@ let formDataClassPreview = ref({
     id: '',
     name: '',
     acess_cod: '',
-    password: '',  
+    password: '',
 })
 
 const formDataTeacherAdd = ref({
@@ -145,7 +145,7 @@ async function getTableTeacherData() {
         formDataTeachersPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
-            acess_cod: take.acess_cod,
+            acess_cod: take.user.acess_cod,
         }));
 
     } catch (error) {
@@ -169,11 +169,11 @@ async function getTableClassData() {
 
 async function submitForm() {
     try {
-        isLoading.value = true;  
+        isLoading.value = true;
         await axios.post('/TeacherCreate', formDataTeacherAdd.value);
-        
+
         getTableTeacherData()
-        
+
         ShowModalClassCreation.value = false;
 
         setTimeout(() => {
@@ -187,9 +187,9 @@ async function submitForm() {
 
 async function submitFormClass() {
     try {
-        isLoading.value = true;  
+        isLoading.value = true;
         await axios.post('/ClassSchoolCreate', formDataClassAdd.value);
-        
+
         getTableClassData();
 
         ShowModalClassCreation.value = false;
@@ -205,23 +205,20 @@ async function submitFormClass() {
 
 async function ShowSchoolTeachersData(id) {
     showModalData.value = true;
-    try {
-        const response = await axios.get(`/Teachers`);
 
-        const teacher = response.data.find(teacher => teacher.id === id);
-        
+    try {
+        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
+
         if (teacher) {
             formDataVisualize.value = {
                 id: teacher.id,
                 name: teacher.name,
-                acess_cod: teacher.acess_cod,
-                password: teacher.password,
+                acess_cod: teacher.user.acess_cod,
                 type: 'teacher'
             };
         } else {
             console.error(`Não foi possível encontrar o professor com o ID ${id}`);
         }
-
     } catch (error) {
         console.error(error);
     }
@@ -248,25 +245,22 @@ async function ShowSchoolClassData(id) {
 
 async function UpdateSchoolTeachersData(id) {
     updateModalTeacherData.value = true;
-    try {
-        const response = await axios.get(`/Teachers/${id}`);
 
-        const teacher = response.data.find(teacher => teacher.id === id);
+    try {
+        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
 
         idToUpdate.value = id;
 
         if (teacher) {
             formDataUpdate.value = {
+                ...formDataUpdate,
                 id: teacher.id,
                 name: teacher.name,
-                acess_cod: teacher.acess_cod,
-                password: teacher.password, 
-                type: 'teacher'
+                acess_cod: teacher.user.acess_cod
             };
         } else {
             console.error(`Não foi possível encontrar o professor com o ID ${id}`);
         }
-
     } catch (error) {
         console.error(error);
     }
@@ -296,14 +290,13 @@ async function UpdateSchoolClassData(id) {
 }
 
 async function updateDataForm() {
-    const id = idToUpdate.value; 
     try {
-        const response = await axios.put(`/Teachers/${id}`, formDataUpdate.value); 
+        await axios.put(`/api/teachers/${idToUpdate.value}`, formDataUpdate.value);
 
         updateModalTeacherData.value = false;
         isLoading.value = true;
 
-        getTableTeacherData(); 
+        getTableTeacherData();
 
         setTimeout(() => {
             isLoading.value = false;
@@ -314,14 +307,14 @@ async function updateDataForm() {
 }
 
 async function updateClassDataForm() {
-    const id = idToUpdate.value; 
+    const id = idToUpdate.value;
     try {
-        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formDataClassUpdated.value); 
+        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formDataClassUpdated.value);
 
         updateModalClassData.value = false;
         isLoading.value = true;
 
-        getTableClassData(); 
+        getTableClassData();
 
         setTimeout(() => {
             isLoading.value = false;
@@ -336,7 +329,7 @@ async function deletedModalTeachersShow(id) {
     resetForm();
     try {
         const response = await axios.get(`/Teachers/${id}`);
-        
+
 
         idToDeleted.value = id;
 
@@ -350,10 +343,10 @@ async function deletedModalTeachersShow(id) {
 
 
 async function deleted() {
-    const id = idToDeleted.value; 
+    const id = idToDeleted.value;
 
     try {
-        var response = await axios.delete(`/Teachers/${id}`); 
+        await axios.delete(`/api/teachers/${id}`);
         deletedModal.value = false;
         isLoading.value = true;
 
@@ -401,39 +394,39 @@ onMounted(() => {
 
 <template>
     <LoadingComponent :isLoading="isLoading" />
-    
+
     <ModalComponent v-if="showModalData" Titlevalue="Visualização de professores">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">
                     <InputComponent
                         disabled="true"
-                        labelTitle="Nome do professor" 
-                        placeholderValue="Nome da escola"  
+                        labelTitle="Nome do professor"
+                        placeholderValue="Nome da escola"
                         icon="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"
                         :value="formDataVisualize.name"
-                        @input="formDataVisualize.name = $event.target.value" 
+                        @input="formDataVisualize.name = $event.target.value"
                    />
 
                    <InputComponent
                         disabled="true"
-                        labelTitle="Código de acesso" 
-                        placeholderValue="Código de acesso"  
+                        labelTitle="Código de acesso"
+                        placeholderValue="Código de acesso"
                         icon="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"
                         :value="formDataVisualize.acess_cod"
-                        @input="formDataVisualize.acess_cod = $event.target.value" 
+                        @input="formDataVisualize.acess_cod = $event.target.value"
                    />
-                   <InputComponentPassword 
+                   <InputComponentPassword
                         disabled="true"
-                        labelTitle="Senha de acesso" 
-                        placeholderValue="Senha"  
+                        labelTitle="Senha de acesso"
+                        placeholderValue="Senha"
                         icon="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"
                         :value="formDataVisualize.password"
-                        @input="formDataVisualize.password = $event.target.value" 
+                        @input="formDataVisualize.password = $event.target.value"
                         />
                 </div>
                 <div class="modal-content-address">
-                 
+
             </div>
        </div>
        <div class="modal-end">
@@ -441,7 +434,7 @@ onMounted(() => {
                 <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
                 </svg>
-                Fechar 
+                Fechar
             </a>
         </div>
     </ModalComponent>
@@ -451,29 +444,29 @@ onMounted(() => {
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">
                     <InputComponent
-                        labelTitle="Nome do professor" 
-                        placeholderValue="Nome da escola"  
+                        labelTitle="Nome do professor"
+                        placeholderValue="Nome da escola"
                         icon="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"
                         :value="formDataUpdate.name"
-                        @input="formDataUpdate.name = $event.target.value" 
+                        @input="formDataUpdate.name = $event.target.value"
                    />
                    <InputComponent
-                        labelTitle="Código de acesso" 
-                        placeholderValue="Código de acesso"  
+                        labelTitle="Código de acesso"
+                        placeholderValue="Código de acesso"
                         icon="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"
                         :value="formDataUpdate.acess_cod"
-                        @input="formDataUpdate.acess_cod = $event.target.value" 
+                        @input="formDataUpdate.acess_cod = $event.target.value"
                    />
-                   <InputComponentPassword 
-                        labelTitle="Senha de acesso" 
-                        placeholderValue="Senha"  
+                   <InputComponentPassword
+                        labelTitle="Senha de acesso"
+                        placeholderValue="Senha"
                         icon="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"
                         :value="formDataUpdate.password"
-                        @input="formDataUpdate.password = $event.target.value" 
+                        @input="formDataUpdate.password = $event.target.value"
                         />
                 </div>
                 <div class="modal-content-address">
-                 
+
             </div>
        </div>
        <div class="modal-end">
@@ -481,7 +474,7 @@ onMounted(() => {
                 <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
                 </svg>
-                Fechar 
+                Fechar
             </a>
             <a class="school-add" @click="updateDataForm()">
                 <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -492,79 +485,36 @@ onMounted(() => {
         </div>
     </ModalComponent>
 
-    <ModalComponent v-if="updateModalClassData" Titlevalue="Atualização de turmas">
-            <div class="modal-body-size">
-                <h2>Detalhes sobre o turma</h2>
-                <div class="modal-content-details">
-                    <InputComponent 
-                        labelTitle="Nome da turma" 
-                        placeholderValue="Nome da turma"  
-                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
-                        :value="formDataClassUpdated.name"
-                        typeValue="text"
-                        @input="formDataClassUpdated.name = $event.target.value" 
-                   />
-                   <SelectComponent 
-                        labelTitle="Professor responsável da turma" 
-                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                        routerPath="Teachers"
-                        typeValue="select"
-                        :value="formDataClassUpdated.teacher_id"
-                        valueField="id"
-                        RightAction="display: none;"
-                        @input="formDataClassUpdated.teacher_id = $event.target.value" 
-                        />
-                </div>
-                <div class="modal-content-address">
-                 
-            </div>
-       </div>
-       <div class="modal-end">
-            <a style="margin-right: 5rem;" class="close-modal" @click="closeModalUpdated()">
-                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
-                </svg>
-                Fechar 
-            </a>
-            <a class="school-add" @click="updateClassDataForm()">
-                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
-                </svg>
-                Atualizar Turmas
-            </a>
-        </div>
-    </ModalComponent>
-    
     <div class="school-register">
-        
+
         <ModalComponent v-if="showModalCreation" Titlevalue="Cadastro de professores">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">
-                    <InputComponent 
-                        labelTitle="Digite o nome completo do professor" 
-                        placeholderValue="Nome do professor"  
+                    <InputComponent
+                        labelTitle="Digite o nome completo do professor"
+                        placeholderValue="Nome do professor"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
                         :value="formDataTeacherAdd.name"
                         typeValue="text"
-                        @input="formDataTeacherAdd.name = $event.target.value" 
+                        @input="formDataTeacherAdd.name = $event.target.value"
                    />
-                   <InputComponent 
-                        labelTitle="Acesso" 
-                        placeholderValue="Digite o acesso da escola"  
+                   <InputComponent
+                        labelTitle="Acesso"
+                        placeholderValue="Digite o acesso da escola"
                         icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
                         :value="formDataTeacherAdd.acess_cod"
                         RightAction="display: none;"
-                        @input="formDataTeacherAdd.acess_cod = $event.target.value" 
+                        @input="formDataTeacherAdd.acess_cod = $event.target.value"
                         autocomplete="new-text"
                     />
                     <div class="input-password">
-                        <InputComponentPassword 
-                        labelTitle="Senha de acesso" 
-                        placeholderValue="Senha"  
+                        <InputComponentPassword
+                        labelTitle="Senha de acesso"
+                        placeholderValue="Senha"
                         icon="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"
                         :value="formDataTeacherAdd.password"
-                        @input="formDataTeacherAdd.password = $event.target.value" 
+                        @input="formDataTeacherAdd.password = $event.target.value"
                         typeValue="password"
                         RightAction="display: flex;"
                         />
@@ -611,27 +561,27 @@ onMounted(() => {
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">
-                    <InputComponent 
-                        labelTitle="Nome da turma" 
-                        placeholderValue="Nome da turma"  
+                    <InputComponent
+                        labelTitle="Nome da turma"
+                        placeholderValue="Nome da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
                         :value="formDataClassVisualize.name"
                         typeValue="text"
-                        @input="formDataClassVisualize.name = $event.target.value" 
+                        @input="formDataClassVisualize.name = $event.target.value"
                    />
-                   <SelectComponent 
-                        labelTitle="Professor responsável da turma" 
+                   <SelectComponent
+                        labelTitle="Professor responsável da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
                         routerPath="Teachers"
                         typeValue="select"
                         :value="formDataClassVisualize.teacher_id"
                         valueField="id"
                         RightAction="display: none;"
-                        @input="formDataClassVisualize.teacher_id = $event.target.value" 
+                        @input="formDataClassVisualize.teacher_id = $event.target.value"
                         />
                 </div>
                 <div class="modal-content-address">
-                 
+
             </div>
        </div>
        <div class="modal-end">
@@ -639,7 +589,7 @@ onMounted(() => {
                 <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                     <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
                 </svg>
-                Fechar 
+                Fechar
             </a>
         </div>
     </ModalComponent>
@@ -648,23 +598,23 @@ onMounted(() => {
             <div class="modal-body-size">
                 <h2>Detalhes sobre a turma</h2>
                 <div class="modal-content-details">
-                    <InputComponent 
-                        labelTitle="Nome da turma" 
-                        placeholderValue="Nome da turma"  
+                    <InputComponent
+                        labelTitle="Nome da turma"
+                        placeholderValue="Nome da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
                         :value="formDataClassAdd.name"
                         typeValue="text"
-                        @input="formDataClassAdd.name = $event.target.value" 
+                        @input="formDataClassAdd.name = $event.target.value"
                    />
-                   <SelectComponent 
-                        labelTitle="Professor responsável da turma" 
+                   <SelectComponent
+                        labelTitle="Professor responsável da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
                         routerPath="Teachers"
                         typeValue="select"
                         :value="formDataClassAdd.teacher_id"
                         valueField="id"
                         RightAction="display: none;"
-                        @input="formDataClassAdd.teacher_id = $event.target.value" 
+                        @input="formDataClassAdd.teacher_id = $event.target.value"
                         />
                 </div>
        </div>
@@ -694,8 +644,8 @@ onMounted(() => {
 
         <div class="register-content" v-else-if="userType === 'school'">
             <TitleComponent title="Cadastro de Professores" />
-            <tableComponentComponent 
-            TitleValue="Cadastrados" 
+            <tableComponentComponent
+            TitleValue="Cadastrados"
             :TableHeader="['Professor', 'Acesso']"
             :TableContent="formDataTeachersPreview"
             :TableActions="true"
@@ -709,9 +659,9 @@ onMounted(() => {
         ></tableComponentComponent>
 
         <TitleComponent title="Cadastro de Turmas"/>
-        <tableComponentComponent 
+        <tableComponentComponent
         class="tableClass"
-            TitleValue="Cadastrados" 
+            TitleValue="Cadastrados"
             :TableHeader="['Turma', 'Professor responsável']"
             :TableContent="formDataClassPreview"
             :TableActions="true"
@@ -724,7 +674,7 @@ onMounted(() => {
             @deletedAction="deletedModalTeachersShow"
         ></tableComponentComponent>
     </div>
-   
+
     </div>
 
 </template>
