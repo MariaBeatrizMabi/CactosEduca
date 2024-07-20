@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('acess_cod')->unique();
             $table->enum('type', ['admin', 'admin_seduc', 'school', 'teacher']);
             $table->string('password');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

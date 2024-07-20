@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,4 +24,10 @@ Route::prefix('teachers')->name('teachers.')->group(function () {
     Route::get('/{teacher}', [TeacherController::class, 'show']);
     Route::put('/{teacher}', [TeacherController::class, 'update']);
     Route::delete('/{teacher}', [TeacherController::class, 'delete']);
+});
+
+Route::prefix('management-schools')->name('management-schools.')->group(function () {
+    Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
+    Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
+    Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
 });
