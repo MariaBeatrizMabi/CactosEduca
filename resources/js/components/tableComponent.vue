@@ -92,10 +92,3 @@ const emits = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
         </table>
     </div>
 </template>
-
-<style>
-
-.tableContent {
-    margin: 0 0 3rem 0 !important;
-}
-</style>
