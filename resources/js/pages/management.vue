@@ -503,6 +503,7 @@ function closeModalDeleted() {
 function closeModalAdd() {
     showModalCreation.value = false;
     ShowModalClassCreation.value = false;
+    showModalStudentCreation.value = false;
     resetForm();
 }
 
