@@ -37,11 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
     ->name('SchoolDetailsByCityAndSchool');
 
-    Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoollController@index')->name('management_school.index');
-    Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoollController@create')->name('management_school.create');
-    Route::put('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@update')->name('management_school.update');
-    Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@show')->name('management_school.show');
-    Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoollController@delete')->name('management_school.delete');
+    Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
+    Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
+    Route::put('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
+    Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
+    Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@delete')->name('management_school.delete');
 
     Route::get('/Teachers', 'App\Http\Controllers\TeacherController@index')->name('teacher');
     Route::get('/Teachers/{id}', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');

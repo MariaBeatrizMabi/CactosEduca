@@ -93,7 +93,8 @@ class TeacherController extends Controller
         }
     }
 
-    public function delete(Request $request, Teacher $teacher) {
+    public function delete(Request $request, Teacher $teacher)
+    {
         DB::beginTransaction();
 
         try {
@@ -106,5 +107,4 @@ class TeacherController extends Controller
             return response()->json(['message' => 'Erro ao excluir professor e usuário', 'error' => $e->getMessage()], 500);
         }
     }
-
 }

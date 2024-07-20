@@ -11,19 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('management_schoolls', function (Blueprint $table) {
+        Schema::create('management_schools', function (Blueprint $table) {
             $table->id();
+
             $table->string('name', 255);
             $table->string('city', 255);
             $table->string('address');
-            $table->string('acess_cod')->unique();
             $table->integer('zip_code');
-            $table->enum('type',['admin','admin_seduc','school','teacher']);
-            $table->string('password');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            $table->timestamps();
         });
     }
 
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('management_schoolls');
+        Schema::dropIfExists('management_schools');
     }
 };

@@ -17,9 +17,8 @@ return new class extends Migration
             $table->string('name', 255);
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('school_id');
+            $table->foreignId('school_id')->constrained();
 
-            $table->softDeletes();
             $table->timestamps();
         });
     }
