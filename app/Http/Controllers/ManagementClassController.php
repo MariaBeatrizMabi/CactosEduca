@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
-use App\Models\managementSchool;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -38,42 +36,42 @@ class ManagementClassController extends Controller
         }
     }
 
-    public function update(Request $request, ClassModel $school)
+    public function update(Request $request, $id)
     {
         try {
-            $school->update([
+            $ClassData = ClassModel::where('id', $id)->firstOrFail();
+            $ClassData->update([
                 'name' => $request->input('name'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
-
-            Log::info('Dados da escola atualizados:', $school->toArray());
-
-            return response()->json(['message' => 'Escola atualizada com sucesso'], 200);
+    
+            Log::info('Dados do professor atualizados:', $ClassData->toArray());
+    
+            return response()->json(['message' => 'Professor atualizado com sucesso'], 200);
         } catch (\Exception $e) {
-            Log::error('Erro ao atualizar escola: ' . $e->getMessage());
-            return response()->json(['message' => 'Erro ao atualizar escola'], 500);
+            Log::error('Erro ao atualizar professor: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar professor: ' . $e->getMessage()], 500);
         }
     }
-
-//     public function delete(ManagementSchooll $managementSchooll) {
-//         if (!$managementSchooll) {
-//             return response()->json(['message' => 'Escola não encontrada'], 404);
-//         }
-
-//         $user = $managementSchooll->user;
-
-//         $managementSchooll->delete();
-
-//         if ($user) {
-//             $user->delete();
-//         }
-
-//         return response()->json(['message' => 'Escola e usuário excluídos com sucesso'], 200);
-//     }
+    
 
     public function show(ClassModel $classModel)
     {
         return response()->json($classModel);
+    }
+
+    public function delete(ClassModel $classData, $id) {
+        $classData = ClassModel::where('id', $id)->firstOrFail();
+        
+        if (!$classData) {
+            return response()->json(['message' => 'Professor não encontrado'], 404);
+        }
+        
+        $classData->delete();
+        
+        Log::info('Turma excluída com sucesso: ' . $classData);
+        
+        return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
     }
 }
