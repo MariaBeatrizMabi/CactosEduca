@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
 import axios from 'axios';
+import { api } from '../api'
 import MenuComponent from '../components/menu.vue';
 import TitleComponent from '../components/title.vue';
 import userWelcomeComponent from '../components/userWelcome.vue';
@@ -135,7 +136,7 @@ const OpenModalStudentCreation = () => {
 function resetForm() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: schoolId.value,
+        school_id: userID.value,
         group_id: '',
         acess_cod: '',
         password: '',
@@ -146,7 +147,7 @@ function resetForm() {
 function resetFormClass() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: schoolId.value,
+        school_id: userID.value,
         teacher_id: '',
     };
 }
@@ -281,7 +282,7 @@ async function ShowSchoolTeachersData(id) {
     showModalData.value = true;
 
     try {
-        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
+        const { data: teacher } = await api.get(`/api/teachers/${id}`);
 
         if (teacher) {
             formDataVisualize.value = {
@@ -325,7 +326,7 @@ async function UpdateSchoolTeachersData(id) {
     updateModalTeacherData.value = true;
 
     try {
-        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
+        const { data: teacher } = await api.get(`/api/teachers/${id}`);
 
         idToUpdate.value = id;
 
@@ -347,7 +348,7 @@ async function UpdateSchoolTeachersData(id) {
 async function UpdateSchoolClassData(id) {
     updateModalClassData.value = true;
     try {
-        const response = await axios.get(`/ClassSchool/${id}`);
+        const response = await api.get(`/ClassSchool/${id}`);
 
         const classData = response.data.find(classData => classData.id === id);
 
@@ -369,7 +370,7 @@ async function UpdateSchoolClassData(id) {
 
 async function updateDataForm() {
     try {
-        await axios.put(`/api/teachers/${idToUpdate.value}`, formDataUpdate.value);
+        await api.put(`/api/teachers/${idToUpdate.value}`, formDataUpdate.value);
 
         updateModalTeacherData.value = false;
         isLoading.value = true;
@@ -389,7 +390,7 @@ async function updateClassDataForm() {
     try {
         const formData = {
             name: formDataClassUpdated.value.name,
-            school_id: schoolId.value,
+            school_id: userID.value,
             teacher_id: formDataClassUpdated.value.teacher_id
         };
 
@@ -410,6 +411,7 @@ async function updateClassDataForm() {
 async function deletedModalTeachersShow(id) {
     deletedModal.value = true;
     resetForm();
+
     try {
         const response = await axios.get(`/Teachers/${id}`);
 
@@ -425,10 +427,8 @@ async function deletedModalTeachersShow(id) {
 }
 
 async function deletedTeachers() {
-    const id = idToDeleted.value;
-
     try {
-        await axios.delete(`/api/teachers/${id}`);
+        await api.delete(`/api/teachers/${idToDeleted.value}`);
         deletedModal.value = false;
         isLoading.value = true;
 
@@ -492,7 +492,7 @@ async function deletedModalStudentShow(id) {
         formDataStudentDeleted.value = {
             name: Student.name,
         };
-        
+
     } catch (error) {
         console.error('Erro ao buscar dados do professor:', error);
     }
@@ -869,7 +869,7 @@ onMounted(() => {
                         :value="formDataStudentAdd.name"
                         typeValue="text"
                         @input="formDataStudentAdd.name = $event.target.value"
-                   /> 
+                   />
 
                     <InputComponent
                         labelTitle="Idade do Aluno"
