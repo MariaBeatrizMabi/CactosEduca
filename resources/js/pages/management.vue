@@ -31,6 +31,7 @@ const updateModalClassData = ref();
 const idToUpdate = ref(null);
 const deletedModal = ref();
 const deletedClassDataModal = ref()
+const deletedStudentModal = ref()
 const idToDeleted = ref(null);
 
 let formDataTeachersPreview = ref({
@@ -111,6 +112,10 @@ let formDataDeleted = ref({
 })
 
 let formDataClassDeleted = ref({
+    name: '',
+})
+
+let formDataStudentDeleted = ref({
     name: '',
 })
 
@@ -494,9 +499,48 @@ async function deleteClassData() {
     }
 }
 
+async function deletedModalStudentShow(id) {
+    deletedStudentModal.value = true;
+    resetForm();
+    try {
+        const response = await axios.get(`/StudentsData/${id}`);
+
+        const Student = response.data.find(Student => Student.id === id);
+        idToDeleted.value = id;
+        formDataStudentDeleted.value = {
+            name: Student.name,
+        };
+        console.log(formDataStudentDeleted);
+        
+    } catch (error) {
+        console.error('Erro ao buscar dados do professor:', error);
+    }
+}
+
+async function deleteStudentData() {
+    const id = idToDeleted.value;
+
+    try {
+        await axios.delete(`/StudentDelete/${id}`);
+        deletedStudentModal.value = false;
+        isLoading.value = true;
+
+        getTableStudentData()
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 800);
+    } catch (error) {
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 800);
+        console.error(error)
+    }
+}
+
 function closeModalDeleted() {
     deletedModal.value = false;
     deletedClassDataModal.value = false;
+    deletedStudentModal.value = false;
     resetForm();
 }
 
@@ -914,6 +958,26 @@ onMounted(() => {
         </div>
         </ModalComponent>
 
+        <ModalComponentDeleted v-if="deletedStudentModal" Titlevalue="Apagar aluno">
+            <h1 class="deleted-title">
+                Você realmente deseja apagar o aluno <strong>{{ formDataStudentDeleted.name }}</strong> ? Esta é uma ação permanente que não poderá ser desfeita
+            </h1>
+            <div class="modal-end-deleted">
+                <a class="close-modal-deleted" @click="closeModalDeleted()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="var(--black-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                    </svg>
+                    Cancelar
+                </a>
+                <a ref="link" @click="deleteStudentData()">
+                    <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <path fill="red" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                    </svg>
+                    Apagar Professor
+                </a>
+            </div>
+        </ModalComponentDeleted>
+
         <userWelcomeComponent />
         <MenuComponent />
 
@@ -930,6 +994,7 @@ onMounted(() => {
             :TableContent="formDataTeachersPreview"
             :TableActions="true"
             :TableActionVisibility="true"
+            :TableActionUpdate="true"
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Professor'"
             :OpenAddModal="OpenModalTeachersCreation"
@@ -946,6 +1011,7 @@ onMounted(() => {
             :TableContent="formDataClassPreview"
             :TableActions="true"
             :TableActionVisibility="true"
+            :TableActionUpdate="true"
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Turma'"
             :OpenAddModal="OpenModalClassCreation"
@@ -963,12 +1029,12 @@ onMounted(() => {
             :TableContent="formDataStudentPreview"
             :TableActions="true"
             :TableActionVisibility="true"
+            :TableActionUpdate="false"
             :TableAddButton="true"
             :ButtonTitle="'Adicionar aluno'"
             :OpenAddModal="OpenModalStudentCreation"
             @viewDetails="ShowStudentData"
-            @updateAction="UpdateSchoolTeachersData"
-            @deletedAction="deletedModalTeachersShow"
+            @deletedAction="deletedModalStudentShow"
         ></tableComponentComponent>
     </div>
 

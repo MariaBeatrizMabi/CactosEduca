@@ -41,4 +41,18 @@ class ManagementStudentController extends Controller
             return response()->json(['message' => 'Erro ao criar aluno'], 500);
         }
     }
+
+    public function delete(Student $studentData, $id) {
+        $studentData = Student::where('id', $id)->firstOrFail();
+        
+        if (!$studentData) {
+            return response()->json(['message' => 'Professor não encontrado'], 404);
+        }
+        
+        $studentData->delete();
+        
+        Log::info('Turma excluída com sucesso: ' . $studentData);
+        
+        return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
+    }
 }

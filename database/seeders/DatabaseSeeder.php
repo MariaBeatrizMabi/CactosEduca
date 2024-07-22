@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\ManagementSchool;
+use App\Models\Teacher;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -10,6 +12,9 @@ class DatabaseSeeder extends Seeder
     
     public function run(): void
     {
+        $this->call(CitiesSeeder::class);
+        $this->call(LocationSeeder::class);
+        
         User::factory()->create([
             'user_name' => 'Admin',
             'acess_cod' => 'CactosAdmin',
@@ -38,6 +43,17 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('school') 
         ]);
 
-        $this->call(CountySeeder::class);
+        ManagementSchool::factory()->create([
+            'name' => 'School',
+            'city_id' => 1,
+            'location_id' => 1,
+            'user_id' => 4,
+        ]);
+
+        Teacher::factory()->create([
+            'name' => 'Teacher',
+            'school_id' => 1,
+            'user_id' => 4
+        ]);
     }
 }

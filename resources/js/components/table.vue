@@ -17,7 +17,6 @@ const idToUpdate = ref(null);
 const idToDeleted = ref(null);
 
 const isLoading = ref(false);
-const ChangeType = ref();
 
 const props = defineProps({
     TitleValue: {
@@ -29,9 +28,8 @@ const props = defineProps({
 function resetForm() {
     formDataAdd.value = {
         name: '',
-        address: '',
-        city: '',
-        zip_code: '',
+        location_id: '',
+        city_id: '',
         acess_cod: '',
         password: '',
         type: 'school'
@@ -41,18 +39,16 @@ function resetForm() {
 let formData = ref({
     id: '',
     name: '',
-    address: '',
+    location_id: '',
     acess_cod: '',
-    city: '',
-    zip_code: '',
+    city_id: '',
     password: '',
 })
 
 const formDataAdd = ref({
     name: '',
-    address: '',
-    city: '',
-    zip_code: '',
+    location_id: '',
+    city_id: '',
     acess_cod: '',
     password: '',
     type: 'school'
@@ -61,37 +57,46 @@ const formDataAdd = ref({
 let formDataUpdate = ref({
     id: '',
     name: '',
-    address: '',
+    location_id: '',
     acess_cod: '',
-    city: '',
-    zip_code: '',
+    city_id: '',
     password: '',
 })
 
 let formDataShow = ref({
     id: '',
     name: '',
-    address: '',
+    location_id: '',
     acess_cod: '',
-    city: '',
-    zip_code: '',
+    city_id: '',
     password: '',
 })
 
 async function getTableData() {
     try {
-        const { data } = await axios('/ManagementSchool');
+        const { data } = await axios.get('/ManagementSchool');
+        console.log(data);
 
-        formData.value = data.map(take => ({
-            id: take.id,
-            name: take.name,
-            city: take.city,
-            acess_cod: take.user.acess_cod,
-        }));
+        const formattedData = [];
+
+        data.forEach(city => {
+            city.schools.forEach(school => {
+                formattedData.push({
+                    id: school.id,
+                    name: school.name,
+                    city_id: city.address, 
+                    location_id: school.location_id,
+                    acess_cod: school.user.acess_cod,
+                });
+            });
+        });
+
+        formData.value = formattedData;
     } catch (error) {
         console.error(error);
     }
 }
+
 
 async function ShowSchoolData(id) {
     showModalData.value = true;
@@ -101,9 +106,8 @@ async function ShowSchoolData(id) {
         formDataShow.value = {
             id: response.data.id,
             name: response.data.name,
-            address: response.data.address,
-            city: response.data.city,
-            zip_code: response.data.zip_code,
+            location_id: response.data.location_id,
+            city_id: response.data.city_id,
             acess_cod: response.data.acess_cod,
             password: response.data.password,
             type: 'school'
@@ -143,6 +147,7 @@ function closeModalDeleted() {
 async function submitForm() {
     try {
         isLoading.value = true;
+
         await axios.post('/ManagementSchoolCreate', formDataAdd.value);
 
         getTableData()
@@ -169,9 +174,8 @@ async function fetchSchoolData(id) {
         formDataUpdate.value = {
             id: managementSchool.id,
             name: managementSchool.name,
-            address: managementSchool.address,
-            city: managementSchool.city,
-            zip_code: managementSchool.zip_code,
+            location_id: managementSchool.location_id,
+            city_id: managementSchool.city_id,
             acess_cod: managementSchool.user.acess_cod,
             type: 'school'
         };
@@ -275,24 +279,19 @@ onMounted(
                         labelTitle="Múnicipio da escola"
                         placeholderValue="Digite o múnicipio"
                         icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-                        :value="formDataShow.city"
-                        @input="formDataShow.city = $event.target.value"
+                        :value="formDataShow.city_id"
+                        @input="formDataShow.city_id = $event.target.value"
                         />
-                    <InputComponent
+                    <SelectComponent
                         disabled="true"
-                        labelTitle="CEP"
-                        placeholderValue="Digite o CEP da escola"
-                        icon="M320 64A64 64 0 1 0 192 64a64 64 0 1 0 128 0zm-96 96c-35.3 0-64 28.7-64 64v48c0 17.7 14.3 32 32 32h1.8l11.1 99.5c1.8 16.2 15.5 28.5 31.8 28.5h38.7c16.3 0 30-12.3 31.8-28.5L318.2 304H320c17.7 0 32-14.3 32-32V224c0-35.3-28.7-64-64-64H224zM132.3 394.2c13-2.4 21.7-14.9 19.3-27.9s-14.9-21.7-27.9-19.3c-32.4 5.9-60.9 14.2-82 24.8c-10.5 5.3-20.3 11.7-27.8 19.6C6.4 399.5 0 410.5 0 424c0 21.4 15.5 36.1 29.1 45c14.7 9.6 34.3 17.3 56.4 23.4C130.2 504.7 190.4 512 256 512s125.8-7.3 170.4-19.6c22.1-6.1 41.8-13.8 56.4-23.4c13.7-8.9 29.1-23.6 29.1-45c0-13.5-6.4-24.5-14-32.6c-7.5-7.9-17.3-14.3-27.8-19.6c-21-10.6-49.5-18.9-82-24.8c-13-2.4-25.5 6.3-27.9 19.3s6.3 25.5 19.3 27.9c30.2 5.5 53.7 12.8 69 20.5c3.2 1.6 5.8 3.1 7.9 4.5c3.6 2.4 3.6 7.2 0 9.6c-8.8 5.7-23.1 11.8-43 17.3C374.3 457 318.5 464 256 464s-118.3-7-157.7-17.9c-19.9-5.5-34.2-11.6-43-17.3c-3.6-2.4-3.6-7.2 0-9.6c2.1-1.4 4.8-2.9 7.9-4.5c15.3-7.7 38.8-14.9 69-20.5z"
-                        :value="formDataShow.zip_code"
-                        @input="formDataShow.zip_code = $event.target.value"
-                        />
-                    <InputComponent
-                        disabled="true"
-                        labelTitle="Bairro"
-                        placeholderValue="Digite o bairro da escola"
-                        icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
-                        :value="formDataShow.address"
-                        @input="formDataShow.address = $event.target.value"
+                        labelTitle="Localidade"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="locations"
+                        typeValue="select"
+                        :value="formDataShow.location_id"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataShow.location_id = $event.target.value"
                     />
             </div>
        </div>
@@ -347,26 +346,21 @@ onMounted(
                         placeholderValue="Digite o múnicipio"
                         icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
                         typeValue="select"
-                        :value="formDataAdd.city"
+                        :value="formDataAdd.city_id"
+                        valueField="id"
                         routerPath="counties"
                         RightAction="display: none;"
-                        @input="formDataAdd.city = $event.target.value"
+                        @input="formDataAdd.city_id = $event.target.value"
                         />
-                    <InputComponent
-                        labelTitle="CEP"
-                        placeholderValue="Digite o CEP da escola"
-                        icon="M320 64A64 64 0 1 0 192 64a64 64 0 1 0 128 0zm-96 96c-35.3 0-64 28.7-64 64v48c0 17.7 14.3 32 32 32h1.8l11.1 99.5c1.8 16.2 15.5 28.5 31.8 28.5h38.7c16.3 0 30-12.3 31.8-28.5L318.2 304H320c17.7 0 32-14.3 32-32V224c0-35.3-28.7-64-64-64H224zM132.3 394.2c13-2.4 21.7-14.9 19.3-27.9s-14.9-21.7-27.9-19.3c-32.4 5.9-60.9 14.2-82 24.8c-10.5 5.3-20.3 11.7-27.8 19.6C6.4 399.5 0 410.5 0 424c0 21.4 15.5 36.1 29.1 45c14.7 9.6 34.3 17.3 56.4 23.4C130.2 504.7 190.4 512 256 512s125.8-7.3 170.4-19.6c22.1-6.1 41.8-13.8 56.4-23.4c13.7-8.9 29.1-23.6 29.1-45c0-13.5-6.4-24.5-14-32.6c-7.5-7.9-17.3-14.3-27.8-19.6c-21-10.6-49.5-18.9-82-24.8c-13-2.4-25.5 6.3-27.9 19.3s6.3 25.5 19.3 27.9c30.2 5.5 53.7 12.8 69 20.5c3.2 1.6 5.8 3.1 7.9 4.5c3.6 2.4 3.6 7.2 0 9.6c-8.8 5.7-23.1 11.8-43 17.3C374.3 457 318.5 464 256 464s-118.3-7-157.7-17.9c-19.9-5.5-34.2-11.6-43-17.3c-3.6-2.4-3.6-7.2 0-9.6c2.1-1.4 4.8-2.9 7.9-4.5c15.3-7.7 38.8-14.9 69-20.5z"
+                    <SelectComponent
+                        labelTitle="Localidade"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="locations"
+                        typeValue="select"
+                        :value="formDataAdd.location_id"
+                        valueField="id"
                         RightAction="display: none;"
-                        :value="formDataAdd.zip_code"
-                        @input="formDataAdd.zip_code = $event.target.value"
-                        />
-                    <InputComponent
-                        labelTitle="Bairro"
-                        placeholderValue="Digite o bairro da escola"
-                        icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
-                        RightAction="display: none;"
-                        :value="formDataAdd.address"
-                        @input="formDataAdd.address = $event.target.value"
+                        @input="formDataAdd.location_id = $event.target.value"
                     />
             </div>
        </div>
@@ -419,22 +413,19 @@ onMounted(
                         placeholderValue="Digite o múnicipio"
                         icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
                         routerPath="counties"
-                        :value="formDataUpdate.city"
-                        @input="formDataUpdate.city = $event.target.value"
+                        valueField="id"
+                        :value="formDataUpdate.city_id"
+                        @input="formDataUpdate.city_id = $event.target.value"
                         />
-                    <InputComponent
-                        labelTitle="CEP"
-                        placeholderValue="Digite o CEP da escola"
-                        icon="M320 64A64 64 0 1 0 192 64a64 64 0 1 0 128 0zm-96 96c-35.3 0-64 28.7-64 64v48c0 17.7 14.3 32 32 32h1.8l11.1 99.5c1.8 16.2 15.5 28.5 31.8 28.5h38.7c16.3 0 30-12.3 31.8-28.5L318.2 304H320c17.7 0 32-14.3 32-32V224c0-35.3-28.7-64-64-64H224zM132.3 394.2c13-2.4 21.7-14.9 19.3-27.9s-14.9-21.7-27.9-19.3c-32.4 5.9-60.9 14.2-82 24.8c-10.5 5.3-20.3 11.7-27.8 19.6C6.4 399.5 0 410.5 0 424c0 21.4 15.5 36.1 29.1 45c14.7 9.6 34.3 17.3 56.4 23.4C130.2 504.7 190.4 512 256 512s125.8-7.3 170.4-19.6c22.1-6.1 41.8-13.8 56.4-23.4c13.7-8.9 29.1-23.6 29.1-45c0-13.5-6.4-24.5-14-32.6c-7.5-7.9-17.3-14.3-27.8-19.6c-21-10.6-49.5-18.9-82-24.8c-13-2.4-25.5 6.3-27.9 19.3s6.3 25.5 19.3 27.9c30.2 5.5 53.7 12.8 69 20.5c3.2 1.6 5.8 3.1 7.9 4.5c3.6 2.4 3.6 7.2 0 9.6c-8.8 5.7-23.1 11.8-43 17.3C374.3 457 318.5 464 256 464s-118.3-7-157.7-17.9c-19.9-5.5-34.2-11.6-43-17.3c-3.6-2.4-3.6-7.2 0-9.6c2.1-1.4 4.8-2.9 7.9-4.5c15.3-7.7 38.8-14.9 69-20.5z"
-                        :value="formDataUpdate.zip_code"
-                        @input="formDataUpdate.zip_code = $event.target.value"
-                        />
-                    <InputComponent
-                        labelTitle="Bairro"
-                        placeholderValue="Digite o bairro da escola"
-                        icon="M48 0C21.5 0 0 21.5 0 48V464c0 26.5 21.5 48 48 48h96V432c0-26.5 21.5-48 48-48s48 21.5 48 48v80h89.9c-6.3-10.2-9.9-22.2-9.9-35.1c0-46.9 25.8-87.8 64-109.2V271.8 48c0-26.5-21.5-48-48-48H48zM64 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V240zm112-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V240zM80 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H176c-8.8 0-16-7.2-16-16V112zM272 96h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H272c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16zM576 272a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM352 477.1c0 19.3 15.6 34.9 34.9 34.9H605.1c19.3 0 34.9-15.6 34.9-34.9c0-51.4-41.7-93.1-93.1-93.1H445.1c-51.4 0-93.1 41.7-93.1 93.1z"
-                        :value="formDataUpdate.address"
-                        @input="formDataUpdate.address = $event.target.value"
+                    <SelectComponent
+                        labelTitle="Localidade"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        routerPath="locations"
+                        typeValue="select"
+                        :value="formDataUpdate.location_id"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataUpdate.location_id = $event.target.value"
                     />
             </div>
        </div>
@@ -496,7 +487,7 @@ onMounted(
         </tr>
         <tr v-for="(data, index) in formData" :key="index">
             <td> {{ data.name }}</td>
-            <td class="address"> {{ data.city }} </td>
+            <td class="address"> {{ data.city_id }} </td>
             <td> {{ data.acess_cod }} </td>
             <td>
                 <div class="actions">

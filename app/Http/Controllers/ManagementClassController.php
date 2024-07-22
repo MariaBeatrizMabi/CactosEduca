@@ -10,8 +10,8 @@ class ManagementClassController extends Controller
 {
     public function index()
     {
-        $class = ClassModel::with('teacher')->get();
-        return response()->json($class);
+        $classes = ClassModel::all();
+        return response()->json($classes);
     }
 
     public function create(Request $request)

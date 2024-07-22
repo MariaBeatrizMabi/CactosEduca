@@ -2,18 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\County;
+use App\Models\Cities;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class CountySeeder extends Seeder
+class CitiesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+ 
     public function run(): void
     {
-        $countys = [
+        $citiess = [
            'Acre',
            'Alagoas',
            'Amazonas',
@@ -42,9 +40,9 @@ class CountySeeder extends Seeder
            'Distrito Federal',
         ];
 
-        foreach ($countys as $county) {
-            County::factory()->create([
-                'name' => $county,
+        foreach ($citiess as $cities) {
+            Cities::factory()->create([
+                'name' => $cities,
             ]);
         }
     }

@@ -15,8 +15,12 @@ const userType = ref({
 const filteredTeachers = ref([]);
 const TeacherCount = ref([]);
 const SchoolCount = ref([]);
+const ClassDataCount = ref([]);
+const StudentCount = ref([]);
 const teachers = ref([]);
 const school = ref([]);
+const classData = ref([]);
+const student = ref([]);
 
 const getUserType = async () => {
     try {
@@ -46,6 +50,24 @@ const fetchSchool = async () => {
     }
 }
 
+const fetchClassData = async () => {
+    try {
+        const response = await axios.get('/ClassSchool');
+        classData.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+const fetchStudent = async () => {
+    try {
+        const response = await axios.get('/StudentsData');
+        student.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
 const countTeachersBySchoolId = () => {
     return teachers.value.filter(teacher => teacher.school_id === userType.value.id);
 }
@@ -58,12 +80,24 @@ const countAllSchool = () => {
     return school.value.length;
 }
 
+const countAllClassData = () => {
+    return classData.value.length;
+}
+
+const countAllStudent= () => {
+    return student.value.length;
+}
+
 onMounted(async () => {
     await getUserType();
     await fetchTeachers();
-    await fetchSchool()
+    await fetchSchool();
+    await fetchClassData();
+    await fetchStudent();
     SchoolCount.value = countAllSchool();
     TeacherCount.value = countAllTeachers();
+    ClassDataCount.value = countAllClassData()
+    StudentCount.value = countAllStudent()
     filteredTeachers.value = countTeachersBySchoolId();
 });
 
@@ -79,9 +113,9 @@ onMounted(async () => {
             
             <div class="Cards-container" v-if="userType.type === 'admin'">
                 <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" :valueCard="SchoolCount" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="253"></CardComponent>
+                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" :valueCard="TeacherCount"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" valueCard="1.021"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" :valueCard="StudentCount"></CardComponent>
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'school'">
