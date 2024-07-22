@@ -92,22 +92,22 @@ class TeacherController extends Controller
             return response()->json(['message' => 'Erro ao atualizar professor: ' . $e->getMessage()], 500);
         }
     }
-    
+
     public function delete(Teacher $teacher) {
         if (!$teacher) {
             return response()->json(['message' => 'Professor não encontrado'], 404);
         }
-        
+
         $user = User::where('acess_cod', $teacher->acess_cod)->first();
-        
+
         $teacher->delete();
-        
+
         if ($user) {
             $user->delete();
         }
-        
+
         Log::info('Professor e usuário excluídos com sucesso: ' . $teacher);
-        
+
         return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
     }
 }

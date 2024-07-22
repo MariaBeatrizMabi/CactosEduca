@@ -9,7 +9,6 @@ use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
-    
     public function run(): void
     {
         $this->call(CitiesSeeder::class);
@@ -17,30 +16,30 @@ class DatabaseSeeder extends Seeder
         
         User::factory()->create([
             'user_name' => 'Admin',
-            'acess_cod' => 'CactosAdmin',
+            'acess_cod'  => 'CactosAdmin',
             'type' => 'admin',
-            'password' => bcrypt('12345678') 
+            'password' => bcrypt('12345678')
         ]);
 
         User::factory()->create([
             'user_name' => 'Seduc',
             'acess_cod' => 'adminSeduc',
             'type' => 'admin_seduc',
-            'password' => bcrypt('seduc') 
+            'password' => bcrypt('seduc')
         ]);
 
         User::factory()->create([
             'user_name' => 'Teacher',
             'acess_cod' => 'teacherTest',
             'type' => 'teacher',
-            'password' => bcrypt('teacher') 
+            'password' => bcrypt('teacher')
         ]);
 
         User::factory()->create([
             'user_name' => 'School',
             'acess_cod' => 'school',
             'type' => 'school',
-            'password' => bcrypt('school') 
+            'password' => bcrypt('school')
         ]);
 
         ManagementSchool::factory()->create([

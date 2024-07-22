@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\ManagementSchoolController;
+use App\Http\Controllers\ManagementStudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,4 +32,13 @@ Route::prefix('management-schools')->name('management-schools.')->group(function
     Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
     Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
     Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
+});
+
+Route::prefix('students')->name('students.')->group(function () {
+    Route::get('/{student}', [ManagementStudentController::class, 'show']);
+    Route::put('/{student}', [ManagementStudentController::class, 'update']);
+});
+
+Route::prefix('users')->name('users.')->group(function () {
+    Route::get('/{user}/management-schools', [UserController::class, 'showManagementSchools']);
 });

@@ -20,17 +20,44 @@ class ManagementStudentController extends Controller
         return response()->json($class);
     }
 
+    public function show(Student $student)
+    {
+        return response()->json($student);
+    }
+
+    public function update(Request $request, Student $student)
+    {
+        if ($request->input('group_id')) {
+            if (!ClassModel::find($request->input('group_id'))) {
+                return response()->json(['message' => 'Turma não existe'], 400);
+            }
+        }
+
+        $student->update([
+            'name' => $request->input('name'),
+            'age' => $request->input('age'),
+            'comments' => $request->input('comments'),
+            'enrollment_date' => $request->input('enrollment_date'),
+            'group_id' => $request->input('group_id'),
+        ]);
+
+        return response()->json(['message' => 'Escola atualizada com sucesso'], 200);
+    }
+
     public function create(Request $request)
     {
         try {
             $student = Student::create([
                 'name' => $request->input('name'),
+                'age' => $request->input('age'),
+                'enrollment_date' => $request->input('enrollment_date'),
+                'comments' => $request->input('comments'),
                 'group_id' => $request->input('group_id'),
                 'school_id' => $request->input('school_id'),
             ]);
-        
+
             Log::info('Dados da escola:', $student->toArray());
-        
+
             return response()->json(['message' => 'Aluno criado com sucesso'], 201);
         } catch (\Exception $e) {
             if (isset($user)) {

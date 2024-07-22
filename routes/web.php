@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/StudentsData/{id}', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
     Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
     Route::delete('/StudentDelete/{id}', 'App\Http\Controllers\ManagementStudentController@delete')->name('student.delete');
-    
+
     Route::get('/counties', function () {
         return cities::all();
     });
@@ -76,5 +76,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/loginUser', 'App\Http\Controllers\LoginController@GetAuth')->name('GetAuth');
 
-    Route::get('/student', StudentController::class)->name('student');
+    Route::get('/student/{student}', StudentController::class)->name('student');
 });

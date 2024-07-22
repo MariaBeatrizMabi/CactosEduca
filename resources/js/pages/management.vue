@@ -53,7 +53,8 @@ const formDataTeacherAdd = ref({
 const formDataStudentAdd = ref({
     name: '',
     group_id: '',
-    school_id: userID.value, 
+    age: null,
+    school_id: userID.value,
 })
 
 let formDataClassPreview = ref({
@@ -66,7 +67,7 @@ let formDataClassPreview = ref({
 let formDataStudentPreview = ref({
     name: '',
     group_id: '',
-    school_id: userID.value,    
+    school_id: userID.value,
 })
 
 const formDataClassAdd = ref({
@@ -134,7 +135,7 @@ const OpenModalStudentCreation = () => {
 function resetForm() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: userID.value,
+        school_id: schoolId.value,
         group_id: '',
         acess_cod: '',
         password: '',
@@ -145,40 +146,36 @@ function resetForm() {
 function resetFormClass() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: userID.value,
+        school_id: schoolId.value,
         teacher_id: '',
     };
 }
 
-const getUserType = () => {
-    axios.get('/loginUser').then(response => {
-        userType.value = response.data.type;
-        userID.value = response.data.id;
+async function getUserType() {
+    const { data: loginUserData } = await axios.get('/loginUser');
+    userType.value = loginUserData.type;
+    userID.value = loginUserData.id
 
-         formDataTeacherAdd.value = {
-            name: '',
-            school_id: userID.value,
-            group_id: '',
-            acess_cod: '',
-            password: '',
-            type: 'teacher'
-        };
+    formDataTeacherAdd.value = {
+        name: '',
+        school_id: userID.value,
+        group_id: '',
+        acess_cod: '',
+        password: '',
+        type: 'teacher'
+    };
 
-        formDataClassAdd.value = {
-            name: '',
-            school_id: userID.value,
-            teacher_id: '',
-        };
+    formDataClassAdd.value = {
+        name: '',
+        school_id: userID.value,
+        teacher_id: '',
+    };
 
-        formDataStudentAdd.value = {
-            name: '',
-            school_id: userID.value,
-            group_id: '',
-        }
-
-    }).catch(error => {
-        console.error("ERROR", error);
-    });
+    formDataStudentAdd.value = {
+        name: '',
+        school_id: userID.value,
+        group_id: '',
+    }
 }
 
 async function getTableTeacherData() {
@@ -321,22 +318,7 @@ async function ShowSchoolClassData(id) {
 }
 
 async function ShowStudentData(id) {
-    showModalStudentData.value = true;
-    try {
-        const response = await axios.get(`/StudentsData`);
-        const student = response.data.find(student => student.id === id);
-
-        if (student) {
-            formDataStudentVisualize.value = {
-                name: student.name,
-                group_id: student.class_data ? student.class_data.id : '',
-            };
-
-        } else {
-            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
-        }
-    } catch (error) {
-        console.error(error);    }
+    window.location.href = `/student/${id}`
 }
 
 async function UpdateSchoolTeachersData(id) {
@@ -407,11 +389,11 @@ async function updateClassDataForm() {
     try {
         const formData = {
             name: formDataClassUpdated.value.name,
-            school_id: userID.value,
+            school_id: schoolId.value,
             teacher_id: formDataClassUpdated.value.teacher_id
         };
 
-        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formData); 
+        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formData);
         updateModalClassData.value = false;
         isLoading.value = true;
 
@@ -876,7 +858,7 @@ onMounted(() => {
             </div>
         </ModalComponentDeleted>
 
-        <ModalComponent v-if="showModalStudentCreation" Titlevalue="Cadastro de professores">
+        <ModalComponent v-if="showModalStudentCreation" Titlevalue="Cadastro de alunos">
             <div class="modal-body-size">
                 <h2>Criação do Aluno</h2>
                 <div class="modal-content-details">
@@ -898,7 +880,25 @@ onMounted(() => {
                         valueField="id"
                         RightAction="display: none;"
                         @input="formDataStudentAdd.group_id = $event.target.value"
-                        />
+                    />
+
+                    <InputComponent
+                        labelTitle="Idade do Aluno"
+                        placeholderValue="Idade do aluno"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        typeValue="number"
+                        :value="formDataStudentAdd.age"
+                        @input="formDataStudentAdd.age = $event.target.value"
+                    />
+
+                    <InputComponent
+                        labelTitle="Data da Matrícula"
+                        placeholderValue="Data da Matrícula"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        typeValue="date"
+                        :value="formDataStudentAdd.enrollment_date"
+                        @input="formDataStudentAdd.enrollment_date = $event.target.value"
+                    />
                 </div>
        </div>
        <div class="modal-end">
@@ -916,7 +916,7 @@ onMounted(() => {
                 </a>
             </div>
         </ModalComponent>
-        
+
         <ModalComponent v-if="showModalStudentData" Titlevalue="Visualização de aluno">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o aluno</h2>
@@ -1030,6 +1030,7 @@ onMounted(() => {
             :TableActionVisibility="true"
             :TableActionUpdate="false"
             :TableAddButton="true"
+            :TableUpdateAction="false"
             :ButtonTitle="'Adicionar aluno'"
             :OpenAddModal="OpenModalStudentCreation"
             @viewDetails="ShowStudentData"

@@ -45,16 +45,16 @@ class ManagementClassController extends Controller
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
-    
+
             Log::info('Dados do professor atualizados:', $ClassData->toArray());
-    
+
             return response()->json(['message' => 'Professor atualizado com sucesso'], 200);
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar professor: ' . $e->getMessage());
             return response()->json(['message' => 'Erro ao atualizar professor: ' . $e->getMessage()], 500);
         }
     }
-    
+
 
     public function show(ClassModel $classModel)
     {
@@ -63,15 +63,15 @@ class ManagementClassController extends Controller
 
     public function delete(ClassModel $classData, $id) {
         $classData = ClassModel::where('id', $id)->firstOrFail();
-        
+
         if (!$classData) {
             return response()->json(['message' => 'Professor não encontrado'], 404);
         }
-        
+
         $classData->delete();
-        
+
         Log::info('Turma excluída com sucesso: ' . $classData);
-        
+
         return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
     }
 }

@@ -49,7 +49,7 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/student',
+            path: '/student/:student',
             name: 'Student',
             component: StudentForm,
             props: true,
