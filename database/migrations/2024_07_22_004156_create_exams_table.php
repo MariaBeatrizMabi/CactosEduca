@@ -26,7 +26,7 @@ return new class extends Migration {
                 'syllabic',
                 'alphabetical_syllabic',
                 'alphabetical'
-            ])->default('not_reader');
+            ])->default('pre_syllabic');
             $table->boolean('need_action')->default(false);
             $table->enum('action_status', [
                 'effective',

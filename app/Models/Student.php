@@ -19,7 +19,7 @@ class Student extends Model
         'group_id'
     ];
 
-    protected $table = 'student';
+    protected $table = 'students';
 
     public function classData(): BelongsTo
     {

@@ -51,8 +51,6 @@ class ManagementStudentController extends Controller
                 'name' => $request->input('name'),
                 'age' => $request->input('age'),
                 'enrollment_date' => $request->input('enrollment_date'),
-                'comments' => $request->input('comments'),
-                'group_id' => $request->input('group_id'),
                 'school_id' => $request->input('school_id'),
             ]);
 

@@ -4,27 +4,29 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 const acess_cod = ref('');
 const password = ref('');
-const router = useRouter(); 
+const router = useRouter();
 import InputComponentPassword from '../components/inputPassword.vue'
 
-const showWrongMessage = ref(false); 
+const showWrongMessage = ref(false);
 
 const login = () => {
     axios.post('/login', {
         acess_cod: acess_cod.value,
         password: password.value
-    }).then(response => {   
+    }).then(response => {
+        localStorage.setItem('token', response.data.token);
+
         if (response.data.type === 'admin') {
-            router.push('/dashboard'); 
+            router.push('/dashboard');
         }
         else if (response.data.type === 'admin_seduc') {
         }
         else if (response.data.type === 'teacher') {
-            router.push('/dashboard'); 
+            router.push('/dashboard');
         }
         else if (response.data.type === 'school') {
-            router.push('/dashboard'); 
-        } 
+            router.push('/dashboard');
+        }
     }).catch(error => {
         if (acess_cod.value === '') {
         }  else if (password.value === '') {
@@ -148,7 +150,7 @@ const login = () => {
             & .label-passworld {
                 margin-top: 1vh;
             }
-            
+
             & h1 {
                 font-size: 3vh;
             }
@@ -173,16 +175,16 @@ const login = () => {
                     height: 6vh;
 
                     background-color: var(--grap-color);
-                    
+
                     border-radius: 0 3vw 3vw 0;
                     border: 1px solid var(--primary-color);
                     border-left: 0;
-                    
+
                     outline: 0;
                     width: 100%;
                     font-size: 1rem;
                 }
-                
+
                 & .icon-password {
                     display: flex;
                     align-items: center;
@@ -248,24 +250,24 @@ const login = () => {
                         margin: -0.2vw;
 
                         background-color: var(--grap-color);
-                        
+
                         border: 1px solid var(--primary-color);
                         border-radius: 3vw 0 0 3vw;
-                        border-right: 0;                        
+                        border-right: 0;
                     }
                 }
             }
             & .button-submit-login {
                     padding: 1.5vh;
-                    
+
                     border: 0;
                     border-radius: 3vw;
-                    
+
                     color: var(--white-color);
-                    
+
                     font-size: 2.1vh;
                     font-weight: bold;
-                    
+
                     background-color: var(--primary-color);
                     cursor: pointer;
             }
@@ -319,7 +321,7 @@ const login = () => {
                         font-size: 1.8vh;
                     }
                 }
-            
+
                 & .wave-left {
                 position: absolute;
                 left: 0;
@@ -354,7 +356,7 @@ const login = () => {
             height: 100% !important;
 
         & .left-section, .right-section {
-            width: 100% !important; 
+            width: 100% !important;
             height: 100vh !important;
         }
 

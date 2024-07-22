@@ -44,7 +44,6 @@ class ManagementSchoolController extends Controller
     public function show($id)
     {
         $school = ManagementSchool::with('user')->find($id);
-        $cities = Cities::with('address')->get();
 
         if (!$school) {
             return response()->json(['message' => 'School not found'], 404);
@@ -53,9 +52,9 @@ class ManagementSchoolController extends Controller
             'id' => $school->id,
             'name' => $school->name,
             'location_id' => $school->location_id,
-            'city_id' => $cities[$school->city_id - 1]->name,
+            'city_id' => $school->city_id,
             'acess_cod' => $school->user->acess_cod,
-            'password' => $school->user->password 
+            'password' => $school->user->password
         ]);
     }
 

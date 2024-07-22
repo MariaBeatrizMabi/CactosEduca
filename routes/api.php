@@ -22,23 +22,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('teachers')->name('teachers.')->group(function () {
-    Route::get('/{teacher}', [TeacherController::class, 'show']);
-    Route::put('/{teacher}', [TeacherController::class, 'update']);
-    Route::delete('/{teacher}', [TeacherController::class, 'delete']);
-});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('teachers')->name('teachers.')->group(function () {
+        Route::get('/{teacher}', [TeacherController::class, 'show']);
+        Route::put('/{teacher}', [TeacherController::class, 'update']);
+        Route::delete('/{teacher}', [TeacherController::class, 'delete']);
+    });
 
-Route::prefix('management-schools')->name('management-schools.')->group(function () {
-    Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
-    Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
-    Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
-});
+    Route::prefix('management-schools')->name('management-schools.')->group(function () {
+        Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
+        Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
+        Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
+    });
 
-Route::prefix('students')->name('students.')->group(function () {
-    Route::get('/{student}', [ManagementStudentController::class, 'show']);
-    Route::put('/{student}', [ManagementStudentController::class, 'update']);
-});
+    Route::prefix('students')->name('students.')->group(function () {
+        Route::get('/{student}', [ManagementStudentController::class, 'show']);
+        Route::put('/{student}', [ManagementStudentController::class, 'update']);
+    });
 
-Route::prefix('users')->name('users.')->group(function () {
-    Route::get('/{user}/management-schools', [UserController::class, 'showManagementSchools']);
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/{user}/management-schools', [UserController::class, 'showManagementSchools']);
+    });
 });
