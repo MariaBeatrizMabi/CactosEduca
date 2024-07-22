@@ -43,9 +43,6 @@
     }
 
     function navigateToSchool(cityName, schoolName) {
-        console.log("Nome da cidade:", cityName);
-        console.log("Nome da escola:", schoolName);
-        
         router.push({ 
         name: 'SchoolDetailsByCityAndSchool', 
         params: { 

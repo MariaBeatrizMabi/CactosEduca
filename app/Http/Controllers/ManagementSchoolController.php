@@ -19,7 +19,7 @@ class ManagementSchoolController extends Controller
 
         $response = $cities->map(function ($city) use ($groupedSchools) {
             return [
-                'address' => $city->name, // Usando 'address' como solicitado
+                'address' => $city->name,
                 'schools' => $groupedSchools->get($city->id, collect())->map(function ($school) {
                     return [
                         'id' => $school->id,
@@ -41,11 +41,22 @@ class ManagementSchoolController extends Controller
         return response()->json($response->values());
     }
 
-    public function show(ManagementSchool $managementSchool)
+    public function show($id)
     {
-        return response()->json(
-            $managementSchool->load('user')
-        );
+        $school = ManagementSchool::with('user')->find($id);
+        $cities = Cities::with('address')->get();
+
+        if (!$school) {
+            return response()->json(['message' => 'School not found'], 404);
+        }
+        return response()->json([
+            'id' => $school->id,
+            'name' => $school->name,
+            'location_id' => $school->location_id,
+            'city_id' => $cities[$school->city_id - 1]->name,
+            'acess_cod' => $school->user->acess_cod,
+            'password' => $school->user->password 
+        ]);
     }
 
     public function create(Request $request)

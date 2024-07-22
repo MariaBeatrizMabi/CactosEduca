@@ -510,7 +510,6 @@ async function deletedModalStudentShow(id) {
         formDataStudentDeleted.value = {
             name: Student.name,
         };
-        console.log(formDataStudentDeleted);
         
     } catch (error) {
         console.error('Erro ao buscar dados do professor:', error);

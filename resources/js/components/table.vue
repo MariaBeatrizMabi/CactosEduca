@@ -75,7 +75,6 @@ let formDataShow = ref({
 async function getTableData() {
     try {
         const { data } = await axios.get('/ManagementSchool');
-        console.log(data);
 
         const formattedData = [];
 
@@ -97,19 +96,19 @@ async function getTableData() {
     }
 }
 
-
 async function ShowSchoolData(id) {
     showModalData.value = true;
     try {
         const response = await axios.get(`/ManagementSchool/${id}`);
 
+        const school = response.data;
+
         formDataShow.value = {
-            id: response.data.id,
-            name: response.data.name,
-            location_id: response.data.location_id,
-            city_id: response.data.city_id,
-            acess_cod: response.data.acess_cod,
-            password: response.data.password,
+            id: school.id,
+            name: school.name,
+            location_id: school.location_id,
+            city_id: school.city_id,
+            acess_cod: school.acess_cod,
             type: 'school'
         };
 
@@ -117,7 +116,6 @@ async function ShowSchoolData(id) {
         console.error(error);
     }
 }
-
 
 function openModal() {
     resetForm();
