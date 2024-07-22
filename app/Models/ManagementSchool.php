@@ -12,11 +12,12 @@ class ManagementSchool extends Model
 
     protected $fillable = [
         'name',
-        'address',
-        'city',
-        'zip_code',
-        'user_id'
+        'city_id',
+        'location_id',
+        'user_id',
     ];
+
+    protected $table = 'management_schools';
 
     public static function boot(): void
     {
@@ -30,5 +31,10 @@ class ManagementSchool extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Cities::class, 'city_id');
     }
 }

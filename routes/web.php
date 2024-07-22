@@ -4,7 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\SchoolDetails;
 use App\Http\Controllers\StudentController;
-use App\Models\County;
+use App\Models\Cities;
+use App\Models\Location;
 use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use Illuminate\Support\Facades\Auth;
@@ -55,11 +56,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ClassSchoolUpdate/{id}', 'App\Http\Controllers\ManagementClassController@update')->name('class.update');
     Route::delete('/ClassSchoolDelete/{id}', 'App\Http\Controllers\ManagementClassController@delete')->name('class.delete');
 
-    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
+    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@index')->name('student.show');
+    Route::get('/StudentsData/{id}', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
     Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
+    Route::delete('/StudentDelete/{id}', 'App\Http\Controllers\ManagementStudentController@delete')->name('student.delete');
     
     Route::get('/counties', function () {
-        return County::all();
+        return cities::all();
+    });
+
+    Route::get('/locations', function () {
+        return Location::all();
     });
 
     Route::post('/logout', function () {

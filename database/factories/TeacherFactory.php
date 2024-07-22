@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Teacher>
  */
-class CountyFactory extends Factory
+class TeacherFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,6 +18,8 @@ class CountyFactory extends Factory
     {
         return [
             'name' => '',
+            'school_id' => '',
+            'user_id' => ''
         ];
     }
 }

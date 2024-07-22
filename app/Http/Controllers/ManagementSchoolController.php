@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cities;
 use App\Models\ManagementSchool;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,14 +13,50 @@ class ManagementSchoolController extends Controller
     public function index()
     {
         $schools = ManagementSchool::with('user')->get();
-        return response()->json($schools);
+        $cities = Cities::with('address')->get();
+
+        $groupedSchools = $schools->groupBy('city_id');
+
+        $response = $cities->map(function ($city) use ($groupedSchools) {
+            return [
+                'address' => $city->name,
+                'schools' => $groupedSchools->get($city->id, collect())->map(function ($school) {
+                    return [
+                        'id' => $school->id,
+                        'name' => $school->name,
+                        'city_id' => $school->city_id,
+                        'location_id' => $school->location_id,
+                        'user' => [
+                            'id' => $school->user->id,
+                            'user_name' => $school->user->user_name,
+                            'acess_cod' => $school->user->acess_cod,
+                        ]
+                    ];
+                })
+            ];
+        })->filter(function ($cityData) {
+            return $cityData['schools']->isNotEmpty();
+        });
+
+        return response()->json($response->values());
     }
 
-    public function show(ManagementSchool $managementSchool)
+    public function show($id)
     {
-        return response()->json(
-            $managementSchool->load('user')
-        );
+        $school = ManagementSchool::with('user')->find($id);
+        $cities = Cities::with('address')->get();
+
+        if (!$school) {
+            return response()->json(['message' => 'School not found'], 404);
+        }
+        return response()->json([
+            'id' => $school->id,
+            'name' => $school->name,
+            'location_id' => $school->location_id,
+            'city_id' => $cities[$school->city_id - 1]->name,
+            'acess_cod' => $school->user->acess_cod,
+            'password' => $school->user->password 
+        ]);
     }
 
     public function create(Request $request)
@@ -37,8 +74,11 @@ class ManagementSchoolController extends Controller
             $school = ManagementSchool::create([
                 'name' => $request->input('name'),
                 'address' => $request->input('address'),
+                'city_id' => $request->input('city_id'),
+                'location_id' => $request->input('location_id'),
+                'acess_cod' => $request->input('acess_cod'),
+                'password' => $request->input('password'),
                 'city' => $request->input('city'),
-                'zip_code' => $request->input('zip_code'),
                 'user_id' => $user->id,
             ]);
 
@@ -59,9 +99,10 @@ class ManagementSchoolController extends Controller
     {
         $managementSchool->update([
             'name' => $request->input('name'),
-            'address' => $request->input('address'),
-            'city' => $request->input('city'),
-            'zip_code' => $request->input('zip_code'),
+            'city_id' => $request->input('city_id'),
+            'location_id' => $request->input('location_id'),
+            'acess_cod' => $request->input('acess_cod'),
+            'password' => $request->input('password'),
             'type' => $request->input('type'),
         ]);
 

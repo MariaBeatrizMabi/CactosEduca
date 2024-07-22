@@ -14,26 +14,20 @@ const login = () => {
         acess_cod: acess_cod.value,
         password: password.value
     }).then(response => {   
-        console.log('Tipo de usuário:', response.data.type);
         if (response.data.type === 'admin') {
             router.push('/dashboard'); 
         }
         else if (response.data.type === 'admin_seduc') {
-            console.log("Olá seduc")
         }
         else if (response.data.type === 'teacher') {
             router.push('/dashboard'); 
-            console.log("Olá professor")
         }
         else if (response.data.type === 'school') {
             router.push('/dashboard'); 
-            console.log("Olá escola")
         } 
     }).catch(error => {
         if (acess_cod.value === '') {
-            console.log("Digite um código de acesso")
         }  else if (password.value === '') {
-            console.log("Digite uma senha")
         } else {
             showWrongMessage.value = true;
         }
