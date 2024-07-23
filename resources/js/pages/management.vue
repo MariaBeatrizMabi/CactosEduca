@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue';
 import axios from 'axios';
+import { api } from '../api'
 import MenuComponent from '../components/menu.vue';
 import TitleComponent from '../components/title.vue';
 import userWelcomeComponent from '../components/userWelcome.vue';
@@ -53,7 +54,8 @@ const formDataTeacherAdd = ref({
 const formDataStudentAdd = ref({
     name: '',
     group_id: '',
-    school_id: userID.value, 
+    age: null,
+    school_id: userID.value,
 })
 
 let formDataClassPreview = ref({
@@ -66,7 +68,7 @@ let formDataClassPreview = ref({
 let formDataStudentPreview = ref({
     name: '',
     group_id: '',
-    school_id: userID.value,    
+    school_id: userID.value,
 })
 
 const formDataClassAdd = ref({
@@ -150,35 +152,31 @@ function resetFormClass() {
     };
 }
 
-const getUserType = () => {
-    axios.get('/loginUser').then(response => {
-        userType.value = response.data.type;
-        userID.value = response.data.id;
+async function getUserType() {
+    const { data: loginUserData } = await axios.get('/loginUser');
+    userType.value = loginUserData.type;
+    userID.value = loginUserData.id
 
-         formDataTeacherAdd.value = {
-            name: '',
-            school_id: userID.value,
-            group_id: '',
-            acess_cod: '',
-            password: '',
-            type: 'teacher'
-        };
+    formDataTeacherAdd.value = {
+        name: '',
+        school_id: userID.value,
+        group_id: '',
+        acess_cod: '',
+        password: '',
+        type: 'teacher'
+    };
 
-        formDataClassAdd.value = {
-            name: '',
-            school_id: userID.value,
-            teacher_id: '',
-        };
+    formDataClassAdd.value = {
+        name: '',
+        school_id: userID.value,
+        teacher_id: '',
+    };
 
-        formDataStudentAdd.value = {
-            name: '',
-            school_id: userID.value,
-            group_id: '',
-        }
-
-    }).catch(error => {
-        console.error("ERROR", error);
-    });
+    formDataStudentAdd.value = {
+        name: '',
+        school_id: userID.value,
+        group_id: '',
+    }
 }
 
 async function getTableTeacherData() {
@@ -198,13 +196,13 @@ async function getTableTeacherData() {
 
 async function getTableClassData() {
     try {
-        const response = await axios('/ClassSchool');
+        const response = await axios.get('/ClassSchool');
+
         formDataClassPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
             teacher_name: take.teacher ? take.teacher.name : '',
         }));
-
     } catch (error) {
         console.error(error);
     }
@@ -217,7 +215,7 @@ async function getTableStudentData() {
         formDataStudentPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
-            group_id: take.class_data ? take.class_data.name : '',
+            age: take.age
         }));
 
 
@@ -284,7 +282,7 @@ async function ShowSchoolTeachersData(id) {
     showModalData.value = true;
 
     try {
-        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
+        const { data: teacher } = await api.get(`/api/teachers/${id}`);
 
         if (teacher) {
             formDataVisualize.value = {
@@ -302,48 +300,18 @@ async function ShowSchoolTeachersData(id) {
 }
 
 async function ShowSchoolClassData(id) {
-    showModalClassData.value = true;
-    try {
-        const response = await axios.get(`/ClassSchool`);
-
-        const classData = response.data.find(classData => classData.id === id);
-        if (classData) {
-            formDataClassVisualize.value = {
-                name: classData.name,
-                teacher_id: classData.teacher_id,
-            };
-        } else {
-            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
-        }
-    } catch (error) {
-        console.error(error);
-    }
+    window.location.href = `/class/${id}`
 }
 
 async function ShowStudentData(id) {
-    showModalStudentData.value = true;
-    try {
-        const response = await axios.get(`/StudentsData`);
-        const student = response.data.find(student => student.id === id);
-
-        if (student) {
-            formDataStudentVisualize.value = {
-                name: student.name,
-                group_id: student.class_data ? student.class_data.id : '',
-            };
-
-        } else {
-            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
-        }
-    } catch (error) {
-        console.error(error);    }
+    window.location.href = `/student/${id}`
 }
 
 async function UpdateSchoolTeachersData(id) {
     updateModalTeacherData.value = true;
 
     try {
-        const { data: teacher } = await axios.get(`/api/teachers/${id}`);
+        const { data: teacher } = await api.get(`/api/teachers/${id}`);
 
         idToUpdate.value = id;
 
@@ -365,7 +333,7 @@ async function UpdateSchoolTeachersData(id) {
 async function UpdateSchoolClassData(id) {
     updateModalClassData.value = true;
     try {
-        const response = await axios.get(`/ClassSchool/${id}`);
+        const response = await api.get(`/ClassSchool/${id}`);
 
         const classData = response.data.find(classData => classData.id === id);
 
@@ -387,7 +355,7 @@ async function UpdateSchoolClassData(id) {
 
 async function updateDataForm() {
     try {
-        await axios.put(`/api/teachers/${idToUpdate.value}`, formDataUpdate.value);
+        await api.put(`/api/teachers/${idToUpdate.value}`, formDataUpdate.value);
 
         updateModalTeacherData.value = false;
         isLoading.value = true;
@@ -411,7 +379,7 @@ async function updateClassDataForm() {
             teacher_id: formDataClassUpdated.value.teacher_id
         };
 
-        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formData); 
+        const response = await axios.put(`/ClassSchoolUpdate/${id}`, formData);
         updateModalClassData.value = false;
         isLoading.value = true;
 
@@ -428,6 +396,7 @@ async function updateClassDataForm() {
 async function deletedModalTeachersShow(id) {
     deletedModal.value = true;
     resetForm();
+
     try {
         const response = await axios.get(`/Teachers/${id}`);
 
@@ -443,10 +412,8 @@ async function deletedModalTeachersShow(id) {
 }
 
 async function deletedTeachers() {
-    const id = idToDeleted.value;
-
     try {
-        await axios.delete(`/api/teachers/${id}`);
+        await api.delete(`/api/teachers/${idToDeleted.value}`);
         deletedModal.value = false;
         isLoading.value = true;
 
@@ -510,7 +477,7 @@ async function deletedModalStudentShow(id) {
         formDataStudentDeleted.value = {
             name: Student.name,
         };
-        
+
     } catch (error) {
         console.error('Erro ao buscar dados do professor:', error);
     }
@@ -736,9 +703,9 @@ onMounted(() => {
     </div>
         </ModalComponentDeleted>
 
-        <ModalComponent v-if="showModalClassData" Titlevalue="Visualização de professores">
+        <ModalComponent v-if="showModalClassData" Titlevalue="Visualização de turmas">
             <div class="modal-body-size">
-                <h2>Detalhes sobre o professor</h2>
+                <h2>Detalhes sobre a turma</h2>
                 <div class="modal-content-details">
                     <InputComponent
                         disabled="true"
@@ -815,27 +782,27 @@ onMounted(() => {
             </div>
         </ModalComponent>
 
-        <ModalComponent v-if="updateModalClassData" Titlevalue="Atualizar professor">
+        <ModalComponent v-if="updateModalClassData" Titlevalue="Atualizar turma">
             <div class="modal-body-size">
-                <h2>Detalhes sobre o professor</h2>
+                <h2>Detalhes sobre a turma</h2>
                 <div class="modal-content-details">
                     <InputComponent
                         labelTitle="Nome da turma"
                         placeholderValue="Nome da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
-                        :value="formDataClassVisualize.name"
+                        :value="formDataClassUpdated.name"
                         typeValue="text"
-                        @input="formDataClassVisualize.name = $event.target.value"
+                        @input="formDataClassUpdated.name = $event.target.value"
                    />
                    <SelectComponent
                         labelTitle="Professor responsável da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
                         routerPath="Teachers"
                         typeValue="select"
-                        :value="formDataClassVisualize.teacher_id"
+                        :value="formDataClassUpdated.teacher_id"
                         valueField="id"
                         RightAction="display: none;"
-                        @input="formDataClassVisualize.teacher_id = $event.target.value"
+                        @input="formDataClassUpdated.teacher_id = $event.target.value"
                         />
                 </div>
                 <div class="modal-content-address"></div>
@@ -876,7 +843,7 @@ onMounted(() => {
             </div>
         </ModalComponentDeleted>
 
-        <ModalComponent v-if="showModalStudentCreation" Titlevalue="Cadastro de professores">
+        <ModalComponent v-if="showModalStudentCreation" Titlevalue="Cadastro de alunos">
             <div class="modal-body-size">
                 <h2>Criação do Aluno</h2>
                 <div class="modal-content-details">
@@ -889,16 +856,23 @@ onMounted(() => {
                         @input="formDataStudentAdd.name = $event.target.value"
                    />
 
-                   <SelectComponent
-                        labelTitle="Turma do aluno"
-                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                        routerPath="ClassSchool"
-                        typeValue="select"
-                        :value="formDataStudentAdd.group_id"
-                        valueField="id"
-                        RightAction="display: none;"
-                        @input="formDataStudentAdd.group_id = $event.target.value"
-                        />
+                    <InputComponent
+                        labelTitle="Idade do Aluno"
+                        placeholderValue="Idade do aluno"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        typeValue="number"
+                        :value="formDataStudentAdd.age"
+                        @input="formDataStudentAdd.age = $event.target.value"
+                    />
+
+                    <InputComponent
+                        labelTitle="Data da Matrícula"
+                        placeholderValue="Data da Matrícula"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        typeValue="date"
+                        :value="formDataStudentAdd.enrollment_date"
+                        @input="formDataStudentAdd.enrollment_date = $event.target.value"
+                    />
                 </div>
        </div>
        <div class="modal-end">
@@ -916,7 +890,7 @@ onMounted(() => {
                 </a>
             </div>
         </ModalComponent>
-        
+
         <ModalComponent v-if="showModalStudentData" Titlevalue="Visualização de aluno">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o aluno</h2>
@@ -1024,16 +998,35 @@ onMounted(() => {
             <TitleComponent title="Cadastro de alunos" />
             <tableComponentComponent
             TitleValue="Cadastrados"
-            :TableHeader="['Nome do aluno', 'Turma']"
+            :TableHeader="['Nome do aluno', 'Idade do aluno']"
             :TableContent="formDataStudentPreview"
             :TableActions="true"
             :TableActionVisibility="true"
             :TableActionUpdate="false"
             :TableAddButton="true"
+            :TableUpdateAction="false"
             :ButtonTitle="'Adicionar aluno'"
             :OpenAddModal="OpenModalStudentCreation"
             @viewDetails="ShowStudentData"
             @deletedAction="deletedModalStudentShow"
+        ></tableComponentComponent>
+
+        <TitleComponent title="Cadastro de Turmas"/>
+        <tableComponentComponent
+        class="tableClass"
+            TitleValue="Cadastrados"
+            :TableHeader="['Turma', 'Professor responsável']"
+            :TableContent="formDataClassPreview"
+            :TableActions="true"
+            :TableActionVisibility="true"
+            :TableActionUpdate="false"
+            :TableActionDelete="false"
+            :TableAddButton="true"
+            :ButtonTitle="'Adicionar Turma'"
+            :OpenAddModal="OpenModalClassCreation"
+            @viewDetails="ShowSchoolClassData"
+            @updateAction="UpdateSchoolClassData"
+            @deletedAction="deletedModalClassShow"
         ></tableComponentComponent>
     </div>
 

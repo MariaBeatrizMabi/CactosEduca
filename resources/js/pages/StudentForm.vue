@@ -2,164 +2,269 @@
 import MenuComponent from "../components/menu.vue";
 import UserWelcomeComponent from "../components/userWelcome.vue";
 import TitleComponent from "../components/title.vue";
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { api } from '../api';
+
+const route = useRoute();
+
+const studentData = ref({
+    name: '',
+    age: null,
+    group_id: null,
+    enrollment_date: '',
+    needAction: false,
+    actionStatus: '',
+    comments: ''
+});
 
 const formData = ref({
-    name: "Ermeson Sampaio de Queiroz",
-    age: 17,
-    class: "5 série",
-    matriculate_date: "2024-07-17",
-    needAction: true,
-    actionStatus: "pending",
+    name: '',
+    age: null,
+    group_id: null,
+    enrollment_date: '',
+    needAction: false,
+    actionStatus: '',
+    comments: ''
+});
+
+const availableClassSchool = ref([]);
+
+const hasChangesToUpdate = computed(() =>
+    Object.entries(studentData.value)
+        .filter(([key]) => key != 'comments')
+        .map(([key, value]) => value == formData.value[key])
+        .some((value) => !value)
+)
+
+const commentsHasChanges = computed(() => studentData.value.comments != formData.value.comments)
+
+async function updateStudent() {
+    await api.put(`/api/students/${route.params.student}`, {
+        ...formData.value,
+        comments: studentData.value.comments
+    });
+    studentData.value = {
+        ...formData.value,
+        comments: studentData.value.comments
+    };
+}
+
+async function updateStudentComments() {
+    await api.put(`/api/students/${route.params.student}`, {
+        ...studentData.value,
+        comments: formData.value.comments
+    });
+
+    studentData.value.comments = formData.value.comments;
+}
+
+function resetForm() {
+    formData.value = studentData.value
+}
+
+onMounted(async () => {
+    const { data } = await api.get(`/api/students/${route.params.student}`);
+
+    studentData.value = {
+        ...data,
+        needAction: false,
+        actionStatus: '',
+    };
+
+    formData.value = studentData.value
+
+    const { data: classSchoolData } = await api.get('/ClassSchool');
+    availableClassSchool.value = classSchoolData
 });
 </script>
 
 <template>
     <div class="school-register">
         <MenuComponent />
-        <UserWelcomeComponent />
+        <UserWelcomeComponent />    
 
         <div class="register-content">
             <TitleComponent title="DADOS REFERENTES AO ALUNO" />
-            <form class="student-form">
-                <div>
-                    <label>
-                        Nome do aluno
-                        <input
-                            readonly
-                            id="name"
-                            name="name"
-                            placeholder="Nome do aluno"
-                            type="text"
-                            class="input"
-                            v-model="formData.name"
-                        />
-                    </label>
 
-                    <label>
-                        Idade do aluno
-                        <input
-                            readonly
-                            id="age"
-                            name="age"
-                            placeholder="Idade do aluno"
-                            type="number"
-                            class="input"
-                            v-model="formData.age"
-                            inputmode="numeric"
-                        />
-                    </label>
-
-                    <label>
-                        Turma atual
-                        <input
-                            readonly
-                            id="class"
-                            name="class"
-                            placeholder="Turma atual"
-                            type="text"
-                            class="input"
-                            v-model="formData.class"
-                        />
-                    </label>
-
-                    <label>
-                        Matriculado em
-                        <input
-                            id="class"
-                            name="class"
-                            placeholder="Matriculado em"
-                            type="date"
-                            class="input"
-                            v-model="formData.matriculate_date"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <label>
-                        Necessário ação de intervenção?
-                        <select class="input" v-model="formData.needAction">
-                            <option v-bind:value="false">Não</option>
-                            <option v-bind:value="true">Sim</option>
-                        </select>
-                    </label>
-
-                    <div
-                        class="radio-container"
-                        :style="{
-                            color: `var(--${
-                                formData.needAction
-                                    ? 'black-color'
-                                    : 'black-frap-color'
-                            })`,
-                        }"
-                    >
-                        <h3>Qual o estado da ação aplicada?</h3>
-                        <label for="success"
-                            ><input
-                                id="success"
-                                name="success"
-                                type="radio"
-                                v-model="formData.actionStatus"
-                                value="success"
-                            />
-                            Eficaz</label
-                        >
-                        <label for="pending"
-                            ><input
-                                id="pending"
-                                name="pending"
-                                type="radio"
-                                v-model="formData.actionStatus"
-                                value="pending"
-                            />
-                            Em andamento
-                        </label>
-                        <label for="fail">
+            <div class="student-form-wrapper">
+                <form class="student-form">
+                    <div>
+                        <label>
+                            Nome do aluno
                             <input
-                                id="fail"
-                                name="fail"
-                                type="radio"
-                                v-model="formData.actionStatus"
-                                value="fail"
+                                id="name"
+                                name="name"
+                                placeholder="Nome do aluno"
+                                type="text"
+                                class="input"
+                                :value="formData.name"
+                                @input="formData = { ...formData, name: $event.target.value }"
                             />
-                            Ineficaz
                         </label>
-                        <label for="stopped">
+
+                        <label>
+                            Idade do aluno
                             <input
-                                id="stopped"
-                                name="stopped"
-                                type="radio"
-                                v-model="formData.actionStatus"
-                                value="stopped"
+                                id="age"
+                                name="age"
+                                placeholder="Idade do aluno"
+                                type="number"
+                                class="input"
+                                :value="formData.age"
+                                @input="formData = { ...formData, age: $event.target.value }"
+                                inputmode="numeric"
                             />
-                            Interrompida
+                        </label>
+
+                        <!-- <label>
+                            Turma atual
+                            <select
+                                id="class"
+                                name="class"
+                                placeholder="Turma atual"
+                                type="text"
+                                class="input"
+                                :value="formData.group_id"
+                                @input="formData = { ...formData, group_id: $event.target.value }"
+                            >
+                                <option v-for="row in availableClassSchool" :value="row.id">{{ row.name }}</option>
+                            </select>
+                        </label> -->
+
+                        <label>
+                            Matriculado em
+                            <input
+                                id="class"
+                                name="class"
+                                placeholder="Matriculado em"
+                                type="date"
+                                class="input"
+                                :value="formData.enrollment_date"
+                                @input="formData = { ...formData, enrollment_date: $event.target.value }"
+                            />
                         </label>
                     </div>
-                </div>
 
-                <div>
-                    <img
-                        class="student-image"
-                        src="https://placehold.co/300x300"
-                        alt="Nome do aluno"
-                    />
+                    <div>
+                        <label>
+                            Necessário ação de intervenção?
+                            <select class="input" v-model="studentData.needAction">
+                                <option v-bind:value="false">Não</option>
+                                <option v-bind:value="true">Sim</option>
+                            </select>
+                        </label>
+
+                        <div
+                            class="radio-container"
+                            :style="{
+                                color: `var(--${
+                                    studentData.needAction
+                                        ? 'black-color'
+                                        : 'black-frap-color'
+                                })`,
+                            }"
+                        >
+                            <h3>Qual o estado da ação aplicada?</h3>
+                            <label for="success">
+                                <input
+                                    id="success"
+                                    name="success"
+                                    type="radio"
+                                    v-model="studentData.actionStatus"
+                                    value="success"
+                                />
+                                Eficaz
+                            </label>
+                            <label for="pending">
+                                <input
+                                    id="pending"
+                                    name="pending"
+                                    type="radio"
+                                    v-model="studentData.actionStatus"
+                                    value="pending"
+                                />
+                                Em andamento
+                            </label>
+                            <label for="fail">
+                                <input
+                                    id="fail"
+                                    name="fail"
+                                    type="radio"
+                                    v-model="studentData.actionStatus"
+                                    value="fail"
+                                />
+                                Ineficaz
+                            </label>
+                            <label for="stopped">
+                                <input
+                                    id="stopped"
+                                    name="stopped"
+                                    type="radio"
+                                    v-model="studentData.actionStatus"
+                                    value="stopped"
+                                />
+                                Interrompida
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <img
+                            class="student-image"
+                            src="https://placehold.co/300x300"
+                            alt="Nome do aluno"
+                        />
+                    </div>
+                </form>
+
+                <div v-if="hasChangesToUpdate" class="student-form-actions-container">
+                    <button class="student-form-action-button" @click="updateStudent">Salvar</button>
+                    <button class="student-form-action-button" @click="resetForm">Cancelar</button>
                 </div>
-            </form>
+            </div>
 
             <TitleComponent title="OBSERVAÇÕES DO PROFESSOR" />
             <div class="teacher-comments-content">
                 <span class="textarea-wrapper">
                     <h3>Observações do Professor</h3>
-                    <textarea rows="12"></textarea>
+                    <textarea
+                        :value="formData.comments"
+                        @input="formData = { ...formData, comments: $event.target.value }"
+                        rows="12"
+                    ></textarea>
                 </span>
+            </div>
+            <div v-if="commentsHasChanges" class="student-form-actions-container">
+                <button class="student-form-action-button" @click="updateStudentComments">Salvar</button>
+                <button class="student-form-action-button" @click="formData.comments = studentData.comments">Cancelar</button>
             </div>
 
             <TitleComponent title="MATERIAL DE APOIO" />
             <div class="support-material-content">
-                <div class="material-card"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></div>
-                <div class="material-card" style="background-image: url('https://m.media-amazon.com/images/I/51E2055ZGUL._SL1000_.jpg');"></div>
+                <div class="material-card">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="40"
+                        height="40"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-plus"
+                    >
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                </div>
+                <div
+                    class="material-card"
+                    style="
+                        background-image: url('https://m.media-amazon.com/images/I/51E2055ZGUL._SL1000_.jpg');
+                    "
+                ></div>
             </div>
 
             <TitleComponent title="AVALIAÇÕES" />
@@ -222,7 +327,7 @@ const formData = ref({
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     gap: 3rem;
-    width: 84%;
+    width: 100%;
 
     & > div {
         display: flex;
@@ -394,10 +499,40 @@ textarea {
         color: var(--secondary-color);
         aspect-ratio: 5 / 7;
         width: 10vw;
-        border-radius: .5rem;
+        border-radius: 0.5rem;
         background-color: #fff;
         border: 2px solid var(--secondary-color);
     }
+}
+
+.student-form-wrapper {
+    display: flex;
+    width: 84%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.student-form-actions-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.student-form-action-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    border-radius: 4rem;
+    background-color: transparent;
+    color: var(--secondary-color);
+    padding: 0.6rem 1.6rem;
+    background-color: #fff;
+    right: 0;
+    font-weight: 700;
 }
 
 @media screen and (min-width: 1200px) {

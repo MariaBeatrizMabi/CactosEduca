@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,13 +14,18 @@ class LoginController extends Controller
     {
         Auth::logout();
         $credentials = $request->only('acess_cod', 'password');
-        
+
         $logins = User::all();
 
         foreach ($logins as $login) {
             if ($credentials['acess_cod'] === $login->acess_cod && Hash::check($credentials['password'], $login->password)) {
                 if (Auth::attempt($credentials)) {
-                    return response()->json(['success' => true, 'type' => $login->type, 'redirect' => '/dashboard']);
+                    return response()->json([
+                        'success' => true,
+                        'type' => $login->type,
+                        'redirect' => '/dashboard',
+                        'token' => $login->createToken('Access Token')->plainTextToken
+                    ]);
                 }
             }
         }

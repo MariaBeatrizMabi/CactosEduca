@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -31,13 +32,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function school() {
-        return $this->belongsTo(managementSchool::class, 'id');
+    public function managementSchool(): HasOne
+    {
+        return $this->hasOne(ManagementSchool::class, 'user_id');
     }
 
-    public function managementSchools()
+    public function teacher(): HasOne
     {
-        return $this->hasMany(managementSchool::class, 'user_id');
+        return $this->hasOne(Teacher::class);
     }
 
     protected static function boot()
@@ -45,7 +47,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function ($user) {
-            $user->managementSchools()->delete();
+            $user->managementSchool()->delete();
         });
     }
 }

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, defineProps } from 'vue';
 import axios from 'axios';
+import { api } from '../api'
 import ModalComponent from '../components/modal.vue'
 import InputComponent from '../components/input.vue'
 import LoadingComponent from '../components/loading.vue'
@@ -83,7 +84,7 @@ async function getTableData() {
                 formattedData.push({
                     id: school.id,
                     name: school.name,
-                    city_id: city.address, 
+                    city_id: city.address,
                     location_id: school.location_id,
                     acess_cod: school.user.acess_cod,
                 });
@@ -165,7 +166,7 @@ async function fetchSchoolData(id) {
     showModalUpdated.value = true;
 
     try {
-        const { data: managementSchool } = await axios.get(`/api/management-schools/${id}`);
+        const { data: managementSchool } = await api.get(`/api/management-schools/${id}`);
 
         idToUpdate.value = id;
 
@@ -174,7 +175,7 @@ async function fetchSchoolData(id) {
             name: managementSchool.name,
             location_id: managementSchool.location_id,
             city_id: managementSchool.city_id,
-            acess_cod: managementSchool.user.acess_cod,
+            acess_cod: managementSchool.acess_cod,
             type: 'school'
         };
 
@@ -185,7 +186,7 @@ async function fetchSchoolData(id) {
 
 async function updateDataForm(dataToUpdate) {
     try {
-        await axios.put(`/api/management-schools/${idToUpdate.value}`, formDataUpdate.value);
+        await api.put(`/api/management-schools/${idToUpdate.value}`, formDataUpdate.value);
 
         showModalUpdated.value = false;
         isLoading.value = true;
@@ -203,7 +204,7 @@ async function updateDataForm(dataToUpdate) {
 async function deletedModalShow(id) {
     deletedModal.value = true;
     resetForm();
-    const response = await axios.get(`/ManagementSchool/${id}`);
+    const response = await api.get(`/ManagementSchool/${id}`);
 
     idToDeleted.value = id;
 
@@ -214,7 +215,7 @@ async function deletedModalShow(id) {
 
 async function deleted() {
     try {
-        await axios.delete(`/api/management-schools/${idToDeleted.value}`);
+        await api.delete(`/api/management-schools/${idToDeleted.value}`);
         deletedModal.value = false;
         isLoading.value = true;
 

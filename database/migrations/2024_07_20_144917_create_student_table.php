@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student', function (Blueprint $table) {
+        Schema::create('students', function (Blueprint $table) {
             $table->id();
-           
+
             $table->string('name', 255);
+            $table->integer('age');
+            $table->date('enrollment_date');
+
             $table->unsignedBigInteger('school_id');
-            $table->foreignId('group_id')->constrained('class');
-           
+
             $table->softDeletes();
             $table->timestamps();
         });

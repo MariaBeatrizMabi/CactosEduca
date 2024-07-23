@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cities;
 use App\Models\ManagementSchool;
+use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +46,6 @@ class ManagementSchoolController extends Controller
     public function show($id)
     {
         $school = ManagementSchool::with('user')->find($id);
-        $cities = Cities::with('address')->get();
 
         if (!$school) {
             return response()->json(['message' => 'School not found'], 404);
@@ -53,10 +54,17 @@ class ManagementSchoolController extends Controller
             'id' => $school->id,
             'name' => $school->name,
             'location_id' => $school->location_id,
-            'city_id' => $cities[$school->city_id - 1]->name,
+            'city_id' => $school->city_id,
             'acess_cod' => $school->user->acess_cod,
-            'password' => $school->user->password 
+            'password' => $school->user->password
         ]);
+    }
+
+    public function listTeachers(ManagementSchool $managementSchool): JsonResponse
+    {
+        return response()->json(
+            Teacher::where('school_id', $managementSchool->user_id)->get()
+        );
     }
 
     public function create(Request $request)
