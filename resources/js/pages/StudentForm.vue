@@ -2,9 +2,9 @@
 import MenuComponent from "../components/menu.vue";
 import UserWelcomeComponent from "../components/userWelcome.vue";
 import TitleComponent from "../components/title.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
+import { api } from '../api';
 
 const route = useRoute();
 
@@ -40,7 +40,7 @@ const hasChangesToUpdate = computed(() =>
 const commentsHasChanges = computed(() => studentData.value.comments != formData.value.comments)
 
 async function updateStudent() {
-    await axios.put(`/api/students/${route.params.student}`, {
+    await api.put(`/api/students/${route.params.student}`, {
         ...formData.value,
         comments: studentData.value.comments
     });
@@ -51,7 +51,7 @@ async function updateStudent() {
 }
 
 async function updateStudentComments() {
-    await axios.put(`/api/students/${route.params.student}`, {
+    await api.put(`/api/students/${route.params.student}`, {
         ...studentData.value,
         comments: formData.value.comments
     });
@@ -64,7 +64,7 @@ function resetForm() {
 }
 
 onMounted(async () => {
-    const { data } = await axios.get(`/api/students/${route.params.student}`);
+    const { data } = await api.get(`/api/students/${route.params.student}`);
 
     studentData.value = {
         ...data,
@@ -74,7 +74,7 @@ onMounted(async () => {
 
     formData.value = studentData.value
 
-    const { data: classSchoolData } = await axios.get('/ClassSchool');
+    const { data: classSchoolData } = await api.get('/ClassSchool');
     availableClassSchool.value = classSchoolData
 });
 </script>
@@ -82,7 +82,7 @@ onMounted(async () => {
 <template>
     <div class="school-register">
         <MenuComponent />
-        <UserWelcomeComponent />
+        <UserWelcomeComponent />    
 
         <div class="register-content">
             <TitleComponent title="DADOS REFERENTES AO ALUNO" />
@@ -117,7 +117,7 @@ onMounted(async () => {
                             />
                         </label>
 
-                        <label>
+                        <!-- <label>
                             Turma atual
                             <select
                                 id="class"
@@ -130,7 +130,7 @@ onMounted(async () => {
                             >
                                 <option v-for="row in availableClassSchool" :value="row.id">{{ row.name }}</option>
                             </select>
-                        </label>
+                        </label> -->
 
                         <label>
                             Matriculado em

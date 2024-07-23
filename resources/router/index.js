@@ -6,6 +6,7 @@ import Management from '../../resources/js/pages/management.vue';
 import Filters from '../../resources/js/pages/Filters.vue';
 import SchoolDetails from '../../resources/js/pages/schoolDetails.vue';
 import StudentForm from '../../resources/js/pages/StudentForm.vue';
+import ClassDetails from '../../resources/js/pages/ClassDetails.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -52,6 +53,13 @@ const router = createRouter({
             path: '/student/:student',
             name: 'Student',
             component: StudentForm,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/class/:class',
+            name: 'Class',
+            component: ClassDetails,
             props: true,
             meta: { requiresAuth: true }
         }

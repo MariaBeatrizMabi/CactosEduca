@@ -37,6 +37,11 @@ class User extends Authenticatable
         return $this->hasOne(ManagementSchool::class, 'user_id');
     }
 
+    public function teacher(): HasOne
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cities;
 use App\Models\ManagementSchool;
+use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -56,6 +58,13 @@ class ManagementSchoolController extends Controller
             'acess_cod' => $school->user->acess_cod,
             'password' => $school->user->password
         ]);
+    }
+
+    public function listTeachers(ManagementSchool $managementSchool): JsonResponse
+    {
+        return response()->json(
+            Teacher::where('school_id', $managementSchool->user_id)->get()
+        );
     }
 
     public function create(Request $request)

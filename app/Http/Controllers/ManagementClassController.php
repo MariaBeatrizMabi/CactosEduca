@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -57,7 +58,7 @@ class ManagementClassController extends Controller
     }
 
 
-    public function show(ClassModel $classModel)
+    public function show(ClassModel $classModel): JsonResponse
     {
         return response()->json($classModel);
     }
@@ -74,5 +75,10 @@ class ManagementClassController extends Controller
         Log::info('Turma excluída com sucesso: ' . $classData);
 
         return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
+    }
+
+    public function listStudents(ClassModel $classModel)
+    {
+        return response()->json($classModel->students);
     }
 }

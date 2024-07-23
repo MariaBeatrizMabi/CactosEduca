@@ -215,7 +215,7 @@ async function getTableStudentData() {
         formDataStudentPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
-            group_id: take.class_data ? take.class_data.name : '',
+            age: take.age
         }));
 
 
@@ -300,22 +300,7 @@ async function ShowSchoolTeachersData(id) {
 }
 
 async function ShowSchoolClassData(id) {
-    showModalClassData.value = true;
-    try {
-        const response = await axios.get(`/ClassSchool`);
-
-        const classData = response.data.find(classData => classData.id === id);
-        if (classData) {
-            formDataClassVisualize.value = {
-                name: classData.name,
-                teacher_id: classData.teacher_id,
-            };
-        } else {
-            console.error(`Não foi possível encontrar o professor com o ID ${id}`);
-        }
-    } catch (error) {
-        console.error(error);
-    }
+    window.location.href = `/class/${id}`
 }
 
 async function ShowStudentData(id) {
@@ -1013,7 +998,7 @@ onMounted(() => {
             <TitleComponent title="Cadastro de alunos" />
             <tableComponentComponent
             TitleValue="Cadastrados"
-            :TableHeader="['Nome do aluno', 'Turma']"
+            :TableHeader="['Nome do aluno', 'Idade do aluno']"
             :TableContent="formDataStudentPreview"
             :TableActions="true"
             :TableActionVisibility="true"
@@ -1024,6 +1009,24 @@ onMounted(() => {
             :OpenAddModal="OpenModalStudentCreation"
             @viewDetails="ShowStudentData"
             @deletedAction="deletedModalStudentShow"
+        ></tableComponentComponent>
+
+        <TitleComponent title="Cadastro de Turmas"/>
+        <tableComponentComponent
+        class="tableClass"
+            TitleValue="Cadastrados"
+            :TableHeader="['Turma', 'Professor responsável']"
+            :TableContent="formDataClassPreview"
+            :TableActions="true"
+            :TableActionVisibility="true"
+            :TableActionUpdate="false"
+            :TableActionDelete="false"
+            :TableAddButton="true"
+            :ButtonTitle="'Adicionar Turma'"
+            :OpenAddModal="OpenModalClassCreation"
+            @viewDetails="ShowSchoolClassData"
+            @updateAction="UpdateSchoolClassData"
+            @deletedAction="deletedModalClassShow"
         ></tableComponentComponent>
     </div>
 
