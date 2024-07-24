@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cities;
 use App\Models\ManagementSchool;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -63,7 +64,14 @@ class ManagementSchoolController extends Controller
     public function listTeachers(ManagementSchool $managementSchool): JsonResponse
     {
         return response()->json(
-            Teacher::where('school_id', $managementSchool->user_id)->get()
+            Teacher::where('school_id', $managementSchool->id)->get()
+        );
+    }
+
+    public function listStudents(ManagementSchool $managementSchool): JsonResponse
+    {
+        return response()->json(
+            Student::where('school_id', $managementSchool->id)->get()
         );
     }
 

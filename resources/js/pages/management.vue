@@ -35,6 +35,8 @@ const deletedClassDataModal = ref()
 const deletedStudentModal = ref()
 const idToDeleted = ref(null);
 
+const schoolId = ref();
+
 let formDataTeachersPreview = ref({
     id: '',
     name: '',
@@ -44,7 +46,7 @@ let formDataTeachersPreview = ref({
 
 const formDataTeacherAdd = ref({
     name: '',
-    school_id: userID.value,
+    school_id: schoolId.value,
     group_id: '',
     acess_cod: '',
     password: '',
@@ -136,7 +138,7 @@ const OpenModalStudentCreation = () => {
 function resetForm() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: userID.value,
+        school_id: schoolId.value,
         group_id: '',
         acess_cod: '',
         password: '',
@@ -147,7 +149,7 @@ function resetForm() {
 function resetFormClass() {
     formDataTeacherAdd.value = {
         name: '',
-        school_id: userID.value,
+        school_id: schoolId.value,
         teacher_id: '',
     };
 }
@@ -156,27 +158,6 @@ async function getUserType() {
     const { data: loginUserData } = await axios.get('/loginUser');
     userType.value = loginUserData.type;
     userID.value = loginUserData.id
-
-    formDataTeacherAdd.value = {
-        name: '',
-        school_id: userID.value,
-        group_id: '',
-        acess_cod: '',
-        password: '',
-        type: 'teacher'
-    };
-
-    formDataClassAdd.value = {
-        name: '',
-        school_id: userID.value,
-        teacher_id: '',
-    };
-
-    formDataStudentAdd.value = {
-        name: '',
-        school_id: userID.value,
-        group_id: '',
-    }
 }
 
 async function getTableTeacherData() {
@@ -227,7 +208,10 @@ async function getTableStudentData() {
 async function submitForm() {
     try {
         isLoading.value = true;
-        await axios.post('/TeacherCreate', formDataTeacherAdd.value);
+        await axios.post('/TeacherCreate', {
+            ...formDataTeacherAdd.value,
+            school_id: schoolId.value
+        });
 
         getTableTeacherData()
 
@@ -245,7 +229,10 @@ async function submitForm() {
 async function submitStudentForm() {
     try {
         isLoading.value = true;
-        await axios.post('/StudentCreate', formDataStudentAdd.value);
+        await axios.post('/StudentCreate', {
+            ...formDataStudentAdd.value,
+            school_id: schoolId.value
+        });
 
         getTableStudentData()
 
@@ -263,7 +250,10 @@ async function submitStudentForm() {
 async function submitFormClass() {
     try {
         isLoading.value = true;
-        await axios.post('/ClassSchoolCreate', formDataClassAdd.value);
+        await axios.post('/ClassSchoolCreate', {
+            ...formDataClassAdd.value,
+            school_id: schoolId.value
+        });
 
         getTableClassData();
 
@@ -530,11 +520,19 @@ function closeModalUpdated() {
     resetForm();
 }
 
-onMounted(() => {
-    getUserType();
-    getTableTeacherData();
-    getTableClassData();
-    getTableStudentData();
+onMounted(async () => {
+    await getUserType();
+    await getTableTeacherData();
+    await getTableClassData();
+    await getTableStudentData();
+
+    if (userType.value === 'teacher') {
+        const { data } = await api.get(`/api/users/${userID.value}/teacher`);
+        schoolId.value = data.teacher.school_id
+    } else if (userType.value === 'school') {
+        const { data } = await api.get(`/api/users/${userID.value}/management-schools`);
+        schoolId.value = data.management_school.id;
+    }
 });
 </script>
 
@@ -1042,5 +1040,4 @@ onMounted(() => {
     .modal-end > .school-add {
         width: 16rem;
     }
-
 </style>

@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('management-schools')->name('management-schools.')->group(function () {
         Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
         Route::get('/{managementSchool}/teachers', [ManagementSchoolController::class, 'listTeachers']);
+        Route::get('/{managementSchool}/students', [ManagementSchoolController::class, 'listStudents']);
         Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
         Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
     });
@@ -50,5 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('classes')->name('classes.')->group(function () {
         Route::get('/{classModel}', [ManagementClassController::class, 'show']);
         Route::get('/{classModel}/students', [ManagementClassController::class, 'listStudents']);
+        Route::post('/{classModel}/students/{student}', [ManagementClassController::class, 'attachStudent']);
+        Route::delete('/{classModel}/students/{student}', [ManagementClassController::class, 'detachStudent']);
     });
 });
