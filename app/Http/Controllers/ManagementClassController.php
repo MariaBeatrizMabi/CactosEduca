@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -77,8 +78,18 @@ class ManagementClassController extends Controller
         return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
     }
 
-    public function listStudents(ClassModel $classModel)
+    public function listStudents(ClassModel $classModel): JsonResponse
     {
         return response()->json($classModel->students);
+    }
+
+    public function attachStudent(ClassModel $classModel, Student $student): void
+    {
+        $classModel->students()->attach($student);
+    }
+
+    public function detachStudent(ClassModel $classModel, Student $student): void
+    {
+        $classModel->students()->detach($student);
     }
 }
