@@ -27,11 +27,13 @@ const selectedStudentToAdd = ref(null);
 const classData = ref({
     id: null,
     name: '',
+    shift: '',
     teacher_id: null
 });
 
 const formData = ref({
     name: '',
+    shift: '',
     teacher_id: null
 });
 
@@ -74,6 +76,7 @@ onMounted(async () => {
     school.value = await fetchSchool()
     availableStudents.value = await fetchAvailableStudents()
     classData.value = await fetchClassData()
+    console.log(classData.value)
     formData.value = classData.value
     availableTeachers.value = await fetchAvailableTeachers();
     students.value = await fetchStudents()
@@ -199,6 +202,22 @@ async function submitRemoveStudent() {
                     <option v-for="row in availableTeachers" :value="row.id">{{ row.name }}</option>
                 </select>
             </label>
+
+            <label>
+                Turno
+                <select
+                    id="class"
+                    name="class"
+                    class="input"
+                    :value="formData.shift"
+                    @input="formData = { ...formData, shift: $event.target.value }"
+                >
+                    <option value="" disabled>Selecione uma opção</option>
+                    <option value="morning">Matutino</option>
+                    <option value="afternoon">Vespertino</option>
+                    <option value="night">Noturno</option>
+                </select>
+            </label>
         </div>
 
         <TableComponent
@@ -238,7 +257,8 @@ async function submitRemoveStudent() {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 1fr;
-    grid-gap: 3rem;
+    grid-column-gap: 3rem;
+    grid-row-gap: 1rem;
     width: 84%;
 }
 

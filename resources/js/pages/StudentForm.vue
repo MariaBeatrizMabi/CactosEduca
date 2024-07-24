@@ -82,7 +82,7 @@ onMounted(async () => {
 <template>
     <div class="school-register">
         <MenuComponent />
-        <UserWelcomeComponent />    
+        <UserWelcomeComponent />
 
         <div class="register-content">
             <TitleComponent title="DADOS REFERENTES AO ALUNO" />
@@ -104,33 +104,45 @@ onMounted(async () => {
                         </label>
 
                         <label>
-                            Idade do aluno
-                            <input
-                                id="age"
-                                name="age"
-                                placeholder="Idade do aluno"
-                                type="number"
-                                class="input"
-                                :value="formData.age"
-                                @input="formData = { ...formData, age: $event.target.value }"
-                                inputmode="numeric"
-                            />
-                        </label>
-
-                        <!-- <label>
-                            Turma atual
+                            Sexo
                             <select
                                 id="class"
                                 name="class"
-                                placeholder="Turma atual"
+                                class="input"
+                                :value="formData.gender"
+                                @input="formData = { ...formData, gender: $event.target.value }"
+                            >
+                                <option value="" disabled>Selecione uma opção</option>
+                                <option value="male">Masculino</option>
+                                <option value="female">Feminino</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Data de nascimento
+                            <input
+                                id="class"
+                                name="class"
+                                placeholder="Data de nascimento"
+                                type="date"
+                                class="input"
+                                :value="formData.date_of_birth"
+                                @input="formData = { ...formData, date_of_birth: $event.target.value }"
+                            />
+                        </label>
+
+                        <label>
+                            Matrícula
+                            <input
+                                id="name"
+                                name="name"
+                                placeholder="Matrícula"
                                 type="text"
                                 class="input"
-                                :value="formData.group_id"
-                                @input="formData = { ...formData, group_id: $event.target.value }"
-                            >
-                                <option v-for="row in availableClassSchool" :value="row.id">{{ row.name }}</option>
-                            </select>
-                        </label> -->
+                                :value="formData.enrollment"
+                                @input="formData = { ...formData, enrollment: $event.target.value }"
+                            />
+                        </label>
 
                         <label>
                             Matriculado em

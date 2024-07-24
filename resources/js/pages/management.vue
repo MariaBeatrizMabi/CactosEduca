@@ -14,6 +14,7 @@ import InputComponentPassword from '../components/inputPassword.vue'
 import LoadingComponent from '../components/loading.vue'
 import ModalComponentDeleted from '../components/modalComponentShort.vue';
 import SelectComponent from '../components/select.vue'
+import NewSelectComponent from '../components/SelectComponent.vue';
 
 const emit = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
 
@@ -55,8 +56,10 @@ const formDataTeacherAdd = ref({
 
 const formDataStudentAdd = ref({
     name: '',
-    group_id: '',
-    age: null,
+    gender: '',
+    enrollment_date: '',
+    enrollment: '',
+    date_of_birth: '',
     school_id: userID.value,
 })
 
@@ -69,12 +72,13 @@ let formDataClassPreview = ref({
 
 let formDataStudentPreview = ref({
     name: '',
-    group_id: '',
+    enrollment: '',
     school_id: userID.value,
 })
 
 const formDataClassAdd = ref({
     name: '',
+    shift: '',
     school_id: userID.value,
     teacher_id: '',
 })
@@ -196,7 +200,7 @@ async function getTableStudentData() {
         formDataStudentPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
-            age: take.age
+            enrollment: take.enrollment
         }));
 
 
@@ -229,7 +233,8 @@ async function submitForm() {
 async function submitStudentForm() {
     try {
         isLoading.value = true;
-        await axios.post('/StudentCreate', {
+
+        await api.post('/api/students', {
             ...formDataStudentAdd.value,
             school_id: schoolId.value
         });
@@ -752,6 +757,7 @@ onMounted(async () => {
                         typeValue="text"
                         @input="formDataClassAdd.name = $event.target.value"
                    />
+
                    <SelectComponent
                         labelTitle="Professor responsável da turma"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -761,7 +767,23 @@ onMounted(async () => {
                         valueField="id"
                         RightAction="display: none;"
                         @input="formDataClassAdd.teacher_id = $event.target.value"
-                        />
+                    />
+
+                    <NewSelectComponent
+                        labelTitle="Turno"
+                        placeholderValue="Turno"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="formDataClassAdd.shift"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataClassAdd.shift = $event.target.value"
+                    >
+                        <option value="">Selecione uma opção</option>
+                        <option value="morning">Matutino</option>
+                        <option value="afternoon">Vespertino</option>
+                        <option value="night">Noturno</option>
+                    </NewSelectComponent>
                 </div>
        </div>
        <div class="modal-end">
@@ -854,13 +876,27 @@ onMounted(async () => {
                         @input="formDataStudentAdd.name = $event.target.value"
                    />
 
+                    <NewSelectComponent
+                        labelTitle="Sexo"
+                        placeholderValue="Sexo"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="formDataStudentAdd.gender"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="formDataStudentAdd.gender = $event.target.value"
+                    >
+                        <option value="male">Masculino</option>
+                        <option value="female">Feminino</option>
+                    </NewSelectComponent>
+
                     <InputComponent
-                        labelTitle="Idade do Aluno"
-                        placeholderValue="Idade do aluno"
+                        labelTitle="Data de Nascimento"
+                        placeholderValue="Data da Nascimento"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
-                        typeValue="number"
-                        :value="formDataStudentAdd.age"
-                        @input="formDataStudentAdd.age = $event.target.value"
+                        typeValue="date"
+                        :value="formDataStudentAdd.date_of_birth"
+                        @input="formDataStudentAdd.date_of_birth = $event.target.value"
                     />
 
                     <InputComponent
@@ -870,6 +906,15 @@ onMounted(async () => {
                         typeValue="date"
                         :value="formDataStudentAdd.enrollment_date"
                         @input="formDataStudentAdd.enrollment_date = $event.target.value"
+                    />
+
+                    <InputComponent
+                        labelTitle="Matrícula"
+                        placeholderValue="Matrícula"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
+                        :value="formDataStudentAdd.enrollment"
+                        typeValue="text"
+                        @input="formDataStudentAdd.enrollment = $event.target.value"
                     />
                 </div>
        </div>
@@ -995,19 +1040,19 @@ onMounted(async () => {
     <div class="register-content" v-else-if="userType === 'teacher'">
             <TitleComponent title="Cadastro de alunos" />
             <tableComponentComponent
-            TitleValue="Cadastrados"
-            :TableHeader="['Nome do aluno', 'Idade do aluno']"
-            :TableContent="formDataStudentPreview"
-            :TableActions="true"
-            :TableActionVisibility="true"
-            :TableActionUpdate="false"
-            :TableAddButton="true"
-            :TableUpdateAction="false"
-            :ButtonTitle="'Adicionar aluno'"
-            :OpenAddModal="OpenModalStudentCreation"
-            @viewDetails="ShowStudentData"
-            @deletedAction="deletedModalStudentShow"
-        ></tableComponentComponent>
+                TitleValue="Cadastrados"
+                :TableHeader="['Nome do aluno', 'Matrícula']"
+                :TableContent="formDataStudentPreview"
+                :TableActions="true"
+                :TableActionVisibility="true"
+                :TableActionUpdate="false"
+                :TableAddButton="true"
+                :TableUpdateAction="false"
+                :ButtonTitle="'Adicionar aluno'"
+                :OpenAddModal="OpenModalStudentCreation"
+                @viewDetails="ShowStudentData"
+                @deletedAction="deletedModalStudentShow"
+            />
 
         <TitleComponent title="Cadastro de Turmas"/>
         <tableComponentComponent

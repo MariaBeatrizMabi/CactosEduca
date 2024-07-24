@@ -22,6 +22,7 @@ class ManagementClassController extends Controller
         try {
             $school = ClassModel::create([
                 'name' => $request->input('name'),
+                'shift' => $request->input('shift'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -45,6 +46,7 @@ class ManagementClassController extends Controller
             $ClassData = ClassModel::where('id', $id)->firstOrFail();
             $ClassData->update([
                 'name' => $request->input('name'),
+                'shift' => $request->input('shift'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);

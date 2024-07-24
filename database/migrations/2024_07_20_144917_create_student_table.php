@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
 
             $table->string('name', 255);
-            $table->integer('age');
-            $table->date('enrollment_date');
+            $table->date('date_of_birth')->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->date('enrollment_date')->nullable();
+            $table->string('enrollment')->nullable();
 
             $table->unsignedBigInteger('school_id');
 
