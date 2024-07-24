@@ -3,6 +3,7 @@
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -40,7 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('students')->name('students.')->group(function () {
         Route::get('/{student}', [ManagementStudentController::class, 'show']);
-        Route::put('/{student}', [ManagementStudentController::class, 'update']);
+        Route::post('/', [StudentController::class, 'store']);
+        Route::put('/{student}', [StudentController::class, 'update']);
     });
 
     Route::prefix('users')->name('users.')->group(function () {

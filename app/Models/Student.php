@@ -2,21 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
-        'age',
+        'date_of_birth',
+        'gender',
         'enrollment_date',
-        'comments',
-        'school_id',
-        'group_id'
+        'enrollment',
+        'school_id'
     ];
 
     protected $table = 'students';
