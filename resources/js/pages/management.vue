@@ -588,7 +588,7 @@ onMounted(async () => {
         </div>
     </ModalComponent>
 
-    <ModalComponent v-if="updateModalTeacherData" Titlevalue="Visualização de professores">
+    <ModalComponent v-if="updateModalTeacherData" Titlevalue="Atualização de professores">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">

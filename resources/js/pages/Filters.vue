@@ -19,16 +19,16 @@
         axios.get('/ManagementSchool')
             .then(response => {
                 const data = response.data;
-                const cities = data.map(item => item.city);
+                const cities = data.map(item => item.address);
                 const names = data.map(item => item.name);
                 city.value = [...new Set(cities)];
                 name.value = [...new Set(names)];
-
                 data.forEach(item => {
-                    if (!citySchoolMap.value[item.city]) {
-                        citySchoolMap.value[item.city] = [];
+
+                    if (!citySchoolMap.value[item.address]) {
+                        citySchoolMap.value[item.address] = [];
                     }
-                    citySchoolMap.value[item.city].push(item.name);
+                    citySchoolMap.value[item.address].push(item.name);
                 });
             })
             .catch(error => {

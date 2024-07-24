@@ -31,7 +31,7 @@ function resetForm() {
     formDataAdd.value = {
         name: '',
         location_id: '',
-        city_id: '',
+        city_name: '',
         acess_cod: '',
         password: '',
         type: 'school'
@@ -43,14 +43,14 @@ let formData = ref({
     name: '',
     location_id: '',
     acess_cod: '',
-    city_id: '',
+    city_name: '',
     password: '',
 })
 
 const formDataAdd = ref({
     name: '',
     location_id: '',
-    city_id: '',
+    city_name: '',
     acess_cod: '',
     password: '',
     type: 'school'
@@ -61,7 +61,7 @@ let formDataUpdate = ref({
     name: '',
     location_id: '',
     acess_cod: '',
-    city_id: '',
+    city_name: '',
     password: '',
 })
 
@@ -70,7 +70,7 @@ let formDataShow = ref({
     name: '',
     location_id: '',
     acess_cod: '',
-    city_id: '',
+    city_name: '',
     password: '',
 })
 
@@ -87,8 +87,8 @@ async function getTableData() {
                 formattedData.push({
                     id: school.id,
                     name: school.name,
-                    city_id: city.address,
-                    location_id: school.location_id,
+                    city_name: city.city,
+                    location_id: school.location,
                     acess_cod: school.user.acess_cod,
                 });
             });
@@ -106,12 +106,13 @@ async function ShowSchoolData(id) {
         const response = await axios.get(`/ManagementSchool/${id}`);
 
         const school = response.data;
+        console.log(school.location);
 
         formDataShow.value = {
             id: school.id,
             name: school.name,
-            location_id: school.location_id,
-            city_id: school.city_id,
+            location_id: school.location,
+            city_name: school.city_name,
             acess_cod: school.acess_cod,
             type: 'school'
         };
@@ -176,8 +177,8 @@ async function fetchSchoolData(id) {
         formDataUpdate.value = {
             id: managementSchool.id,
             name: managementSchool.name,
-            location_id: managementSchool.location_id,
-            city_id: managementSchool.city_id,
+            location_id: managementSchool.location,
+            city_name: managementSchool.city_name,
             acess_cod: managementSchool.acess_cod,
             type: 'school'
         };
@@ -439,10 +440,10 @@ activeUpdateCity
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
                         routerPath="locations"
                         typeValue="select"
-                        :value="formDataUpdate.location_id"
+                        :value="formDataUpdate.location"
                         valueField="id"
                         RightAction="display: none;"
-                        @input="formDataUpdate.location_id = $event.target.value"
+                        @input="formDataUpdate.location = $event.target.value"
                     />
             </div>
        </div>
@@ -498,13 +499,15 @@ activeUpdateCity
     <table>
         <tr>
             <th>Nome</th>
-            <th class="address">Endereço</th>
+            <th class="address">Múnicipio</th>
+            <th>Localidade</th>
             <th>Código de acesso</th>
             <th>Ações</th>
         </tr>
         <tr v-for="(data, index) in formData" :key="index">
             <td> {{ data.name }}</td>
-            <td class="address"> {{ data.city_id }} </td>
+            <td class="address"> {{ data.city_name }} </td>
+            <td class="address"> {{ data.location_id }} </td>
             <td> {{ data.acess_cod }} </td>
             <td>
                 <div class="actions">
