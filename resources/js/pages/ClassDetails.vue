@@ -3,7 +3,7 @@ import MenuComponent from "../components/menu.vue";
 import UserWelcomeComponent from "../components/userWelcome.vue";
 import TitleComponent from "../components/title.vue";
 import TableComponent from '../components/tableComponent.vue';
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import { useRoute } from "vue-router";
 import {api} from "../api.js"
 import ModalComponent from "../components/modal.vue";
@@ -36,6 +36,12 @@ const formData = ref({
     shift: '',
     teacher_id: null
 });
+
+const hasChangesToUpdate = computed(() =>
+    Object.entries(classData.value)
+        .map(([key, value]) => value === formData.value[key])
+        .some((value) => !value)
+)
 
 async function fetchSchool() {
     const { data: loginUserData } = await api.get('/loginUser');
@@ -110,6 +116,18 @@ async function submitRemoveStudent() {
     await api.delete(`/api/classes/${classData.value.id}/students/${studentIdToRemove.value}`);
     students.value = await fetchStudents();
     closeRemoveStudentModal();
+}
+
+async function updateClassData() {
+    await api.put(`/ClassSchoolUpdate/${classData.value.id}`, formData.value);
+    classData.value = {
+        ...classData.value,
+        ...formData.value
+    }
+}
+
+function resetForm() {
+    formData.value = classData.value
 }
 </script>
 
@@ -220,6 +238,11 @@ async function submitRemoveStudent() {
             </label>
         </div>
 
+        <div v-if="hasChangesToUpdate" class="student-form-actions-container">
+            <button class="student-form-action-button" @click="updateClassData">Salvar</button>
+            <button class="student-form-action-button" @click="resetForm">Cancelar</button>
+        </div>
+
         <TableComponent
             TitleValue="ALUNOS DA TURMA"
             :TableHeader="['Nome', 'Idade']"
@@ -323,5 +346,28 @@ async function submitRemoveStudent() {
             padding: 0.8rem 1rem 0.8rem 1rem;
         }
     }
+}
+
+.student-form-actions-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.student-form-action-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    border-radius: 4rem;
+    background-color: transparent;
+    color: var(--secondary-color);
+    padding: 0.6rem 1.6rem;
+    background-color: #fff;
+    right: 0;
+    font-weight: 700;
 }
 </style>
