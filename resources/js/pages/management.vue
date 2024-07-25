@@ -1035,24 +1035,40 @@ onMounted(async () => {
             @updateAction="UpdateSchoolClassData"
             @deletedAction="deletedModalClassShow"
         ></tableComponentComponent>
+
+        <TitleComponent title="Cadastro de alunos" />
+        <tableComponentComponent
+            TitleValue="Cadastrados"
+            :TableHeader="['Nome do aluno', 'Matrícula']"
+            :TableContent="formDataStudentPreview"
+            :TableActions="true"
+            :TableActionVisibility="true"
+            :TableActionUpdate="false"
+            :TableAddButton="true"
+            :TableUpdateAction="false"
+            :ButtonTitle="'Adicionar aluno'"
+            :OpenAddModal="OpenModalStudentCreation"
+            @viewDetails="ShowStudentData"
+            @deletedAction="deletedModalStudentShow"
+        />
     </div>
 
     <div class="register-content" v-else-if="userType === 'teacher'">
-            <TitleComponent title="Cadastro de alunos" />
-            <tableComponentComponent
-                TitleValue="Cadastrados"
-                :TableHeader="['Nome do aluno', 'Matrícula']"
-                :TableContent="formDataStudentPreview"
-                :TableActions="true"
-                :TableActionVisibility="true"
-                :TableActionUpdate="false"
-                :TableAddButton="true"
-                :TableUpdateAction="false"
-                :ButtonTitle="'Adicionar aluno'"
-                :OpenAddModal="OpenModalStudentCreation"
-                @viewDetails="ShowStudentData"
-                @deletedAction="deletedModalStudentShow"
-            />
+        <TitleComponent title="Cadastro de alunos" />
+        <tableComponentComponent
+            TitleValue="Cadastrados"
+            :TableHeader="['Nome do aluno', 'Matrícula']"
+            :TableContent="formDataStudentPreview"
+            :TableActions="true"
+            :TableActionVisibility="true"
+            :TableActionUpdate="false"
+            :TableAddButton="true"
+            :TableUpdateAction="false"
+            :ButtonTitle="'Adicionar aluno'"
+            :OpenAddModal="OpenModalStudentCreation"
+            @viewDetails="ShowStudentData"
+            @deletedAction="deletedModalStudentShow"
+        />
 
         <TitleComponent title="Cadastro de Turmas"/>
         <tableComponentComponent
