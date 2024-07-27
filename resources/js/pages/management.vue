@@ -151,7 +151,7 @@ function resetForm() {
 }
 
 function resetFormClass() {
-    formDataTeacherAdd.value = {
+    formDataClassAdd.value = {
         name: '',
         school_id: schoolId.value,
         teacher_id: '',
@@ -166,8 +166,8 @@ async function getUserType() {
 
 async function getTableTeacherData() {
     try {
-        const response = await axios('/Teachers');
-
+        const response = await axios('/TeachersSchool');
+        
         formDataTeachersPreview.value = response.data.map(take => ({
             id: take.id,
             name: take.name,
@@ -588,7 +588,7 @@ onMounted(async () => {
         </div>
     </ModalComponent>
 
-    <ModalComponent v-if="updateModalTeacherData" Titlevalue="Visualização de professores">
+    <ModalComponent v-if="updateModalTeacherData" Titlevalue="Atualização de professores">
             <div class="modal-body-size">
                 <h2>Detalhes sobre o professor</h2>
                 <div class="modal-content-details">

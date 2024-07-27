@@ -3,18 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use App\Models\ManagementSchool;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ManagementClassController extends Controller
 {
+    public function all()
+    {
+        return ClassModel::all();
+    }
+
     public function index()
     {
-        return response()->json(
-            ClassModel::with('teacher')->get()
-        );
+        $user = Auth::user();
+        $school = ManagementSchool::where('user_id', $user->id)->get();
+        
+        if ($user && $user->id) {
+            $schoolIds = $school->pluck('id');
+            $classes = ClassModel::with('teacher')
+                ->whereIn('school_id', $schoolIds)
+                ->get();
+        } else {
+            $classes = collect();
+        }
+        
+        return response()->json($classes);
     }
 
     public function create(Request $request)

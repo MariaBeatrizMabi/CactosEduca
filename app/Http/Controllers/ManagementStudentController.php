@@ -14,6 +14,11 @@ class ManagementStudentController extends Controller
         return view('student');
     }
 
+    public function all()
+    {
+        return Student::all();
+    }
+
     public function index()
     {
         $class = Student::with('classData')->get();
