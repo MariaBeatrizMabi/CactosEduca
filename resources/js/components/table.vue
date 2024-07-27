@@ -255,7 +255,6 @@ onMounted(
     setTimeout(() => isLoading.value = false, 800),
 );
 
-activeUpdateCity
 </script>
 
 <template>
