@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
 use App\Models\Student;
-use App\Services\StoreStudentService;
-use App\Services\UpdateStudentService;
+use App\Services\Student\StoreStudentService;
+use App\Services\Student\UpdateStudentService;
 
 class StudentController extends Controller
 {

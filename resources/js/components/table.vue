@@ -8,6 +8,7 @@ import LoadingComponent from '../components/loading.vue'
 import ModalComponentDeleted from '../components/modalComponentShort.vue';
 import InputComponentPassword from '../components/inputPassword.vue'
 import SelectComponent from '../components/select.vue'
+import CreatableSelect from "./CreatableSelect.vue";
 
 const showModal = ref();
 const showModalUpdated = ref();
@@ -72,6 +73,8 @@ let formDataShow = ref({
     city_id: '',
     password: '',
 })
+
+const cities = ref([]);
 
 async function getTableData() {
     try {
@@ -231,15 +234,30 @@ async function deleted() {
     }
 }
 
+async function getCities() {
+    const { data } = await api.get('/api/cities');
+    return data
+}
+
+async function createCity(name) {
+    const { data } = await api.post('/api/cities', { name });
+    cities.value = await getCities();
+    formDataAdd.value.city_id = data.id
+}
+
+onMounted(async () => {
+    cities.value = await getCities();
+})
+
 onMounted(
     isLoading.value = true,
     getTableData(),
-    setTimeout(() => {
-            isLoading.value = false;
-        }, 800),
+    setTimeout(() => isLoading.value = false, 800),
 );
 
+activeUpdateCity
 </script>
+
 <template>
     <LoadingComponent :isLoading="isLoading" />
     <ModalComponent v-if="showModalData" Titlevalue="Visualização de escolas">
@@ -274,13 +292,12 @@ onMounted(
                 <h2>Localização da escola</h2>
                 <div class="modal-content-address">
                     <InputComponent
-                        disabled="true"
+                        disabled
                         labelTitle="Múnicipio da escola"
                         placeholderValue="Digite o múnicipio"
                         icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-                        :value="formDataShow.city_id"
-                        @input="formDataShow.city_id = $event.target.value"
-                        />
+                        :value="cities.find(({ id }) => id === formDataShow.city_id)?.name"
+                    />
                     <SelectComponent
                         disabled="true"
                         labelTitle="Localidade"
@@ -340,17 +357,12 @@ onMounted(
                 </div>
                 <h2>Localização da escola</h2>
                 <div class="modal-content-address">
-                    <SelectComponent
-                        labelTitle="Múnicipio da escola"
-                        placeholderValue="Digite o múnicipio"
-                        icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-                        typeValue="select"
+                    <CreatableSelect
                         :value="formDataAdd.city_id"
-                        valueField="id"
-                        routerPath="counties"
-                        RightAction="display: none;"
-                        @input="formDataAdd.city_id = $event.target.value"
-                        />
+                        :options="cities.map(({ name }) => name)"
+                        @create="createCity"
+                        @change="formDataAdd.city_id = cities.find(({ name }) => name === $event)?.id"
+                    />
                     <SelectComponent
                         labelTitle="Localidade"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -407,15 +419,21 @@ onMounted(
                 </div>
                 <h2>Localização da escola</h2>
                 <div class="modal-content-address">
-                    <SelectComponent
-                        labelTitle="Múnicipio da escola"
-                        placeholderValue="Digite o múnicipio"
-                        icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-                        routerPath="counties"
-                        valueField="id"
-                        :value="formDataUpdate.city_id"
-                        @input="formDataUpdate.city_id = $event.target.value"
-                        />
+                    <CreatableSelect
+                        :defaultValue="cities.find(({ id }) => id === formDataUpdate.city_id)?.name"
+                        :options="cities.map(({ name }) => name)"
+                        @create="createCity"
+                        @change="formDataUpdate.city_id = cities.find(({ name }) => name === $event)?.id"
+                    />
+<!--                    <SelectComponent-->
+<!--                        labelTitle="Múnicipio da escola"-->
+<!--                        placeholderValue="Digite o múnicipio"-->
+<!--                        icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"-->
+<!--                        routerPath="counties"-->
+<!--                        valueField="id"-->
+<!--                        :value="formDataUpdate.city_id"-->
+<!--                        @input="formDataUpdate.city_id = $event.target.value"-->
+<!--                        />-->
                     <SelectComponent
                         labelTitle="Localidade"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
