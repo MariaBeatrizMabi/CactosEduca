@@ -3,13 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cities;
-use Illuminate\Http\Request;
+use App\Http\Requests\City\StoreCityRequest;
+use App\Services\City\StoreCityService;
+use Illuminate\Http\JsonResponse;
 
 class CitiesController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        $cities = cities::all();
-        return response()->json($cities);
+        return response()->json(Cities::all());
+    }
+
+    public function store(
+        StoreCityRequest $storeCityRequest,
+        StoreCityService $storeCityService
+    ): JsonResponse
+    {
+        $data = $storeCityRequest->validated();
+        return response()->json(
+            $storeCityService->run($data)
+        );
     }
 }

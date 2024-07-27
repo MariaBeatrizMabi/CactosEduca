@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
@@ -55,5 +56,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{classModel}/students', [ManagementClassController::class, 'listStudents']);
         Route::post('/{classModel}/students/{student}', [ManagementClassController::class, 'attachStudent']);
         Route::delete('/{classModel}/students/{student}', [ManagementClassController::class, 'detachStudent']);
+    });
+
+    Route::prefix('cities')->name('cities.')->group(function () {
+        Route::get('/', [CitiesController::class, 'index']);
+        Route::post('/', [CitiesController::class, 'store']);
     });
 });
