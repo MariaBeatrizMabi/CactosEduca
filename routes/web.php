@@ -40,29 +40,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
-    Route::put('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
-    Route::get('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
-    Route::delete('/ManagementSchool/{managementSchooll}', 'App\Http\Controllers\ManagementSchoolController@delete')->name('management_school.delete');
+    Route::put('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
+    Route::get('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
+    Route::delete('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@delete')->name('management_school.delete');
 
-    Route::get('/Teachers', 'App\Http\Controllers\TeacherController@index')->name('teacher');
-    Route::get('/Teachers/{id}', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');
+    Route::get('/Teachers', 'App\Http\Controllers\TeacherController@all')->name('teacher.all');
+    Route::get('/TeachersSchool', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');
     Route::post('/TeacherCreate', 'App\Http\Controllers\TeacherController@create')->name('teacher.create');
     Route::put('/Teachers/{id}', 'App\Http\Controllers\TeacherController@update')->name('teacher.update');
     Route::delete('/TeachersDeleted/{id}', 'App\Http\Controllers\TeacherController@delete')->name('teacher.delete');
 
-    Route::get('/ClassSchool', 'App\Http\Controllers\ManagementClassController@index')->name('class');
-    Route::get('/ClassSchool/{id}', 'App\Http\Controllers\ManagementClassController@index')->name('class.index');
+    Route::get('/ClassAllSchool', 'App\Http\Controllers\ManagementClassController@all')->name('class.all');
+    Route::get('/ClassSchool', 'App\Http\Controllers\ManagementClassController@index')->name('class.index');
     Route::post('/ClassSchoolCreate', 'App\Http\Controllers\ManagementClassController@create')->name('class.create');
     Route::put('/ClassSchoolUpdate/{id}', 'App\Http\Controllers\ManagementClassController@update')->name('class.update');
     Route::delete('/ClassSchoolDelete/{id}', 'App\Http\Controllers\ManagementClassController@delete')->name('class.delete');
 
-    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@index')->name('student.show');
+    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@all')->name('student.all');
     Route::get('/StudentsData/{id}', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
     Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
     Route::delete('/StudentDelete/{id}', 'App\Http\Controllers\ManagementStudentController@delete')->name('student.delete');
 
     Route::get('/counties', function () {
-        return cities::all();
+        return Cities::all();
     });
 
     Route::get('/locations', function () {

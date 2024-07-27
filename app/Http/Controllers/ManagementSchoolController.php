@@ -18,7 +18,7 @@ class ManagementSchoolController extends Controller
     {
         $schools = ManagementSchool::with('user')->get();
         $cities = Cities::with('address')->get();
-        $locations = Location::all();  // Obtém todas as locations
+        $locations = Location::all(); 
 
         $groupedSchools = $schools->groupBy('city_id');
 
@@ -29,7 +29,7 @@ class ManagementSchoolController extends Controller
                     'id' => $school->id,
                     'name' => $school->name,
                     'city_id' => $school->city_id,
-                    'location' => $location ? $location->name : null, // Inclui o nome da location
+                    'location' => $location ? $location->name : null,
                     'user' => [
                         'id' => $school->user->id,
                         'user_name' => $school->user->user_name,
@@ -58,12 +58,13 @@ class ManagementSchoolController extends Controller
         }
 
         $location = Location::find($school->location_id);
+        $city = Cities::find($school->city_id);
 
         return response()->json([
             'id' => $school->id,
             'name' => $school->name,
-            'city_id' => $school->city_id,
-            'location' => $location ? $location->name : null, // Inclui o nome da location
+            'city_id' => $city ?? null,
+            'location' => $location ?? null,
             'acess_cod' => $school->user->acess_cod,
             'password' => $school->user->password
         ]);
