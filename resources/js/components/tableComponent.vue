@@ -102,3 +102,9 @@ const emits = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
         </table>
     </div>
 </template>
+
+<style>
+    .titleTable {
+        height: 3.5rem;
+}
+</style>

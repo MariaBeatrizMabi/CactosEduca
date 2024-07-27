@@ -1056,7 +1056,7 @@ onMounted(async () => {
     <div class="register-content" v-else-if="userType === 'teacher'">
         <TitleComponent title="Cadastro de alunos" />
         <tableComponentComponent
-            TitleValue="Cadastrados"
+            TitleValue=""
             :TableHeader="['Nome do aluno', 'Matrícula']"
             :TableContent="formDataStudentPreview"
             :TableActions="true"
@@ -1073,7 +1073,7 @@ onMounted(async () => {
         <TitleComponent title="Cadastro de Turmas"/>
         <tableComponentComponent
         class="tableClass"
-            TitleValue="Cadastrados"
+            TitleValue=""
             :TableHeader="['Turma', 'Professor responsável']"
             :TableContent="formDataClassPreview"
             :TableActions="true"
