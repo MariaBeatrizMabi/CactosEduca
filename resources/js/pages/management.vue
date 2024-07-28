@@ -1006,13 +1006,13 @@ onMounted(async () => {
 
         <div class="register-content" v-if="userType === 'admin'">
             <TitleComponent title="Cadastro de escolas" />
-            <TableComponent TitleValue="Escolas cadastradas" />
+            <TableComponent TitleValue="" />
         </div>
 
         <div class="register-content" v-else-if="userType === 'school'">
             <TitleComponent title="Cadastro de Professores" />
             <tableComponentComponent
-            TitleValue="Cadastrados"
+            TitleValue=""
             :TableHeader="['Professor', 'Acesso']"
             :TableContent="formDataTeachersPreview"
             :TableActions="true"
@@ -1029,7 +1029,7 @@ onMounted(async () => {
         <TitleComponent title="Cadastro de Turmas"/>
         <tableComponentComponent
         class="tableClass"
-            TitleValue="Cadastrados"
+            TitleValue=""
             :TableHeader="['Turma', 'Professor responsável']"
             :TableContent="formDataClassPreview"
             :TableActions="true"
@@ -1045,7 +1045,7 @@ onMounted(async () => {
 
         <TitleComponent title="Cadastro de alunos" />
         <tableComponentComponent
-            TitleValue="Cadastrados"
+            TitleValue=""
             :TableHeader="['Nome do aluno', 'Matrícula']"
             :TableContent="formDataStudentPreview"
             :TableActions="true"
