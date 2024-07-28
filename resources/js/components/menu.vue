@@ -24,7 +24,7 @@ const logout = () => {
 
 function toggleMenu() {
     const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('sidebar-expanded'); // Alternar a classe CSS
+    sidebar.classList.toggle('sidebar-expanded'); 
 }
 
 function closeModalExit() {

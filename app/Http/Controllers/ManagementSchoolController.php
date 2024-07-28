@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cities;
+use App\Models\Location;
 use App\Models\ManagementSchool;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -17,25 +18,29 @@ class ManagementSchoolController extends Controller
     {
         $schools = ManagementSchool::with('user')->get();
         $cities = Cities::with('address')->get();
+        $locations = Location::all(); 
 
         $groupedSchools = $schools->groupBy('city_id');
 
-        $response = $cities->map(function ($city) use ($groupedSchools) {
+        $response = $cities->map(function ($city) use ($groupedSchools, $locations) {
+            $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
+                $location = $locations->firstWhere('id', $school->location_id);
+                return [
+                    'id' => $school->id,
+                    'name' => $school->name,
+                    'city_id' => $school->city_id,
+                    'location' => $location ? $location->name : null,
+                    'user' => [
+                        'id' => $school->user->id,
+                        'user_name' => $school->user->user_name,
+                        'acess_cod' => $school->user->acess_cod,
+                    ]
+                ];
+            });
+
             return [
-                'address' => $city->name,
-                'schools' => $groupedSchools->get($city->id, collect())->map(function ($school) {
-                    return [
-                        'id' => $school->id,
-                        'name' => $school->name,
-                        'city_id' => $school->city_id,
-                        'location_id' => $school->location_id,
-                        'user' => [
-                            'id' => $school->user->id,
-                            'user_name' => $school->user->user_name,
-                            'acess_cod' => $school->user->acess_cod,
-                        ]
-                    ];
-                })
+                'city' => $city->name,
+                'schools' => $citySchools
             ];
         })->filter(function ($cityData) {
             return $cityData['schools']->isNotEmpty();
@@ -51,11 +56,15 @@ class ManagementSchoolController extends Controller
         if (!$school) {
             return response()->json(['message' => 'School not found'], 404);
         }
+
+        $location = Location::find($school->location_id);
+        $city = Cities::find($school->city_id);
+
         return response()->json([
             'id' => $school->id,
             'name' => $school->name,
-            'location_id' => $school->location_id,
-            'city_id' => $school->city_id,
+            'city_id' => $city ?? null,
+            'location' => $location ?? null,
             'acess_cod' => $school->user->acess_cod,
             'password' => $school->user->password
         ]);

@@ -37,4 +37,9 @@ class ManagementSchool extends Model
     {
         return $this->belongsTo(Cities::class, 'city_id');
     }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class, 'teacher_id');
+    }
 }
