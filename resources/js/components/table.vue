@@ -361,6 +361,7 @@ onMounted(
                         :options="cities.map(({ name }) => name)"
                         @create="createCity"
                         @change="formDataAdd.city_id = cities.find(({ name }) => name === $event)?.id"
+                        @delete="deleteCity"
                     />
                     <SelectComponent
                         labelTitle="Localidade"
