@@ -6,11 +6,12 @@ import {
     ComboboxGroup,
     ComboboxInput,
     ComboboxItem,
+    ComboboxItemIndicator,
     ComboboxRoot,
     ComboboxTrigger,
     ComboboxViewport
 } from 'radix-vue';
-import {computed, onMounted, ref} from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
     options: {
@@ -41,10 +42,7 @@ function handleUpdateModelValue(value) {
     );
 }
 
-onMounted(() => {
-    console.log(props.defaultValue)
-    activeItem.value = props.defaultValue
-});
+onMounted(() => activeItem.value = props.defaultValue);
 </script>
 
 <template>
@@ -55,7 +53,6 @@ onMounted(() => {
             v-model:searchTerm="search"
             @update:modelValue="handleUpdateModelValue"
         >
-            {{ activeItem }}
             <ComboboxAnchor class="ComboboxAnchor">
                 <ComboboxInput
                     class="ComboboxInput"
@@ -68,34 +65,37 @@ onMounted(() => {
             <ComboboxContent class="ComboboxContent">
                 <ComboboxViewport class="ComboboxViewport">
                     <ComboboxEmpty class="ComboboxEmpty">
-                        <div class="ComboboxItem">
-                            <span>Criar "{{ search }}"</span>
-                        </div>
-
-                         <ComboboxGroup v-if="search">
-                            <ComboboxItem>
+                        <ComboboxGroup v-if="showCreateButton">
+                            <ComboboxItem
                                 class="ComboboxItem"
                                 :value="search"
                             >
+                                <span>Criar "{{ search }}"</span>
                             </ComboboxItem>
                         </ComboboxGroup>
                     </ComboboxEmpty>
 
                     <ComboboxGroup>
                         <ComboboxItem
+                            v-if="showCreateButton"
+                            :key="search"
                             :value="search"
                             class="ComboboxItem"
-                            v-if="showCreateButton"
                         >
                             <span>Criar "{{ search }}"</span>
                         </ComboboxItem>
                         <ComboboxItem
-                            v-for="(option, index) in props.options"
-                            :key="index"
+                            v-for="option in props.options"
+                            :key="option"
                             class="ComboboxItem"
                             :value="option"
                         >
-                            <span>{{ option }}</span>
+                            <div>
+                                <span>{{ option }}</span>
+                                <button @click="emit('delete', option)">
+                                    <svg height="14" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.43214 0.725977L5.14286 1.3125H1.28571C0.574554 1.3125 0 1.89902 0 2.625C0 3.35098 0.574554 3.9375 1.28571 3.9375H16.7143C17.4254 3.9375 18 3.35098 18 2.625C18 1.89902 17.4254 1.3125 16.7143 1.3125H12.8571L12.5679 0.725977C12.3509 0.278906 11.9049 0 11.4188 0H6.58125C6.09509 0 5.64911 0.278906 5.43214 0.725977ZM16.7143 5.25H1.28571L2.1375 19.1543C2.20179 20.192 3.04554 21 4.06205 21H13.9379C14.9545 21 15.7982 20.192 15.8625 19.1543L16.7143 5.25Z" fill="#253138"/></svg>
+                                </button>
+                            </div>
                         </ComboboxItem>
                     </ComboboxGroup>
                 </ComboboxViewport>
@@ -109,7 +109,6 @@ onMounted(() => {
     position: relative;
 }
 
-/* reset */
 button, input {
     all: unset;
 }
@@ -155,6 +154,8 @@ button, input {
     background-color: white;
     border-radius: 6px;
     margin-top: 8px;
+    max-height: 150px;
+    border: 2px solid var(--primary-color);
     box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
 }
 
@@ -178,15 +179,23 @@ button, input {
     font-size: 13px;
     line-height: 1;
     color: black;
+    margin: 4px;
     border-radius: 3px;
     display: flex;
     align-items: center;
-    height: 25px;
+    height: 30px;
     flex: 1;
     padding: 0 35px 0 25px;
     position: relative;
     user-Combobox: none;
     cursor: pointer;
+
+    & > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
 }
 
 .ComboboxItem[data-disabled] {
@@ -196,7 +205,7 @@ button, input {
 
 .ComboboxItem[data-highlighted] {
     outline: none;
-    background-color: red;
+    background-color: var(--secondary-color);
     color: white;
 }
 
