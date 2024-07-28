@@ -8,7 +8,7 @@ import LoadingComponent from '../components/loading.vue'
 import ModalComponentDeleted from '../components/modalComponentShort.vue';
 import InputComponentPassword from '../components/inputPassword.vue'
 import SelectComponent from '../components/select.vue'
-import CreatableSelect from "./CreatableSelect.vue";
+import Combobox from './Combobox';
 
 const showModal = ref();
 const showModalUpdated = ref();
@@ -75,6 +75,8 @@ let formDataShow = ref({
 })
 
 const cities = ref([]);
+
+const searchCity = ref('');
 
 async function getTableData() {
     try {
@@ -189,7 +191,6 @@ async function fetchSchoolData(id) {
 async function updateDataForm(dataToUpdate) {
     try {
         await api.put(`/api/management-schools/${idToUpdate.value}`, formDataUpdate.value);
-        console.log(formDataUpdate.value)
 
         showModalUpdated.value = false;
         isLoading.value = true;
@@ -245,6 +246,33 @@ async function createCity(name) {
     formDataAdd.value.city_id = data.id
 }
 
+async function deleteCity(id) {
+    await api.delete(`/api/cities/${id}`);
+    cities.value = await getCities();
+}
+
+async function handleSelectedCityChange(value) {
+    const cityAlreadyExists = cities.value.find(({ name }) => name === value);
+
+    if (cityAlreadyExists) {
+        formDataAdd.value.city_id = cityAlreadyExists.id;
+        return
+    }
+
+    await createCity(value);
+}
+
+async function handleSelectedCityChangeUpdate(value) {
+    const cityAlreadyExists = cities.value.find(({ name }) => name === value);
+
+    if (cityAlreadyExists) {
+        formDataUpdate.value.city_id = cityAlreadyExists.id;
+        return
+    }
+
+    await createCity(value);
+}
+
 onMounted(async () => {
     cities.value = await getCities();
 })
@@ -254,7 +282,6 @@ onMounted(
     getTableData(),
     setTimeout(() => isLoading.value = false, 800),
 );
-
 </script>
 
 <template>
@@ -295,7 +322,7 @@ onMounted(
                         labelTitle="Múnicipio da escola"
                         placeholderValue="Digite o múnicipio"
                         icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-                        :value="cities.find(({ id }) => id === formDataShow.city_id)?.name"
+                        :value="formDataShow.city_name"
                     />
                     <SelectComponent
                         disabled="true"
@@ -356,13 +383,59 @@ onMounted(
                 </div>
                 <h2>Localização da escola</h2>
                 <div class="modal-content-address">
-                    <CreatableSelect
-                        :value="formDataAdd.city_id"
-                        :options="cities.map(({ name }) => name)"
-                        @create="createCity"
-                        @change="formDataAdd.city_id = cities.find(({ name }) => name === $event)?.id"
-                        @delete="deleteCity"
-                    />
+                    <div>
+                        <label class="city-label">Município da Escola</label>
+                        <Combobox.Root
+                            :value="cities.find(({ id }) => formDataAdd.city_id === id)?.name"
+                            :search="searchCity"
+                            @update:search="searchCity = $event"
+                            @update:value="handleSelectedCityChange"
+                        >
+                            <Combobox.Input />
+                            <Combobox.Content>
+                                <Combobox.Viewport>
+                                    <Combobox.Empty>
+                                        <Combobox.Item
+                                            v-if="searchCity"
+                                            :key="searchCity"
+                                            :value="searchCity"
+                                        >
+                                            Criar "{{ searchCity }}"
+                                        </Combobox.Item>
+                                    </Combobox.Empty>
+
+                                    <Combobox.Group>
+                                        <Combobox.Item
+                                            v-if="searchCity && !cities.find(({ name }) => name.toLowerCase() == searchCity.toLowerCase())"
+                                            :key="searchCity"
+                                            :value="searchCity"
+                                        >
+                                            Criar "{{ searchCity }}"
+                                        </Combobox.Item>
+
+                                        <Combobox.Item
+                                            v-for="city in cities"
+                                            :value="city.name"
+                                            :key="city.name"
+                                        >
+                                            <div class="combobox-item-content">
+                                                <span>{{ city.name }}</span>
+
+                                                <button
+                                                    class="delete-city"
+                                                    v-if="!formData.find(({ city_name }) => city_name == city.name)"
+                                                    @click="deleteCity(city.id)"
+                                                >
+                                                    <svg height="14" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.43214 0.725977L5.14286 1.3125H1.28571C0.574554 1.3125 0 1.89902 0 2.625C0 3.35098 0.574554 3.9375 1.28571 3.9375H16.7143C17.4254 3.9375 18 3.35098 18 2.625C18 1.89902 17.4254 1.3125 16.7143 1.3125H12.8571L12.5679 0.725977C12.3509 0.278906 11.9049 0 11.4188 0H6.58125C6.09509 0 5.64911 0.278906 5.43214 0.725977ZM16.7143 5.25H1.28571L2.1375 19.1543C2.20179 20.192 3.04554 21 4.06205 21H13.9379C14.9545 21 15.7982 20.192 15.8625 19.1543L16.7143 5.25Z" fill="#253138"/></svg>
+                                                </button>
+                                            </div>
+                                        </Combobox.Item>
+                                    </Combobox.Group>
+                                </Combobox.Viewport>
+                            </Combobox.Content>
+                        </Combobox.Root>
+                    </div>
+
                     <SelectComponent
                         labelTitle="Localidade"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -419,21 +492,58 @@ onMounted(
                 </div>
                 <h2>Localização da escola</h2>
                 <div class="modal-content-address">
-                    <CreatableSelect
-                        :defaultValue="cities.find(({ id }) => id === formDataUpdate.city_id)?.name"
-                        :options="cities.map(({ name }) => name)"
-                        @create="createCity"
-                        @change="formDataUpdate.city_id = cities.find(({ name }) => name === $event)?.id"
-                    />
-<!--                    <SelectComponent-->
-<!--                        labelTitle="Múnicipio da escola"-->
-<!--                        placeholderValue="Digite o múnicipio"-->
-<!--                        icon="M408 120c0 54.6-73.1 151.9-105.2 192c-7.7 9.6-22 9.6-29.6 0C241.1 271.9 168 174.6 168 120C168 53.7 221.7 0 288 0s120 53.7 120 120zm8 80.4c3.5-6.9 6.7-13.8 9.6-20.6c.5-1.2 1-2.5 1.5-3.7l116-46.4C558.9 123.4 576 135 576 152V422.8c0 9.8-6 18.6-15.1 22.3L416 503V200.4zM137.6 138.3c2.4 14.1 7.2 28.3 12.8 41.5c2.9 6.8 6.1 13.7 9.6 20.6V451.8L32.9 502.7C17.1 509 0 497.4 0 480.4V209.6c0-9.8 6-18.6 15.1-22.3l122.6-49zM327.8 332c13.9-17.4 35.7-45.7 56.2-77V504.3L192 449.4V255c20.5 31.3 42.3 59.6 56.2 77c20.5 25.6 59.1 25.6 79.6 0zM288 152a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"-->
-<!--                        routerPath="counties"-->
-<!--                        valueField="id"-->
-<!--                        :value="formDataUpdate.city_id"-->
-<!--                        @input="formDataUpdate.city_id = $event.target.value"-->
-<!--                        />-->
+                    <div>
+                        <label class="city-label">Município da Escola</label>
+                        <Combobox.Root
+                            :value="cities.find(({ id }) => formDataUpdate.city_id === id)?.name"
+                            :search="searchCity"
+                            @update:search="searchCity = $event"
+                            @update:value="handleSelectedCityChangeUpdate"
+                        >
+                            <Combobox.Input />
+                            <Combobox.Content>
+                                <Combobox.Viewport>
+                                    <Combobox.Empty>
+                                        <Combobox.Item
+                                            v-if="searchCity"
+                                            :key="searchCity"
+                                            :value="searchCity"
+                                        >
+                                            Criar "{{ searchCity }}"
+                                        </Combobox.Item>
+                                    </Combobox.Empty>
+
+                                    <Combobox.Group>
+                                        <Combobox.Item
+                                            v-if="searchCity && !cities.find(({ name }) => name.toLowerCase() == searchCity.toLowerCase())"
+                                            :key="searchCity"
+                                            :value="searchCity"
+                                        >
+                                            Criar "{{ searchCity }}"
+                                        </Combobox.Item>
+
+                                        <Combobox.Item
+                                            v-for="city in cities"
+                                            :value="city.name"
+                                            :key="city.name"
+                                        >
+                                            <div class="combobox-item-content">
+                                                <span>{{ city.name }}</span>
+
+                                                <button
+                                                    class="delete-city"
+                                                    v-if="!formData.find(({ city_name }) => city_name == city.name)"
+                                                    @click="deleteCity(city.id)"
+                                                >
+                                                    <svg height="14" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.43214 0.725977L5.14286 1.3125H1.28571C0.574554 1.3125 0 1.89902 0 2.625C0 3.35098 0.574554 3.9375 1.28571 3.9375H16.7143C17.4254 3.9375 18 3.35098 18 2.625C18 1.89902 17.4254 1.3125 16.7143 1.3125H12.8571L12.5679 0.725977C12.3509 0.278906 11.9049 0 11.4188 0H6.58125C6.09509 0 5.64911 0.278906 5.43214 0.725977ZM16.7143 5.25H1.28571L2.1375 19.1543C2.20179 20.192 3.04554 21 4.06205 21H13.9379C14.9545 21 15.7982 20.192 15.8625 19.1543L16.7143 5.25Z" fill="#253138"/></svg>
+                                                </button>
+                                            </div>
+                                        </Combobox.Item>
+                                    </Combobox.Group>
+                                </Combobox.Viewport>
+                            </Combobox.Content>
+                        </Combobox.Root>
+                    </div>
                     <SelectComponent
                         labelTitle="Localidade"
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -532,7 +642,11 @@ onMounted(
 </div>
 </template>
 
-<style>
+<style scoped>
+button, input {
+    all: unset;
+}
+
 .modal-body-size {
     width: 80%;
     color: var(--black-color);
@@ -817,6 +931,20 @@ tr:nth-child(even) {
     }
 }
 
+.combobox-item-content {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.city-label {
+    font-size: 14px;
+    margin-bottom: 3px;
+    font-weight: 600;
+    color: var(--black-color);
+}
+
 @media (max-width: 700px) {
 .modal-content-details {
     grid-template-columns: repeat(1, 1fr);
@@ -864,28 +992,29 @@ tr:nth-child(even) {
             margin: 1rem 0;
         }
     }
+
     .address {
-    display: none;
-}
+        display: none;
+    }
 }
 
 @media (max-width: 550px) {
     .actions {
-    gap: 1rem;
-    flex-direction: column;
-    align-items: center;
+        gap: 1rem;
+        flex-direction: column;
+        align-items: center;
 
-    & .show {
-        padding: 1rem;
-    }
+        & .show {
+            padding: 1rem;
+        }
 
-    & .edit {
-        padding: 1rem;
-    }
+        & .edit {
+            padding: 1rem;
+        }
 
-    & .deleted {
-        padding: 1rem;
-    }
+        & .deleted {
+            padding: 1rem;
+        }
     }
 }
 </style>
