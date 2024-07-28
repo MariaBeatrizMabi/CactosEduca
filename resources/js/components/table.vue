@@ -255,7 +255,6 @@ onMounted(
     setTimeout(() => isLoading.value = false, 800),
 );
 
-activeUpdateCity
 </script>
 
 <template>
@@ -362,6 +361,7 @@ activeUpdateCity
                         :options="cities.map(({ name }) => name)"
                         @create="createCity"
                         @change="formDataAdd.city_id = cities.find(({ name }) => name === $event)?.id"
+                        @delete="deleteCity"
                     />
                     <SelectComponent
                         labelTitle="Localidade"
