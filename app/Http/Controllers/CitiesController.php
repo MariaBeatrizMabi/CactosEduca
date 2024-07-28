@@ -24,4 +24,9 @@ class CitiesController extends Controller
             $storeCityService->run($data)
         );
     }
+
+    public function delete(Cities $city): void
+    {
+        $city->delete();
+    }
 }

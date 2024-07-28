@@ -61,5 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('cities')->name('cities.')->group(function () {
         Route::get('/', [CitiesController::class, 'index']);
         Route::post('/', [CitiesController::class, 'store']);
+        Route::delete('/{city}', [CitiesController::class, 'delete']);
     });
 });
