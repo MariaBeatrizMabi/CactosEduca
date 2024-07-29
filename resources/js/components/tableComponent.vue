@@ -21,7 +21,7 @@ const props = defineProps({
         type: Boolean,
         required: true,
     },
-    TableActionVisibily: {
+    TableActionVisibility: {
         type: Boolean,
         required: true,
     },
@@ -32,7 +32,7 @@ const props = defineProps({
     },
     TableActionDelete: {
         type: Boolean,
-        required: true,
+        required: false,
         default: true
     },
     TableAddButton: {

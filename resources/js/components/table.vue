@@ -386,6 +386,7 @@ onMounted(
                     <div>
                         <label class="city-label">Município da Escola</label>
                         <Combobox.Root
+                            style="margin-top: 3px;"
                             :value="cities.find(({ id }) => formDataAdd.city_id === id)?.name"
                             :search="searchCity"
                             @update:search="searchCity = $event"
@@ -495,6 +496,7 @@ onMounted(
                     <div>
                         <label class="city-label">Município da Escola</label>
                         <Combobox.Root
+                            style="margin-top: 3px;"
                             :value="cities.find(({ id }) => formDataUpdate.city_id === id)?.name"
                             :search="searchCity"
                             @update:search="searchCity = $event"
@@ -643,7 +645,16 @@ onMounted(
 </template>
 
 <style scoped>
-button, input {
+.city-label {
+    font-size: 14px;
+    padding-bottom: 10px;
+    font-weight: 600;
+    color: var(--black-color);
+}
+</style>
+
+<style>
+.delete-city {
     all: unset;
 }
 
@@ -936,13 +947,6 @@ tr:nth-child(even) {
     width: 100%;
     align-items: center;
     justify-content: space-between;
-}
-
-.city-label {
-    font-size: 14px;
-    margin-bottom: 3px;
-    font-weight: 600;
-    color: var(--black-color);
 }
 
 @media (max-width: 700px) {
