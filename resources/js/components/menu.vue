@@ -24,7 +24,7 @@ const logout = () => {
 
 function toggleMenu() {
     const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('sidebar-expanded'); 
+    sidebar.classList.toggle('sidebar-expanded');
 }
 
 function closeModalExit() {
@@ -151,7 +151,7 @@ a {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 8rem 0;
+        margin: 5rem 0;
         height: 100vh;
     }
 }
