@@ -77,5 +77,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/loginUser', 'App\Http\Controllers\LoginController@GetAuth')->name('GetAuth');
 
     Route::get('/student/{student}', StudentController::class)->name('student');
+    Route::get('/student/{student}/classes/{class}', StudentController::class);
     Route::get('/class/{class}', StudentController::class);
 });
