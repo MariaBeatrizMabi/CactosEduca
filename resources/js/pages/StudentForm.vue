@@ -29,7 +29,7 @@ const formData = ref({
     comments: ''
 });
 
-const availableClassSchool = ref([]);
+const studentClasses = ref([]);
 
 const hasChangesToUpdate = computed(() =>
     Object.entries(studentData.value)
@@ -37,8 +37,6 @@ const hasChangesToUpdate = computed(() =>
         .map(([key, value]) => value == formData.value[key])
         .some((value) => !value)
 )
-
-const commentsHasChanges = computed(() => studentData.value.comments != formData.value.comments)
 
 async function updateStudent() {
     await api.put(`/api/students/${route.params.student}`, {
@@ -60,8 +58,11 @@ async function updateStudentComments() {
     studentData.value.comments = formData.value.comments;
 }
 
-function resetForm() {
-    formData.value = studentData.value
+const resetForm = () => formData.value = studentData.value;
+
+async function getStudentClasses() {
+    const { data } = await api.get(`/api/students/${route.params.student}/classes`);
+    return data;
 }
 
 onMounted(async () => {
@@ -75,8 +76,7 @@ onMounted(async () => {
 
     formData.value = studentData.value
 
-    const { data: classSchoolData } = await api.get('/ClassSchool');
-    availableClassSchool.value = classSchoolData
+    studentClasses.value = await getStudentClasses();
 });
 </script>
 
@@ -258,84 +258,17 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <TitleComponent title="OBSERVAÇÕES DO PROFESSOR" />
-            <div class="teacher-comments-content">
-                <span class="textarea-wrapper">
-                    <h3>Observações do Professor</h3>
-                    <textarea
-                        :value="formData.comments"
-                        @input="formData = { ...formData, comments: $event.target.value }"
-                        rows="12"
-                    ></textarea>
-                </span>
-            </div>
-            <div v-if="commentsHasChanges" class="student-form-actions-container">
-                <button class="student-form-action-button" @click="updateStudentComments">Salvar</button>
-                <button class="student-form-action-button" @click="formData.comments = studentData.comments">Cancelar</button>
-            </div>
-
-            <TitleComponent title="MATERIAL DE APOIO" />
-            <div class="support-material-content">
-                <div class="material-card">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="40"
-                        height="40"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="lucide lucide-plus"
+            <TitleComponent title="HISTÓRICO" />
+            <div class="classes-container">
+                <ul class="classes-list">
+                    <li
+                        class="classes-item"
+                        v-for="row in studentClasses"
+                        :key="row.id"
                     >
-                        <path d="M5 12h14" />
-                        <path d="M12 5v14" />
-                    </svg>
-                </div>
-                <div
-                    class="material-card"
-                    style="
-                        background-image: url('https://m.media-amazon.com/images/I/51E2055ZGUL._SL1000_.jpg');
-                    "
-                ></div>
-            </div>
-
-            <TitleComponent title="AVALIAÇÕES" />
-            <div class="tests-content">
-                <div class="test-table-container">
-                    <h2>2° Período de avaliações</h2>
-                    <table class="test-table">
-                        <tr>
-                            <th>Leitura</th>
-                            <th>Escrita</th>
-                            <th>Ações</th>
-                        </tr>
-                        <tr>
-                            <td>Leitor de texto com fluência</td>
-                            <td>Ortográfico</td>
-                            <td>Hello, World!</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="test-table-container">
-                    <h2>1° Período de avaliações</h2>
-                    <table class="test-table">
-                        <tr>
-                            <th>Leitura</th>
-                            <th>Escrita</th>
-                            <th>Ações</th>
-                        </tr>
-                        <tr>
-                            <td>Leitor de texto com fluência</td>
-                            <td>Ortográfico</td>
-                            <td>Hello, World!</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <button class="create-test">Adicionar avaliação</button>
+                        <a :href="`/student/${route.params.student}/classes/${row.id}`">{{ row.name }}</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -568,6 +501,32 @@ textarea {
     right: 0;
     font-weight: 700;
 }
+
+.classes-container {
+    display: flex;
+    width: 84%;
+}
+
+.classes-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    list-style: none;
+    gap: 0.8rem;
+}
+
+.classes-item a {
+    background-color: var(--secondary-color);
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    text-align: center;
+    font-weight: 400;
+    color: white;
+}
+
 
 @media screen and (min-width: 1200px) {
     .student-form {

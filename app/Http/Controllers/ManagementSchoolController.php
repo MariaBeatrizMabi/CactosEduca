@@ -18,7 +18,7 @@ class ManagementSchoolController extends Controller
     {
         $schools = ManagementSchool::with('user')->get();
         $cities = Cities::with('address')->get();
-        $locations = Location::all(); 
+        $locations = Location::all();
 
         $groupedSchools = $schools->groupBy('city_id');
 
@@ -79,9 +79,7 @@ class ManagementSchoolController extends Controller
 
     public function listStudents(ManagementSchool $managementSchool): JsonResponse
     {
-        return response()->json(
-            Student::where('school_id', $managementSchool->id)->get()
-        );
+        return response()->json($managementSchool->students);
     }
 
     public function create(Request $request)
