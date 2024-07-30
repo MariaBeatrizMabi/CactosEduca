@@ -1306,7 +1306,7 @@ onMounted(async () => {
     </div>
 </template>
 
-<style scoped>
+<style>
 .modal-background {
     z-index: 9999;
 }

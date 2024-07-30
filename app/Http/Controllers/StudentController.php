@@ -37,8 +37,11 @@ class StudentController extends Controller
 
     public function listClasses(Student $student): JsonResponse
     {
-        return response()->json(
-            $student->classData
-        );
+        return response()->json($student->classData);
+    }
+
+    public function getActiveClass(Student $student): JsonResponse
+    {
+        return response()->json($student->activeClass());
     }
 }

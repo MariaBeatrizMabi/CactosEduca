@@ -6,6 +6,8 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { api } from '../api';
 import Breadcrumb from '../components/Breadcrumb'
+import Modal from "../components/modal.vue";
+import SelectComponent from "../components/SelectComponent.vue";
 
 const route = useRoute();
 
@@ -29,7 +31,18 @@ const formData = ref({
     comments: ''
 });
 
-const studentClasses = ref([]);
+const classData = ref({
+    id: null,
+})
+
+const availableClassSchool = ref([]);
+
+const createExamData = ref({
+    reading: '',
+    writing: ''
+});
+
+const showExamCreateModal = ref(false);
 
 const hasChangesToUpdate = computed(() =>
     Object.entries(studentData.value)
@@ -37,6 +50,8 @@ const hasChangesToUpdate = computed(() =>
         .map(([key, value]) => value == formData.value[key])
         .some((value) => !value)
 )
+
+const commentsHasChanges = computed(() => studentData.value.comments != formData.value.comments)
 
 async function updateStudent() {
     await api.put(`/api/students/${route.params.student}`, {
@@ -58,11 +73,21 @@ async function updateStudentComments() {
     studentData.value.comments = formData.value.comments;
 }
 
-const resetForm = () => formData.value = studentData.value;
+async function submitExamCreate() {
+    await api.post(`/api/exams`, {
+        ...createExamData.value,
+        student_id: route.params.student,
+        class_id: classData.value.id
+    });
+}
 
-async function getStudentClasses() {
-    const { data } = await api.get(`/api/students/${route.params.student}/classes`);
+async function getActiveStudentClass() {
+    const { data } = await api.get(`/api/students/${route.params.student}/class`);
     return data;
+}
+
+function resetForm() {
+    formData.value = studentData.value
 }
 
 onMounted(async () => {
@@ -76,7 +101,10 @@ onMounted(async () => {
 
     formData.value = studentData.value
 
-    studentClasses.value = await getStudentClasses();
+    const { data: classSchoolData } = await api.get('/ClassSchool');
+    availableClassSchool.value = classSchoolData
+
+    classData.value = await getActiveStudentClass()
 });
 </script>
 
@@ -258,20 +286,164 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <TitleComponent title="HISTÓRICO" />
-            <div class="classes-container">
-                <ul class="classes-list">
-                    <li
-                        class="classes-item"
-                        v-for="row in studentClasses"
-                        :key="row.id"
+            <TitleComponent title="OBSERVAÇÕES DO PROFESSOR" />
+            <div class="teacher-comments-content">
+                <span class="textarea-wrapper">
+                    <h3>Observações do Professor</h3>
+                    <textarea
+                        :value="formData.comments"
+                        @input="formData = { ...formData, comments: $event.target.value }"
+                        rows="12"
+                    ></textarea>
+                </span>
+            </div>
+            <div v-if="commentsHasChanges" class="student-form-actions-container">
+                <button class="student-form-action-button" @click="updateStudentComments">Salvar</button>
+                <button class="student-form-action-button" @click="formData.comments = studentData.comments">Cancelar</button>
+            </div>
+
+            <TitleComponent title="MATERIAL DE APOIO" />
+            <div class="support-material-content">
+                <div class="material-card">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="40"
+                        height="40"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-plus"
                     >
-                        <a :href="`/student/${route.params.student}/classes/${row.id}`">{{ row.name }}</a>
-                    </li>
-                </ul>
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                </div>
+                <div
+                    class="material-card"
+                    style="
+                        background-image: url('https://m.media-amazon.com/images/I/51E2055ZGUL._SL1000_.jpg');
+                    "
+                ></div>
+            </div>
+
+            <TitleComponent title="AVALIAÇÕES" />
+            <div class="tests-content">
+                <div class="test-table-container">
+                    <h2>2° Período de avaliações</h2>
+                    <table class="test-table">
+                        <tr>
+                            <th>Leitura</th>
+                            <th>Escrita</th>
+                            <th>Ações</th>
+                        </tr>
+                        <tr>
+                            <td>Leitor de texto com fluência</td>
+                            <td>Ortográfico</td>
+                            <td>Hello, World!</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="test-table-container">
+                    <h2>1° Período de avaliações</h2>
+                    <table class="test-table">
+                        <tr>
+                            <th>Leitura</th>
+                            <th>Escrita</th>
+                            <th>Ações</th>
+                        </tr>
+                        <tr>
+                            <td>Leitor de texto com fluência</td>
+                            <td>Ortográfico</td>
+                            <td>Hello, World!</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <button
+                    class="create-test"
+                    @click="showExamCreateModal = true"
+                >
+                    Adicionar avaliação
+                </button>
             </div>
         </div>
     </div>
+
+    <Modal
+        v-if="showExamCreateModal"
+        Titlevalue="Cadastro de Avaliações"
+    >
+        <div class="modal-body-size">
+            <h2>Detalhes da avaliação</h2>
+            <div class="modal-content-details">
+                <SelectComponent
+                    labelTitle="Nível de leitura"
+                    placeholderValue="Nível de leitura"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="createExamData.reading"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="createExamData.reading = $event.target.value"
+                >
+                    <option value="not_reader">Não leitor</option>
+                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="word_reader">Leitor de palavras</option>
+                    <option value="sentence_reader">Leitor de frases</option>
+                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                </SelectComponent>
+
+                <SelectComponent
+                    labelTitle="Nível de escrita"
+                    placeholderValue="Nível de escrita"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="createExamData.writing"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="createExamData.writing = $event.target.value"
+                >
+                    <option value="pre_syllabic">Pré silábico</option>
+                    <option value="syllabic">Silábico</option>
+                    <option value="alphabetical_syllabic">Silábico alfabético</option>
+                    <option value="alphabetical">Alfabético</option>
+                </SelectComponent>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal" @click="showExamCreateModal = false">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="red"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+                    ></path>
+                </svg>
+                Cancelar
+            </a>
+            <a class="school-add" @click="submitExamCreate">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="var(--secondary-color)"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
+                    />
+                </svg>
+                Adicionar avaliação
+            </a>
+        </div>
+    </Modal>
 </template>
 
 <style scoped>
@@ -501,32 +673,6 @@ textarea {
     right: 0;
     font-weight: 700;
 }
-
-.classes-container {
-    display: flex;
-    width: 84%;
-}
-
-.classes-list {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    list-style: none;
-    gap: 0.8rem;
-}
-
-.classes-item a {
-    background-color: var(--secondary-color);
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.6rem;
-    text-align: center;
-    font-weight: 400;
-    color: white;
-}
-
 
 @media screen and (min-width: 1200px) {
     .student-form {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CitiesController;
+use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
@@ -45,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [StudentController::class, 'store']);
         Route::put('/{student}', [StudentController::class, 'update']);
         Route::get('/{student}/classes', [StudentController::class, 'listClasses']);
+        Route::get('/{student}/class', [StudentController::class, 'getActiveClass']);
     });
 
     Route::prefix('users')->name('users.')->group(function () {
@@ -63,5 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [CitiesController::class, 'index']);
         Route::post('/', [CitiesController::class, 'store']);
         Route::delete('/{city}', [CitiesController::class, 'delete']);
+    });
+
+    Route::prefix('exams')->name('exams.')->group(function () {
+        Route::post('/', [ExamController::class, 'store']);
     });
 });
