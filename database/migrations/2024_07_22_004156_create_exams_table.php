@@ -36,6 +36,7 @@ return new class extends Migration {
             ])->nullable();
 
             $table->foreignId('student_id')->constrained();
+            $table->foreignId('class_id')->constrained('class');
 
             $table->timestamps();
         });

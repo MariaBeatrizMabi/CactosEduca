@@ -390,13 +390,12 @@ async function deletedModalTeachersShow(id) {
     resetForm();
 
     try {
-        const response = await axios.get(`/Teachers/${id}`);
+        const { data } = await api.get(`/api/teachers/${id}`);
 
-        const teachers = response.data.find((classData) => classData.id === id);
         idToDeleted.value = id;
 
         formDataDeleted.value = {
-            name: teachers.name,
+            name: data.name,
         };
     } catch (error) {
         console.error("Erro ao buscar dados do professor:", error);
@@ -1307,7 +1306,7 @@ onMounted(async () => {
     </div>
 </template>
 
-<style scoped>
+<style>
 .modal-background {
     z-index: 9999;
 }

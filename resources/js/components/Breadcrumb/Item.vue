@@ -15,6 +15,7 @@ li {
     gap: 8px;
     font-size: 0.9rem;
     line-height: 0;
+    text-wrap: nowrap;
 }
 
 li + li::before {
