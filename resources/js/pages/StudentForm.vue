@@ -8,6 +8,7 @@ import { api } from '../api';
 import Breadcrumb from '../components/Breadcrumb'
 import Modal from "../components/modal.vue";
 import SelectComponent from "../components/SelectComponent.vue";
+import { translate } from '../utils/translate';
 
 const route = useRoute();
 
@@ -35,14 +36,27 @@ const classData = ref({
     id: null,
 })
 
+const studentExams = ref([]);
 const availableClassSchool = ref([]);
 
 const createExamData = ref({
     reading: '',
-    writing: ''
+    writing: '',
+    action: null
 });
 
+const updateExamData = ref({
+    reading: '',
+    writing: '',
+    action: null
+})
+
 const showExamCreateModal = ref(false);
+const showExamViewModal = ref(false);
+const showExamUpdateModal = ref(false);
+
+const activeExamId = ref(null);
+const activeExamData = computed(() => studentExams.value.find(({ id }) => id === activeExamId.value));
 
 const hasChangesToUpdate = computed(() =>
     Object.entries(studentData.value)
@@ -50,8 +64,6 @@ const hasChangesToUpdate = computed(() =>
         .map(([key, value]) => value == formData.value[key])
         .some((value) => !value)
 )
-
-const commentsHasChanges = computed(() => studentData.value.comments != formData.value.comments)
 
 async function updateStudent() {
     await api.put(`/api/students/${route.params.student}`, {
@@ -79,11 +91,31 @@ async function submitExamCreate() {
         student_id: route.params.student,
         class_id: classData.value.id
     });
+
+    studentExams.value = await getStudentExams()
+    showExamCreateModal.value = false
+}
+
+async function submitExamUpdate() {
+    await api.put(`/api/exams/${activeExamId.value}`, updateExamData.value);
+
+    studentExams.value = await getStudentExams()
+    showExamUpdateModal.value = false
+}
+
+async function submitExamDelete(id) {
+    await api.delete(`/api/exams/${id}`);
+    studentExams.value = await getStudentExams()
 }
 
 async function getActiveStudentClass() {
     const { data } = await api.get(`/api/students/${route.params.student}/class`);
     return data;
+}
+
+async function getStudentExams() {
+    const { data } = await api.get(`/api/students/${route.params.student}/classes/${classData.value.id}/exams`);
+    return data?.reverse();
 }
 
 function resetForm() {
@@ -105,7 +137,20 @@ onMounted(async () => {
     availableClassSchool.value = classSchoolData
 
     classData.value = await getActiveStudentClass()
+    studentExams.value = await getStudentExams()
 });
+
+function openShowExamModal(id) {
+    showExamViewModal.value = true;
+    activeExamId.value = id;
+}
+
+function openExamUpdateModal(id) {
+    showExamUpdateModal.value = true;
+    activeExamId.value = id;
+
+    updateExamData.value = {...activeExamData.value};
+}
 </script>
 
 <template>
@@ -208,70 +253,7 @@ onMounted(async () => {
                         </label>
                     </div>
 
-                    <div>
-                        <label>
-                            Necessário ação de intervenção?
-                            <select class="input" v-model="studentData.needAction">
-                                <option v-bind:value="false">Não</option>
-                                <option v-bind:value="true">Sim</option>
-                            </select>
-                        </label>
-
-                        <div
-                            class="radio-container"
-                            :style="{
-                                color: `var(--${
-                                    studentData.needAction
-                                        ? 'black-color'
-                                        : 'black-frap-color'
-                                })`,
-                            }"
-                        >
-                            <h3>Qual o estado da ação aplicada?</h3>
-                            <label for="success">
-                                <input
-                                    id="success"
-                                    name="success"
-                                    type="radio"
-                                    v-model="studentData.actionStatus"
-                                    value="success"
-                                />
-                                Eficaz
-                            </label>
-                            <label for="pending">
-                                <input
-                                    id="pending"
-                                    name="pending"
-                                    type="radio"
-                                    v-model="studentData.actionStatus"
-                                    value="pending"
-                                />
-                                Em andamento
-                            </label>
-                            <label for="fail">
-                                <input
-                                    id="fail"
-                                    name="fail"
-                                    type="radio"
-                                    v-model="studentData.actionStatus"
-                                    value="fail"
-                                />
-                                Ineficaz
-                            </label>
-                            <label for="stopped">
-                                <input
-                                    id="stopped"
-                                    name="stopped"
-                                    type="radio"
-                                    v-model="studentData.actionStatus"
-                                    value="stopped"
-                                />
-                                Interrompida
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
+                    <div class="student-image-wrapper">
                         <img
                             class="student-image"
                             src="https://placehold.co/300x300"
@@ -284,22 +266,6 @@ onMounted(async () => {
                     <button class="student-form-action-button" @click="updateStudent">Salvar</button>
                     <button class="student-form-action-button" @click="resetForm">Cancelar</button>
                 </div>
-            </div>
-
-            <TitleComponent title="OBSERVAÇÕES DO PROFESSOR" />
-            <div class="teacher-comments-content">
-                <span class="textarea-wrapper">
-                    <h3>Observações do Professor</h3>
-                    <textarea
-                        :value="formData.comments"
-                        @input="formData = { ...formData, comments: $event.target.value }"
-                        rows="12"
-                    ></textarea>
-                </span>
-            </div>
-            <div v-if="commentsHasChanges" class="student-form-actions-container">
-                <button class="student-form-action-button" @click="updateStudentComments">Salvar</button>
-                <button class="student-form-action-button" @click="formData.comments = studentData.comments">Cancelar</button>
             </div>
 
             <TitleComponent title="MATERIAL DE APOIO" />
@@ -331,8 +297,13 @@ onMounted(async () => {
 
             <TitleComponent title="AVALIAÇÕES" />
             <div class="tests-content">
-                <div class="test-table-container">
-                    <h2>2° Período de avaliações</h2>
+                <div
+                    v-if="studentExams?.length > 0"
+                    v-for="(row, index) in studentExams"
+                    class="test-table-container"
+                    :key="row.id"
+                >
+                    <h2>{{ studentExams.length - index }}° Período de avaliações</h2>
                     <table class="test-table">
                         <tr>
                             <th>Leitura</th>
@@ -340,28 +311,31 @@ onMounted(async () => {
                             <th>Ações</th>
                         </tr>
                         <tr>
-                            <td>Leitor de texto com fluência</td>
-                            <td>Ortográfico</td>
-                            <td>Hello, World!</td>
+                            <td>{{ translate(row.reading) }}</td>
+                            <td>{{ translate(row.writing) }}</td>
+                            <td>
+                                <div class="actions">
+                                    <div class="show" @click="() => openShowExamModal(row.id)">
+                                        <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                            <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="edit" @click="() => openExamUpdateModal(row.id)">
+                                        <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="deleted" @click="() => submitExamDelete(row.id)">
+                                        <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </table>
                 </div>
-
-                <div class="test-table-container">
-                    <h2>1° Período de avaliações</h2>
-                    <table class="test-table">
-                        <tr>
-                            <th>Leitura</th>
-                            <th>Escrita</th>
-                            <th>Ações</th>
-                        </tr>
-                        <tr>
-                            <td>Leitor de texto com fluência</td>
-                            <td>Ortográfico</td>
-                            <td>Hello, World!</td>
-                        </tr>
-                    </table>
-                </div>
+                <h3 v-else>O aluno não possui nenhuma avaliação</h3>
 
                 <button
                     class="create-test"
@@ -413,6 +387,15 @@ onMounted(async () => {
                     <option value="alphabetical_syllabic">Silábico alfabético</option>
                     <option value="alphabetical">Alfabético</option>
                 </SelectComponent>
+
+                <span class="textarea-wrapper">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        :value="createExamData.action"
+                        @input="createExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
             </div>
         </div>
         <div class="modal-end">
@@ -430,6 +413,155 @@ onMounted(async () => {
                 Cancelar
             </a>
             <a class="school-add" @click="submitExamCreate">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="var(--secondary-color)"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
+                    />
+                </svg>
+                Adicionar avaliação
+            </a>
+        </div>
+    </Modal>
+
+    <Modal
+        v-if="showExamViewModal"
+        Titlevalue="Cadastro de Avaliações"
+    >
+        <div class="modal-body-size">
+            <h2>Detalhes da avaliação</h2>
+            <div class="modal-content-details">
+                <SelectComponent
+                    disabled
+                    labelTitle="Nível de leitura"
+                    placeholderValue="Nível de leitura"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="activeExamData.reading"
+                    valueField="id"
+                    RightAction="display: none;"
+                >
+                    <option value="not_reader">Não leitor</option>
+                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="word_reader">Leitor de palavras</option>
+                    <option value="sentence_reader">Leitor de frases</option>
+                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                </SelectComponent>
+
+                <SelectComponent
+                    disabled
+                    labelTitle="Nível de escrita"
+                    placeholderValue="Nível de escrita"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="activeExamData.writing"
+                    valueField="id"
+                    RightAction="display: none;"
+                >
+                    <option value="pre_syllabic">Pré silábico</option>
+                    <option value="syllabic">Silábico</option>
+                    <option value="alphabetical_syllabic">Silábico alfabético</option>
+                    <option value="alphabetical">Alfabético</option>
+                </SelectComponent>
+
+                <span class="textarea-wrapper">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        disabled
+                        :value="activeExamData.action"
+                        rows="12"
+                    ></textarea>
+                </span>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal" @click="showExamViewModal = false">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="red"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+                    ></path>
+                </svg>
+                Fechar
+            </a>
+        </div>
+    </Modal>
+
+    <Modal
+        v-if="showExamUpdateModal"
+        Titlevalue="Cadastro de Avaliações"
+    >
+        <div class="modal-body-size">
+            <h2>Detalhes da avaliação</h2>
+            <div class="modal-content-details">
+                <SelectComponent
+                    labelTitle="Nível de leitura"
+                    placeholderValue="Nível de leitura"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="updateExamData.reading"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="updateExamData.reading = $event.target.value"
+                >
+                    <option value="not_reader">Não leitor</option>
+                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="word_reader">Leitor de palavras</option>
+                    <option value="sentence_reader">Leitor de frases</option>
+                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                </SelectComponent>
+
+                <SelectComponent
+                    labelTitle="Nível de escrita"
+                    placeholderValue="Nível de escrita"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="updateExamData.writing"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="updateExamData.writing = $event.target.value"
+                >
+                    <option value="pre_syllabic">Pré silábico</option>
+                    <option value="syllabic">Silábico</option>
+                    <option value="alphabetical_syllabic">Silábico alfabético</option>
+                    <option value="alphabetical">Alfabético</option>
+                </SelectComponent>
+
+                <span class="textarea-wrapper">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        :value="updateExamData.action"
+                        @input="updateExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal" @click="showExamUpdateModal = false">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="red"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+                    ></path>
+                </svg>
+                Cancelar
+            </a>
+            <a class="school-add" @click="submitExamUpdate">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -486,10 +618,10 @@ onMounted(async () => {
     font-weight: bold;
 }
 
-.radio-container {
+.student-image-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    width: 100%;
+    align-items: flex-end;
 }
 
 .student-image {
@@ -498,12 +630,14 @@ onMounted(async () => {
     border: 2px solid var(--primary-color);
     border-radius: 10px;
     width: 100%;
+    max-width: 22rem;
 }
 
 .textarea-wrapper {
+    grid-area: 2 / 1 / 3 / 3;
     display: flex;
     flex-direction: column;
-    border: 2px solid var(--secondary-color);
+    border: 2px solid var(--primary-color);
     border-radius: 1rem;
     align-items: center;
     cursor: text;
@@ -676,7 +810,7 @@ textarea {
 
 @media screen and (min-width: 1200px) {
     .student-form {
-        grid-template-columns: repeat(2, 1.8fr) 1fr;
+        grid-template-columns: 2fr 1fr;
     }
 }
 

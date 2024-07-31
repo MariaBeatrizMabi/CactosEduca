@@ -27,13 +27,7 @@ return new class extends Migration {
                 'alphabetical_syllabic',
                 'alphabetical'
             ])->default('pre_syllabic');
-            $table->boolean('need_action')->default(false);
-            $table->enum('action_status', [
-                'effective',
-                'in_progress',
-                'ineffective',
-                'interrupted'
-            ])->nullable();
+            $table->text('action')->nullable();
 
             $table->foreignId('student_id')->constrained();
             $table->foreignId('class_id')->constrained('class');

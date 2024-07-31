@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
+use App\Models\ClassModel;
 use App\Models\Student;
 use App\Services\Student\StoreStudentService;
 use App\Services\Student\UpdateStudentService;
@@ -43,5 +44,12 @@ class StudentController extends Controller
     public function getActiveClass(Student $student): JsonResponse
     {
         return response()->json($student->activeClass());
+    }
+
+    public function getExamsFromClass(Student $student, ClassModel $class): JsonResponse
+    {
+        return response()->json(
+            $student->exams()->where('class_id', $class->id)->get()
+        );
     }
 }
