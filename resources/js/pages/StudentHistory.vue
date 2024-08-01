@@ -89,10 +89,10 @@ onMounted(async () => {
                 </Breadcrumb.Content>
             </Breadcrumb.Root>
 
-            <Title title="AVALIAÇOES" />
+            <Title title="SONDAGENS" />
             <div class="tests-content">
                 <div class="test-table-container">
-                    <h2>2° Período de avaliações</h2>
+                    <h2>2° Período de sondagens</h2>
                     <table class="test-table">
                         <tr>
                             <th>Leitura</th>
@@ -108,7 +108,7 @@ onMounted(async () => {
                 </div>
 
                 <div class="test-table-container">
-                    <h2>1° Período de avaliações</h2>
+                    <h2>1° Período de sondagens</h2>
                     <table class="test-table">
                         <tr>
                             <th>Leitura</th>
@@ -124,7 +124,7 @@ onMounted(async () => {
                 </div>
 
                 <button class="create-test" @click="showModal = true">
-                    Adicionar avaliação
+                    Adicionar sondagem
                 </button>
             </div>
         </div>
@@ -132,10 +132,10 @@ onMounted(async () => {
 
     <Modal
         v-if="showModal"
-        Titlevalue="Cadastro de Avaliações"
+        Titlevalue="Cadastro de Sondagens"
     >
         <div class="modal-body-size">
-            <h2>Detalhes da avaliação</h2>
+            <h2>Detalhes da sondagem</h2>
             <div class="modal-content-details">
                 <SelectComponent
                     labelTitle="Nível de leitura"
