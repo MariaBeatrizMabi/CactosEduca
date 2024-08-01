@@ -23,7 +23,7 @@ const getUserType = () => {
 onMounted(() => {
     getUserType();
 });
-    
+
 </script>
 
 <template>
@@ -38,7 +38,7 @@ onMounted(() => {
                 <Grapich></Grapich>
             </div>
         </div>
-        
+
         <div class="card-grapich" v-if="userType === 'admin'">
             <div class="card-grapich-content">
                 <div class="card-title">
@@ -104,7 +104,7 @@ onMounted(() => {
                 <h1 class="user-not-Found">Tipo de usuário não encontrado</h1>
             </div>
         </div> -->
-    </div>  
+    </div>
 </template>
 
 <style scoped>
@@ -133,7 +133,7 @@ onMounted(() => {
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -167,7 +167,7 @@ onMounted(() => {
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -191,7 +191,7 @@ onMounted(() => {
             width: 84%;
         }
 
-       
+
     }
 }
 
