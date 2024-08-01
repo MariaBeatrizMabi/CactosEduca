@@ -60,7 +60,6 @@ const fetchTeachers = async () => {
 const fetchSchool = async () => {
     try {
         const response = await axios.get('/ManagementSchool');
-        console.log(response);
         school.value = response.data;
     } catch (error) {
         console.error("ERROR", error);
@@ -70,6 +69,7 @@ const fetchSchool = async () => {
 const fetchClassAllData = async () => {
     try {
         const response = await axios.get('/ClassAllSchool');
+        console.log(response);
         classAllData.value = response.data;
     } catch (error) {
         console.error("ERROR", error);
