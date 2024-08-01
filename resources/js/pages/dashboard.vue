@@ -19,6 +19,7 @@ const TeacherCount = ref([]);
 const SchoolCount = ref([]);
 const ClassDataCount = ref([]);
 const ClassAllDataCount = ref([]);
+const StudentAllCount = ref([]);
 const StudentCount = ref([]);
 const teachers = ref([]);
 const teachersAll = ref([]);
@@ -26,6 +27,7 @@ const school = ref([]);
 const classData = ref([]);
 const classAllData = ref([])
 const student = ref([]);
+const studentAll = ref([])
 
 const getUserType = async () => {
     try {
@@ -58,6 +60,7 @@ const fetchTeachers = async () => {
 const fetchSchool = async () => {
     try {
         const response = await axios.get('/ManagementSchool');
+        console.log(response);
         school.value = response.data;
     } catch (error) {
         console.error("ERROR", error);
@@ -77,6 +80,15 @@ const fetchClassData = async () => {
     try {
         const response = await axios.get('/ClassSchool');
         classData.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+const fetchAllStudent = async () => {
+    try {
+        const response = await axios.get('/StudentsAllData');
+        studentAll.value = response.data;
     } catch (error) {
         console.error("ERROR", error);
     }
@@ -115,8 +127,12 @@ const countClassData = () => {
     return classData.value.length;
 }
 
-const countAllStudent= () => {
+const countStudent = () => {
     return student.value.length;
+}
+
+const countAllStudent= () => {
+    return studentAll.value.length;
 }
 
 onMounted(async () => {
@@ -126,13 +142,15 @@ onMounted(async () => {
     await fetchSchool();
     await fetchClassData();
     await fetchStudent();
+    await fetchAllStudent();
     await fetchClassAllData();
     SchoolCount.value = countAllSchool();
     TeacherAllCount.value = countAllTeachers();
     TeacherCount.value = countTeachers();
     ClassDataCount.value = countClassData()
     ClassAllDataCount.value = countAllClassData()
-    StudentCount.value = countAllStudent()
+    StudentCount.value = countStudent()
+    StudentAllCount.value = countAllStudent()
     filteredTeachers.value = countTeachersBySchoolId();
 });
 </script>
@@ -159,7 +177,7 @@ onMounted(async () => {
                 <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" :valueCard="SchoolCount" :ref="CardValue"></CardComponent>
                 <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassAllDataCount"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" :valueCard="TeacherAllCount"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" :valueCard="StudentCount"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" :valueCard="StudentAllCount"></CardComponent>
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'school'">
@@ -169,9 +187,9 @@ onMounted(async () => {
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'teacher'">
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" valueCard="120" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" valueCard="253"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Meus Alunos" valueCard="1.021"></CardComponent>
+                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount" :ref="CardValue"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="filteredTeachers"></CardComponent>
+                <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="StudentCount"></CardComponent>
             </div>
 
             <div class="Cards-container" v-else>

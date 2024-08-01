@@ -46,7 +46,7 @@ const router = createRouter({
         {
             path: '/schoolDetails/:city/:schoolName',
             name: 'SchoolDetailsByCityAndSchool',
-            component: SchoolDetails, // Corrigido para apontar para o componente SchoolDetails
+            component: SchoolDetails,
             props: true,
             meta: { requiresAuth: true }
         },
@@ -87,8 +87,7 @@ router.beforeEach((to, from, next) => {
 });
 
 function isAuthenticated() {
-    return true
+    return true;
 }
-
 
 export default router;

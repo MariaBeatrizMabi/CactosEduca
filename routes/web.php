@@ -35,8 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/Filters', [SchoolDetails::class, 'filteredScreen'])->name('filteredScreen');
 
     Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
-    ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
+    ->where(['city' => '[\pL\s]+', 'schoolName' => '[\pL\s]+'])
     ->name('SchoolDetailsByCityAndSchool');
+
+    // Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
+    // ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
+    // ->name('SchoolDetailsByCityAndSchool');
 
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
@@ -56,8 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ClassSchoolUpdate/{id}', 'App\Http\Controllers\ManagementClassController@update')->name('class.update');
     Route::delete('/ClassSchoolDelete/{id}', 'App\Http\Controllers\ManagementClassController@delete')->name('class.delete');
 
-    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@all')->name('student.all');
-    Route::get('/StudentsData/{id}', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
+    Route::get('/StudentsAllData', 'App\Http\Controllers\ManagementStudentController@all')->name('student.all');
+    Route::get('/StudentsData', 'App\Http\Controllers\ManagementStudentController@index')->name('student.index');
     Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
     Route::delete('/StudentDelete/{id}', 'App\Http\Controllers\ManagementStudentController@delete')->name('student.delete');
 

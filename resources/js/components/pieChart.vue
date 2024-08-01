@@ -1,125 +1,104 @@
+<template>
+  <div id="chartdivpie" class="chart-container"></div>
+</template>
+
 <script>
+import axios from 'axios';
 import * as am5 from '@amcharts/amcharts5';
-import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
-import * as am5percent from '@amcharts/amcharts5/percent'; // Importe o módulo de gráficos percentuais
+import * as am5percent from '@amcharts/amcharts5/percent';
 
 export default {
   name: 'Chart',
   mounted() {
-let root = am5.Root.new("chartdivpie");
+    this.createChart();
+    this.fetchData();
+  },
+  methods: {
+    createChart() {
+      this.root = am5.Root.new("chartdivpie");
 
-// Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
-root.setThemes([
-  am5themes_Animated.new(root)
-]);
+      this.root.setThemes([am5themes_Animated.new(this.root)]);
 
-// Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+      this.chart = this.root.container.children.push(
+        am5percent.PieChart.new(this.root, {
+          endAngle: 270,
+        })
+      );
 
-let chart = root.container.children.push(
-  am5percent.PieChart.new(root, {
-    endAngle: 270,
-    
-  })
-);
+      this.series = this.chart.series.push(
+        am5percent.PieSeries.new(this.root, {
+          valueField: "value",
+          categoryField: "nameValue",
+          endAngle: 270,
+          fillField: "sliceColor",
+        })
+      );
 
-// Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
-let series = chart.series.push(
-  am5percent.PieSeries.new(root, {
-    valueField: "value",
-    categoryField: "nameValue",
-    endAngle: 270,
-    fillField: "sliceColor"
-  })
-);
+      this.series.slices.template.setAll({
+        fillOpacity: 1,
+        stroke: am5.color(0xffffff),
+        strokeWidth: 1,
+      });
 
-series.states.create("hidden", {
-  endAngle: -90
-});
+      let colorSet = am5.ColorSet.new(this.root, {
+        colors: [
+          am5.color("#0D5413"),
+          am5.color("#76AA3B"),
+          am5.color("#FFCB00"),
+          am5.color("#FF5C00"),
+          am5.color("#008BD0"),
+          am5.color("#FF0000"),
+          am5.color("#9747FF")
+        ]
+      });
 
-// Set data
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
-series.data.setAll([{
-  nameValue: "Fortaleza",
-  value: 5,      
-  sliceColor: "#0D5413"
-}, {
-  nameValue: "Aquiraz",
-  value: 3,
-  sliceColor: "#76AA3B"
-}, {
-  nameValue: "Aracati",
-  value: 4,
-  sliceColor: "#FFCB00"
-}, {
-  nameValue: "Pacajus",
-  value: 3,
-  sliceColor: "#FF5C00"
-}, {
-  nameValue: "Crato",
-  value: 7,
-  sliceColor: "#008BD0"
-}, {
-  nameValue: "Quixadá",
-  value: 8,
-  sliceColor: "#FF0000"
-}, {
-  nameValue: "Itaitinga",
-  value: 2,
-  sliceColor: "#9747FF"
-}]);
+      this.series.set('colors', colorSet);
 
+      this.series.labels.template.setAll({
+        fill: am5.color(0x253138)
+      });
 
+      this.series.appear(1000, 100);
+    },
+    fetchData() {
+      axios.get('/ManagementSchool')
+        .then(response => {
+          const data = response.data.map(item => ({
+            nameValue: item.city,
+            value: item.schools.length,
+            sliceColor: this.assignColor(item.schools.length)
+          }));
 
-series.slices.template.setAll({
-  fillOpacity: 1,
-  stroke: am5.color(0xffffff),
-  strokeWidth: 1,
-});
-
-
-let assignedColors = (numberOfColors) => {
-        let colors = [];
-        for (let i = 0; i < numberOfColors; i++) {
-          colors.push(am5.color(this.membersPerCountryData[i].countryColor));
-        }
-        return colors;
+          this.series.data.setAll(data);
+        })
+        .catch(error => {
+          console.error("Error fetching data: ", error);
+        });
+    },
+    assignColor(value) {
+      const colorMap = {
+        1: "#0D5413",
+        2: "#76AA3B",
+        3: "#FFCB00",
+        4: "#FF5C00",
+        5: "#008BD0",
+        6: "#FF0000",
+        7: "#9747FF"
       };
-
-      var colorSet = am5.ColorSet.new(root, {
-   colors: [
-    am5.color("#0D5413"),
-    am5.color("#76AA3B"),
-    am5.color("#FFCB00"),
-    am5.color("#FF5C00"),
-    am5.color("#008BD0"),
-    am5.color("#FF0000"),
-    am5.color("#9747FF")
-  ]
-});
-
-series.set('colors', colorSet);
-
-series.labels.template.setAll({
-    fill: am5.color(0x253138)
-})
- 
-series.appear(1000, 100);
-},
+      return colorMap[value] || "#000000"; 
+    }
+  },
+  beforeDestroy() {
+    if (this.root) {
+      this.root.dispose();
+    }
+  }
 };
 </script>
 
-<template>
-  <div class="hello" id="chartdivpie" ref="chartdivpie">
-  </div>
-</template>
-
-
 <style scoped>
-.hello {
+.chart-container {
   width: 100%;
   height: 250px;
 }

@@ -10,6 +10,12 @@ class SchoolDetails extends Controller
         return view('schoolDetails');
     }
 
+    public function indexFilteredCity($city) {
+        return view('schoolDetails', [
+            'city' => $city,
+        ]);
+    }
+
     public function indexFiltered($city, $schoolName) {
         return view('schoolDetails', [
             'city' => $city,

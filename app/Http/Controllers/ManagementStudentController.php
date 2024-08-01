@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use App\Models\ManagementSchool;
 use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ManagementStudentController extends Controller
@@ -21,8 +25,19 @@ class ManagementStudentController extends Controller
 
     public function index()
     {
-        $class = Student::with('classData')->get();
-        return response()->json($class);
+        $user = Auth::user();
+        $school = User::where('id', $user->id)->get();
+
+        if ($user && $user->id) {
+            $schoolIds = $school->pluck('id');
+            $classes = Student::with('user')
+                ->whereIn('school_id', $schoolIds)
+                ->get();
+        } else {
+            $classes = collect();
+        }
+        
+        return response()->json($classes);
     }
 
     public function show(Student $student)
