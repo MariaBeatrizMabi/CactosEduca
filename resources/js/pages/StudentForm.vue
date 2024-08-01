@@ -295,7 +295,7 @@ function openExamUpdateModal(id) {
                 ></div>
             </div>
 
-            <TitleComponent title="AVALIAÇÕES" />
+            <TitleComponent title="SONDAGENS" />
             <div class="tests-content">
                 <div
                     v-if="studentExams?.length > 0"
@@ -303,7 +303,7 @@ function openExamUpdateModal(id) {
                     class="test-table-container"
                     :key="row.id"
                 >
-                    <h2>{{ studentExams.length - index }}° Período de avaliações</h2>
+                    <h2>{{ studentExams.length - index }}° Período de sondagem</h2>
                     <table class="test-table">
                         <tr>
                             <th>Leitura</th>
@@ -335,13 +335,13 @@ function openExamUpdateModal(id) {
                         </tr>
                     </table>
                 </div>
-                <h3 v-else>O aluno não possui nenhuma avaliação</h3>
+                <h3 v-else>O aluno não possui nenhuma sondagem</h3>
 
                 <button
                     class="create-test"
                     @click="showExamCreateModal = true"
                 >
-                    Adicionar avaliação
+                    Adicionar sondagem
                 </button>
             </div>
         </div>
@@ -349,10 +349,10 @@ function openExamUpdateModal(id) {
 
     <Modal
         v-if="showExamCreateModal"
-        Titlevalue="Cadastro de Avaliações"
+        Titlevalue="Cadastro de Sondagens"
     >
         <div class="modal-body-size">
-            <h2>Detalhes da avaliação</h2>
+            <h2>Detalhes da sondagem</h2>
             <div class="modal-content-details">
                 <SelectComponent
                     labelTitle="Nível de leitura"
@@ -423,17 +423,17 @@ function openExamUpdateModal(id) {
                         d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
                     />
                 </svg>
-                Adicionar avaliação
+                Adicionar sondagem
             </a>
         </div>
     </Modal>
 
     <Modal
         v-if="showExamViewModal"
-        Titlevalue="Cadastro de Avaliações"
+        Titlevalue="Cadastro de Sondagens"
     >
         <div class="modal-body-size">
-            <h2>Detalhes da avaliação</h2>
+            <h2>Detalhes da sondagem</h2>
             <div class="modal-content-details">
                 <SelectComponent
                     disabled
@@ -498,10 +498,10 @@ function openExamUpdateModal(id) {
 
     <Modal
         v-if="showExamUpdateModal"
-        Titlevalue="Cadastro de Avaliações"
+        Titlevalue="Cadastro de Sondagens"
     >
         <div class="modal-body-size">
-            <h2>Detalhes da avaliação</h2>
+            <h2>Detalhes da sondagem</h2>
             <div class="modal-content-details">
                 <SelectComponent
                     labelTitle="Nível de leitura"
@@ -572,7 +572,7 @@ function openExamUpdateModal(id) {
                         d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
                     />
                 </svg>
-                Adicionar avaliação
+                Adicionar sondagem
             </a>
         </div>
     </Modal>

@@ -1,56 +1,41 @@
 <script setup>
-    import MenuComponent from '../components/menu.vue'
-    import userWelcomeComponent from '../components/userWelcome.vue'
-    import ButtonComponent from '../components/button.vue'
+import MenuComponent from '../components/menu.vue'
+import userWelcomeComponent from '../components/userWelcome.vue'
+import ButtonComponent from '../components/button.vue'
 
-    import axios from 'axios';
-    import { ref, onMounted } from 'vue';
-    import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
-    let router = useRouter();
-    let city = ref([]);
-    let name = ref([]);
-    let citySchoolMap = ref({});
-    let selectedCity = ref('');
-    let selectedCitySchools = ref([]);
-    let schoolSelected = ref(false);
+const router = useRouter();
+const citiesSchools = ref([]);
+const cities = ref([]);
+const selectedCity = ref('');
+const schoolSelected = ref(false);
 
-    onMounted(() => {
-        axios.get('/ManagementSchool')
-            .then(response => {
-                const data = response.data;
-                const cities = data.map(item => item.address);
-                const names = data.map(item => item.name);
-                city.value = [...new Set(cities)];
-                name.value = [...new Set(names)];
-                data.forEach(item => {
+onMounted(async () => {
+    const { data } = await axios.get('/ManagementSchool');
 
-                    if (!citySchoolMap.value[item.address]) {
-                        citySchoolMap.value[item.address] = [];
-                    }
-                    citySchoolMap.value[item.address].push(item.name);
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
+    citiesSchools.value = data
+    cities.value = new Set(data.map(item => item.city));
+});
+
+function showSchools(cityName) {
+    selectedCity.value = cityName;
+    schoolSelected.value = true;
+}
+
+function navigateToSchool(cityName, schoolName) {
+    router.push({
+        name: 'SchoolDetailsByCityAndSchool',
+        params: {
+            city: cityName,
+            schoolName: schoolName
+        }
     });
+}
 
-    function showSchools(cityName) {
-        selectedCity.value = cityName;
-        selectedCitySchools.value = citySchoolMap.value[cityName];
-        schoolSelected.value = true;
-    }
-
-    function navigateToSchool(cityName, schoolName) {
-        router.push({ 
-        name: 'SchoolDetailsByCityAndSchool', 
-        params: { 
-            city: cityName, 
-            schoolName: schoolName 
-        } 
-    });
-    }
+const filteredSchools = computed(() => citiesSchools.value.find(({ city }) => selectedCity.value === city)?.schools);
 </script>
 
 <template>
@@ -68,7 +53,12 @@
                 </a>
             </div>
 
-            <ButtonComponent v-for="(cityName, index) in city" :key="index" :TextValue="cityName" @click="showSchools(cityName)"/>        
+            <ButtonComponent
+                v-for="(cityName, index) in cities"
+                :key="index"
+                :TextValue="cityName"
+                @click="showSchools(cityName)"
+            />
         </div>
 
         <div v-if="schoolSelected" class="register-content">
@@ -81,7 +71,13 @@
                     Pesquisar
                 </a>
             </div>
-            <ButtonComponent  v-for="(schoolName, index) in selectedCitySchools" :key="index" :TextValue="schoolName" @click="navigateToSchool(selectedCity, schoolName)"/>        
+
+            <ButtonComponent
+                v-for="({ name }, index) in filteredSchools"
+                :key="index"
+                :TextValue="name"
+                @click="navigateToSchool(selectedCity, name)"
+            />
         </div>
     </div>
 </template>
