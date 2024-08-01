@@ -38,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->where(['city' => '[\pL\s]+', 'schoolName' => '[\pL\s]+'])
     ->name('SchoolDetailsByCityAndSchool');
 
+    // Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
+    // ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
+    // ->name('SchoolDetailsByCityAndSchool');
+
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
     Route::put('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
