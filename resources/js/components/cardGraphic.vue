@@ -57,17 +57,6 @@ onMounted(() => {
                 </div>
             </div>
             <div class="grapich">
-                <Grapich></Grapich>
-            </div>
-        </div>
-
-        <div class="card-grapich" v-if="userType === 'school'">
-            <div class="card-grapich-content">
-                <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
-                </div>
-            </div>
-            <div class="grapich">
                 <PieChart></PieChart>
             </div>
         </div>

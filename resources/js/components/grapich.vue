@@ -18,17 +18,6 @@ export default {
   },
   mounted() {
     this.getUserType();
-      data: []
-    };
-  },
-  mounted() {
-    this.getUserType();
-      data: []
-    };
-  },
-  mounted() {
-    this.createChart();
-    this.fetchData();
   },
   methods: {
     createChart() {
@@ -126,7 +115,16 @@ export default {
       });
     },
     fetchData() {
-      axios.get('/ManagementSchool')
+      let url;
+      if (this.userType === 'admin') {
+        url = '/ManagementSchool';
+      } else if (this.userType === 'teacher') {
+        url = '/ClassSchool';
+      } else {
+        url = '/ClassSchool';
+      }
+
+      axios.get(url)
         .then(response => {
           this.data = response.data.map(cityData => ({
             nameValue: cityData.city,
@@ -172,6 +170,17 @@ export default {
       }
 
 
+    },
+    getUserType() {
+      axios.get('/loginUser')
+        .then(response => {
+          this.userType = response.data.type;
+          this.createChart();
+          this.fetchData();
+        })
+        .catch(error => {
+          console.log("ERROR", error);
+        });
     },
     getUserType() {
       axios.get('/loginUser')
