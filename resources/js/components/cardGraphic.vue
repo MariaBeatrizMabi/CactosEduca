@@ -28,7 +28,7 @@ onMounted(() => {
 
 <template>
     <div class="cards">
-        <div class="card-grapich">
+        <div class="card-grapich" v-if="userType === 'admin'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -50,7 +50,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="card-grapich" v-else-if="userType === 'school'">
+        <div class="card-grapich" v-if="userType === 'school'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -61,7 +61,18 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="card-grapich" v-else-if="userType === 'teacher'">
+        <div class="card-grapich" v-if="userType === 'teacher'">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <Grapich></Grapich>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-if="userType === 'teacher'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -72,7 +83,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="card-grapich" v-else>
+        <!-- <div class="card-grapich" v-else>
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -81,7 +92,7 @@ onMounted(() => {
             <div class="grapich">
                 <h1 class="user-not-Found">Tipo de usuário não encontrado</h1>
             </div>
-        </div>
+        </div> -->
     </div>  
 </template>
 

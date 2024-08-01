@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
+import { ref, onMounted, defineProps } from 'vue';
 
 export default {
   name: 'Chart',
@@ -11,12 +12,12 @@ export default {
       chart: null,
       series: null,
       xAxis: null,
-      data: []
+      data: [],
+      userType: ''
     };
   },
   mounted() {
-    this.createChart();
-    this.fetchData();
+    this.getUserType();
   },
   methods: {
     createChart() {
@@ -103,7 +104,16 @@ export default {
       });
     },
     fetchData() {
-      axios.get('/ManagementSchool')
+      let url;
+      if (this.userType === 'admin') {
+        url = '/ManagementSchool';
+      } else if (this.userType === 'teacher') {
+        url = '/ClassSchool';
+      } else {
+        url = '/ClassSchool';
+      }
+
+      axios.get(url)
         .then(response => {
           this.data = response.data.map(cityData => ({
             nameValue: cityData.city,
@@ -113,6 +123,17 @@ export default {
         })
         .catch(error => {
           console.error("Error fetching data: ", error);
+        });
+    },
+    getUserType() {
+      axios.get('/loginUser')
+        .then(response => {
+          this.userType = response.data.type;
+          this.createChart();
+          this.fetchData();
+        })
+        .catch(error => {
+          console.log("ERROR", error);
         });
     },
     updateChart() {
