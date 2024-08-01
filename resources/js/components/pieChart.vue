@@ -37,6 +37,10 @@ export default {
         console.error("Error fetching user type: ", error);
       }
     },
+    this.createChart();
+    this.fetchData();
+  },
+  methods: {
     createChart() {
       this.root = am5.Root.new("chartdivpie");
 
@@ -124,7 +128,8 @@ export default {
         });
       }
     },
-      
+
+    },
     assignColor(value) {
       const colorMap = {
         1: "#0D5413",

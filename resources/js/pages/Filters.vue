@@ -76,13 +76,6 @@ const filteredSchools = computed(() => !search.value
         <div v-if="schoolSelected" class="register-content">
             <h1>Você gostaria de visualizar os dados de leitura e escrita de qual escola?</h1>
             <div class="searcheble">
-                <input
-                    class="seacheble-camp"
-                    placeholder="Digite o nome do múnicipio"
-                    :value="search"
-                    @input="search = $event.target.value"
-                >
-                <input class="seacheble-camp" placeholder="Digite o nome da escola" />
                 <input class="seacheble-camp" placeholder="Digite o nome do múnicipio">
                 <a class="send-searche">
                     <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
