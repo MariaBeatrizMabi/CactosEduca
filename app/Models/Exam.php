@@ -13,8 +13,7 @@ class Exam extends Model
     protected $fillable = [
         'reading',
         'writing',
-        'need_action',
-        'action_status',
+        'action',
         'student_id',
         'class_id'
     ];
