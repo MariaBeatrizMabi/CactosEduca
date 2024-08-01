@@ -18,6 +18,12 @@ export default {
   },
   mounted() {
     this.getUserType();
+      data: []
+    };
+  },
+  mounted() {
+    this.createChart();
+    this.fetchData();
   },
   methods: {
     createChart() {
@@ -41,8 +47,8 @@ export default {
       let cursor = this.chart.set("cursor", am5xy.XYCursor.new(root, {}));
       cursor.lineY.set("visible", false);
 
-      let xRenderer = am5xy.AxisRendererX.new(root, { 
-        minGridDistance: 30, 
+      let xRenderer = am5xy.AxisRendererX.new(root, {
+        minGridDistance: 30,
         minorGridEnabled: true
       });
 
@@ -100,15 +106,11 @@ export default {
         if (this.chart && this.chart.get("colors") && columnIndex !== -1) {
           return this.chart.get("colors").getIndex(columnIndex);
         }
-        return am5.color("#000000"); 
+        return am5.color("#000000");
       });
     },
     fetchData() {
-      let url;
-      if (this.userType === 'admin') {
-        url = '/ManagementSchool';
-
-        axios.get(url)
+      axios.get('/ManagementSchool')
         .then(response => {
           this.data = response.data.map(cityData => ({
             nameValue: cityData.city,
@@ -118,52 +120,6 @@ export default {
         })
         .catch(error => {
           console.error("Error fetching data: ", error);
-        });
-
-      } else if (this.userType === 'school') {
-        url = '/ClassSchool';
-
-        axios.get(url)
-        .then(response => {
-          this.data = response.data.map(classData => ({
-            nameValue: classData.name,
-            value: classData.students_in_class.length
-          }));
-          this.updateChart();
-        })
-        .catch(error => {
-          console.error("Error fetching data: ", error);
-        });
-        
-      } else if (this.userType === 'teacher') {
-        url = '/ClassSchool';
-
-        axios.get(url)
-        .then(response => {
-          this.data = response.data.map(classData => ({
-            nameValue: classData.name,
-            value: classData.students_in_class.length
-          }));
-          this.updateChart();
-        })
-        .catch(error => {
-          console.error("Error fetching data: ", error);
-        });
-      } else {
-        url = '/ClassSchool';
-      }
-
-      
-    },
-    getUserType() {
-      axios.get('/loginUser')
-        .then(response => {
-          this.userType = response.data.type;
-          this.createChart();
-          this.fetchData();
-        })
-        .catch(error => {
-          console.log("ERROR", error);
         });
     },
     updateChart() {

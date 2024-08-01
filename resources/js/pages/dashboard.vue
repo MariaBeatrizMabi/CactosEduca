@@ -60,6 +60,7 @@ const fetchTeachers = async () => {
 const fetchSchool = async () => {
     try {
         const response = await axios.get('/ManagementSchool');
+        console.log(response);
         school.value = response.data;
     } catch (error) {
         console.error("ERROR", error);
@@ -186,6 +187,7 @@ onMounted(async () => {
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'teacher'">
+                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount" :ref="CardValue"></CardComponent>
                 <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="filteredTeachers"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="StudentCount"></CardComponent>
             </div>

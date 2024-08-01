@@ -20,23 +20,10 @@ export default {
     };
   },
   mounted() {
-    this.initChart();
+    this.createChart();
+    this.fetchData();
   },
   methods: {
-    async initChart() {
-      await this.getUserType(); // Fetch the user type first
-      this.createChart();
-      this.fetchData();
-    },
-    async getUserType() {
-      try {
-        const response = await axios.get('/loginUser');
-        this.userType = response.data.type;
-        console.log("User type:", this.userType); // Debugging
-      } catch (error) {
-        console.error("Error fetching user type: ", error);
-      }
-    },
     createChart() {
       this.root = am5.Root.new("chartdivpie");
 
@@ -84,8 +71,7 @@ export default {
       this.series.appear(1000, 100);
     },
     fetchData() {
-      if(this.userType === 'admin') {
-        axios.get('/ManagementSchool')
+      axios.get('/ManagementSchool')
         .then(response => {
           const data = response.data.map(item => ({
             nameValue: item.city,
@@ -98,33 +84,7 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
-      } else if (this.userType === 'school') {
-        axios.get('/ClassSchool')
-        .then(response => {
-          const data = response.data.map(classData => ({
-            nameValue: classData.name,
-            value: classData.students_in_class.length
-          }));
-          this.series.data.setAll(data);
-        })
-        .catch(error => {
-          console.error("Error fetching data: ", error);
-        });
-      } else if (this.userType === 'teacher') {
-        axios.get('/ClassSchool')
-        .then(response => {
-          const data = response.data.map(classData => ({
-            nameValue: classData.name,
-            value: classData.students_in_class.length
-          }));
-          this.series.data.setAll(data);
-        })
-        .catch(error => {
-          console.error("Error fetching data: ", error);
-        });
-      }
     },
-      
     assignColor(value) {
       const colorMap = {
         1: "#0D5413",
@@ -135,7 +95,7 @@ export default {
         6: "#FF0000",
         7: "#9747FF"
       };
-      return colorMap[value] || "#000000"; 
+      return colorMap[value] || "#000000";
     }
   },
   beforeDestroy() {

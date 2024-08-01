@@ -26,57 +26,18 @@ class ManagementStudentController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        if ($user && $user->id && $user->type === 'school') {
-            $school = ManagementSchool::where('user_id', $user->id)->first();
-            
-            if ($school) {
-                $students = Student::where('school_id', $school->id)
-                    ->with('classData') 
-                    ->get();
-            } else {
-                $students = collect(); 
-            }
-        } else if ($user && $user->id && $user->type === 'teacher') {
-            $teacher = Teacher::where('user_id', $user->id)->first();
-            
-            if ($teacher) {
-                $students = Student::whereHas('classData', function ($query) use ($teacher) {
-                    $query->where('teacher_id', $teacher->id);
-                })->with('classData') 
-                ->get();
-            } else {
-                $students = collect();
-            }
-        } else {
-            $students = collect(); 
-        }
-        
-        return response()->json($students);
-    }
+        $school = User::where('id', $user->id)->get();
 
-    public function indexChart()
-    {
-        $user = Auth::user();
-        $school = ManagementSchool::where('user_id', $user->id)->first();
-        $teacher = Teacher::where('user_id', $user->id)->first();
-    
-        if ($user && $user->id && $user->type === 'school') {
-            $schoolIds = [$school->id];
-            $classes = ClassModel::whereIn('school_id', $schoolIds)->pluck('id');
-            $students = Student::whereHas('classData', function($query) use ($classes) {
-                $query->whereIn('class_id', $classes);
-            })->with('user')->get();
-        } else if ($user && $user->id && $user->type === 'teacher') {
-            $classIds = ClassModel::where('teacher_id', $teacher->id)->pluck('id');
-            $students = Student::whereHas('classData', function($query) use ($classIds) {
-                $query->whereIn('class_id', $classIds);
-            })->with('user')->get();
+        if ($user && $user->id) {
+            $schoolIds = $school->pluck('id');
+            $classes = Student::with('user')
+                ->whereIn('school_id', $schoolIds)
+                ->get();
         } else {
-            $students = collect();
+            $classes = collect();
         }
-        
-        return response()->json($students);
+
+        return response()->json($classes);
     }
 
     public function show(Student $student)
@@ -128,15 +89,15 @@ class ManagementStudentController extends Controller
 
     public function delete(Student $studentData, $id) {
         $studentData = Student::where('id', $id)->firstOrFail();
-        
+
         if (!$studentData) {
             return response()->json(['message' => 'Professor não encontrado'], 404);
         }
-        
+
         $studentData->delete();
-        
+
         Log::info('Turma excluída com sucesso: ' . $studentData);
-        
+
         return response()->json(['message' => 'Professor e usuário excluídos com sucesso'], 200);
     }
 }
