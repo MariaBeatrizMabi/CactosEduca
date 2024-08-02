@@ -524,9 +524,6 @@ function closeModalUpdated() {
 
 onMounted(async () => {
     await getUserType();
-    await getTableTeacherData();
-    await getTableClassData();
-    await getTableStudentData();
 
     if (userType.value === "teacher") {
         const { data } = await api.get(`/api/users/${userID.value}/teacher`);
@@ -537,6 +534,10 @@ onMounted(async () => {
         );
         schoolId.value = data.management_school.id;
     }
+
+    await getTableTeacherData();
+    await getTableClassData();
+    await getTableStudentData();
 });
 </script>
 

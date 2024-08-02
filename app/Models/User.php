@@ -50,4 +50,19 @@ class User extends Authenticatable
             $user->managementSchool()->delete();
         });
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->type === 'admin';
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->type === 'teacher';
+    }
+
+    public function isSchool(): bool
+    {
+        return $this->type === 'school';
+    }
 }

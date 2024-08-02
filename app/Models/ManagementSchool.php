@@ -48,4 +48,9 @@ class ManagementSchool extends Model
     {
         return $this->hasMany(Student::class, 'school_id');
     }
+
+    public function classes(): HasMany
+    {
+        return $this->hasMany(ClassModel::class, 'school_id');
+    }
 }
