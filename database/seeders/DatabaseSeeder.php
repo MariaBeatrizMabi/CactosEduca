@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CitiesSeeder::class);
         $this->call(LocationSeeder::class);
-        
+
         User::factory()->create([
             'user_name' => 'Admin',
             'acess_cod'  => 'CactosAdmin',
@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
         Teacher::factory()->create([
             'name' => 'Teacher',
             'school_id' => 1,
-            'user_id' => 4
+            'user_id' => 3
         ]);
     }
 }
