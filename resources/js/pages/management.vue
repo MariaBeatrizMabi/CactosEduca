@@ -175,7 +175,6 @@ async function getTableTeacherData() {
     try {
         const response = await axios("/TeachersSchool");
 
-
         formDataTeachersPreview.value = response.data.map((take) => ({
             id: take.id,
             name: take.name,

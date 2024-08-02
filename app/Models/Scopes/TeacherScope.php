@@ -16,6 +16,6 @@ class TeacherScope implements Scope
         if (!isset($user) || $user?->isAdmin()) return;
 
         if ($user?->isTeacher()) $builder->where('user_id', $user->id);
-        else if ($user?->isSchool()) $builder->where('id', $user->managementSchool->id);
+        else if ($user?->isSchool()) $builder->where('school_id', $user->managementSchool->id);
     }
 }
