@@ -872,7 +872,6 @@ onMounted(async () => {
                         RightAction="display: none;"
                         @input="formDataClassAdd.shift = $event.target.value"
                     >
-                        <option value="">Selecione uma opção</option>
                         <option value="morning">Matutino</option>
                         <option value="afternoon">Vespertino</option>
                         <option value="night">Noturno</option>
