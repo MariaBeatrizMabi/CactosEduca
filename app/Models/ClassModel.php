@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClassModel extends Model
 {
     protected $fillable = [
+        'id',
         'name',
         'shift',
         'active',
@@ -52,7 +53,12 @@ class ClassModel extends Model
 
     public function students(): BelongsToMany
     {
-        return $this->belongsToMany(Student::class, 'student_class', 'class_id', 'student_id');
+        return $this->hasMany(StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
+    }
+
+    public function students()
+    {
+        return $this->hasManyThrough(Student::class, StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
     }
 
     public function school(): BelongsTo
