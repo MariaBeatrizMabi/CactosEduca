@@ -75,15 +75,13 @@ async function fetchStudents() {
 }
 
 async function fetchAvailableStudents() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/students`)
+    const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`)
     return data
 }
 
 onMounted(async () => {
     school.value = await fetchSchool()
-    availableStudents.value = await fetchAvailableStudents()
     classData.value = await fetchClassData()
-    console.log(classData.value)
     formData.value = classData.value
     availableTeachers.value = await fetchAvailableTeachers();
     students.value = await fetchStudents()
@@ -93,7 +91,8 @@ function redirectToStudentScreen(id) {
     window.location.href = `/student/${id}`
 }
 
-function openAddStudentModal() {
+async function openAddStudentModal() {
+    availableStudents.value = await fetchAvailableStudents();
     showAddStudentModal.value = true;
 }
 
@@ -346,6 +345,7 @@ function resetForm() {
         background-color: var(--grap-color);
         border: 2px solid var(--primary-color);
         border-radius:  2rem;
+        padding: 0 1rem 0 0;
 
         & svg {
             background-color: var(--grap-color);

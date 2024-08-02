@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cities;
+use App\Models\ClassModel;
 use App\Models\Location;
 use App\Models\ManagementSchool;
-use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ManagementSchoolController extends Controller
@@ -77,9 +78,21 @@ class ManagementSchoolController extends Controller
         );
     }
 
-    public function listStudents(ManagementSchool $managementSchool): JsonResponse
+    public function listAvailableStudentsClass(ManagementSchool $managementSchool, ClassModel $class): JsonResponse
     {
-        return response()->json($managementSchool->students);
+        return response()->json(
+            $managementSchool->students->whereNotIn(
+                'id',
+                DB::table('students')
+                    ->select('students.*')
+                    ->join('student_class', 'student_class.student_id', '=', 'students.id')
+                    ->where('students.school_id', $managementSchool->id)
+                    ->where('student_class.class_id', $class->id)
+                    ->get()
+                    ->pluck('id')
+                    ->toArray()
+            )
+        );
     }
 
     public function create(Request $request)
