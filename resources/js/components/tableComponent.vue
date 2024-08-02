@@ -128,11 +128,11 @@ const emits = defineEmits(['viewDetails', 'updateAction', 'deletedAction']);
 }
 
 .table-scroll table tr {
-    & > td:nth-child(1), th:nth-child(1) {
+    & > td:first-child, th:first-child {
         border-left: 0;
     }
 
-    & > td:nth-child(3), th:nth-child(3) {
+    & > td:last-child, th:last-child {
         border-right: 0;
     }
 }
