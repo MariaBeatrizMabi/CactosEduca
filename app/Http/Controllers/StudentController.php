@@ -43,7 +43,7 @@ class StudentController extends Controller
 
     public function getActiveClass(Student $student): JsonResponse
     {
-        return response()->json($student->activeClass());
+        return response()->json($student?->activeClass());
     }
 
     public function getExamsFromClass(Student $student, ClassModel $class): JsonResponse

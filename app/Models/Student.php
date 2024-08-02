@@ -36,7 +36,7 @@ class Student extends Model
         return $this->belongsTo(ManagementSchool::class);
     }
 
-    public function activeClass(): ClassModel
+    public function activeClass(): ?ClassModel
     {
         return $this->classData()->latest()->first();
     }
