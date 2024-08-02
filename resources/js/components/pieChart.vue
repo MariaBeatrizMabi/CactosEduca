@@ -10,11 +10,33 @@ import * as am5percent from '@amcharts/amcharts5/percent';
 
 export default {
   name: 'Chart',
+  data() {
+    return {
+      chart: null,
+      series: null,
+      xAxis: null,
+      data: [],
+      userType: ''
+    };
+  },
   mounted() {
-    this.createChart();
-    this.fetchData();
+    this.initChart();
   },
   methods: {
+    async initChart() {
+      await this.getUserType(); // Fetch the user type first
+      this.createChart();
+      this.fetchData();
+    },
+    async getUserType() {
+      try {
+        const response = await axios.get('/loginUser');
+        this.userType = response.data.type;
+        console.log("User type:", this.userType); // Debugging
+      } catch (error) {
+        console.error("Error fetching user type: ", error);
+      }
+    },
     createChart() {
       this.root = am5.Root.new("chartdivpie");
 
@@ -62,7 +84,8 @@ export default {
       this.series.appear(1000, 100);
     },
     fetchData() {
-      axios.get('/ManagementSchool')
+      if(this.userType === 'admin') {
+        axios.get('/ManagementSchool')
         .then(response => {
           const data = response.data.map(item => ({
             nameValue: item.city,
@@ -75,7 +98,21 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
+      } else if (this.userType === 'school') {
+        axios.get('/ClassSchool')
+        .then(response => {
+          const data = response.data.map(classData => ({
+            nameValue: classData.name,
+            value: classData.students_in_class.length
+          }));
+          this.series.data.setAll(data);
+        })
+        .catch(error => {
+          console.error("Error fetching data: ", error);
+        });
+      }
     },
+      
     assignColor(value) {
       const colorMap = {
         1: "#0D5413",
