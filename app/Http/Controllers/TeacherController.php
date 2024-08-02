@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ManagementSchool;
 use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
@@ -16,22 +14,12 @@ class TeacherController extends Controller
     {
         return Teacher::all();
     }
-    
-    public function index()
-    {
-        $user = Auth::user();
-        $school = ManagementSchool::where('user_id', $user->id)->get();
-        
-        $schoolIds = $school->pluck('id');
-        if ($schoolIds->isNotEmpty()) {
-            $teachers = Teacher::with('user')
-                ->whereIn('school_id', $schoolIds)
-                ->get();
-        } else {
-            $teachers = collect(); // Empty collection
-        }
 
-        return response()->json($teachers);
+    public function index(): JsonResponse
+    {
+        return response()->json(
+            Teacher::with('user')->get()
+        );
     }
 
     public function show(Teacher $teacher)

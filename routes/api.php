@@ -27,6 +27,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/school', [UserController::class, 'school']);
+    });
+
     Route::prefix('teachers')->name('teachers.')->group(function () {
         Route::get('/{teacher}', [TeacherController::class, 'show']);
         Route::put('/{teacher}', [TeacherController::class, 'update']);

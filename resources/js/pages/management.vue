@@ -166,9 +166,15 @@ async function getUserType() {
     userID.value = loginUserData.id;
 }
 
+async function getSchool() {
+    const { data: school } = await api.get('/api/user/school');
+    schoolId.value = school.id;
+}
+
 async function getTableTeacherData() {
     try {
         const response = await axios("/TeachersSchool");
+
 
         formDataTeachersPreview.value = response.data.map((take) => ({
             id: take.id,
@@ -524,16 +530,17 @@ function closeModalUpdated() {
 
 onMounted(async () => {
     await getUserType();
+    await getSchool();
 
-    if (userType.value === "teacher") {
-        const { data } = await api.get(`/api/users/${userID.value}/teacher`);
-        schoolId.value = data.teacher.school_id;
-    } else if (userType.value === "school") {
-        const { data } = await api.get(
-            `/api/users/${userID.value}/management-schools`
-        );
-        schoolId.value = data.management_school.id;
-    }
+    // if (userType.value === "teacher") {
+    //     const { data } = await api.get(`/api/users/${userID.value}/teacher`);
+    //     schoolId.value = data.teacher.school_id;
+    // } else if (userType.value === "school") {
+    //     const { data } = await api.get(
+    //         `/api/users/${userID.value}/management-schools`
+    //     );
+    //     schoolId.value = data.management_school.id;
+    // }
 
     await getTableTeacherData();
     await getTableClassData();

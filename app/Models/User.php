@@ -32,6 +32,15 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            $user->managementSchool()->delete();
+        });
+    }
+
     public function managementSchool(): HasOne
     {
         return $this->hasOne(ManagementSchool::class, 'user_id');
@@ -40,15 +49,6 @@ class User extends Authenticatable
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($user) {
-            $user->managementSchool()->delete();
-        });
     }
 
     public function isAdmin(): bool

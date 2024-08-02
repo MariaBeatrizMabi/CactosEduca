@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ManagementSchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,11 @@ class ManagementSchool extends Model
     ];
 
     protected $table = 'management_schools';
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ManagementSchoolScope);
+    }
 
     public static function boot(): void
     {

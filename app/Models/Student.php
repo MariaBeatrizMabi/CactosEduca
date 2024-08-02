@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\SchoolScope;
 use App\Models\Scopes\StudentScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +23,7 @@ class Student extends Model
 
     protected static function booted(): void
     {
-        static::addGlobalScope(new SchoolScope);
+        static::addGlobalScope(new StudentScope);
     }
 
     public function classData(): BelongsToMany
