@@ -118,13 +118,8 @@ export default {
       let url;
       if (this.userType === 'admin') {
         url = '/ManagementSchool';
-      } else if (this.userType === 'teacher') {
-        url = '/ClassSchool';
-      } else {
-        url = '/ClassSchool';
-      }
 
-      axios.get(url)
+        axios.get(url)
         .then(response => {
           this.data = response.data.map(cityData => ({
             nameValue: cityData.city,
@@ -153,34 +148,11 @@ export default {
 
       } else if (this.userType === 'teacher') {
         url = '/ClassSchool';
-        axios.get(url)
-        .then(response => {
-          this.data = response.data.map(classData => ({
-            nameValue: classData.name,
-            value: classData.students_in_class.length
-          }));
-          this.updateChart();
-        })
-        .catch(error => {
-          console.error("Error fetching data: ", error);
-        });
-
       } else {
         url = '/ClassSchool';
       }
 
 
-    },
-    getUserType() {
-      axios.get('/loginUser')
-        .then(response => {
-          this.userType = response.data.type;
-          this.createChart();
-          this.fetchData();
-        })
-        .catch(error => {
-          console.log("ERROR", error);
-        });
     },
     getUserType() {
       axios.get('/loginUser')
