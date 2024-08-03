@@ -137,6 +137,7 @@ export default {
         
       } else if (this.userType === 'teacher') {
         url = '/ClassSchool';
+
         axios.get(url)
         .then(response => {
           this.data = response.data.map(classData => ({
@@ -148,7 +149,6 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
-
       } else {
         url = '/ClassSchool';
       }
