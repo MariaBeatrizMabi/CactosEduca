@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class ClassModel extends Model
 {
@@ -51,12 +52,7 @@ class ClassModel extends Model
         return $this->hasMany(StudentInClass::class, 'class_id', 'id');
     }
 
-    public function students(): BelongsToMany
-    {
-        return $this->hasMany(StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
-    }
-
-    public function students()
+    public function students(): HasManyThrough
     {
         return $this->hasManyThrough(Student::class, StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
     }

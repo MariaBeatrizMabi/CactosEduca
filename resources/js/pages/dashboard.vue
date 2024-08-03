@@ -186,8 +186,7 @@ onMounted(async () => {
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'teacher'">
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="filteredTeachers"></CardComponent>
+                <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="ClassDataCount"></CardComponent>
                 <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="StudentCount"></CardComponent>
             </div>
 
