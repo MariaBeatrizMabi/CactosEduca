@@ -27,7 +27,9 @@ const school = ref([]);
 const classData = ref([]);
 const classAllData = ref([])
 const student = ref([]);
-const studentAll = ref([])
+const studentAll = ref([]);
+const studentTeachers = ref([]);
+const filteredcountStudentTeachers = ref([]);
 
 const getUserType = async () => {
     try {
@@ -103,6 +105,15 @@ const fetchStudent = async () => {
     }
 }
 
+const fetchTeacherStudent = async () => {
+    try {
+        const response = await axios.get('/StudentsChartData');
+        studentTeachers.value = response.data;
+    } catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
 const countTeachersBySchoolId = () => {
     return teachers.value.length;
 }
@@ -131,6 +142,10 @@ const countStudent = () => {
     return student.value.length;
 }
 
+const countStudentTeachers = () => {
+    return studentTeachers.value.length;
+}
+
 const countAllStudent= () => {
     return studentAll.value.length;
 }
@@ -144,6 +159,7 @@ onMounted(async () => {
     await fetchStudent();
     await fetchAllStudent();
     await fetchClassAllData();
+    await fetchTeacherStudent();
     SchoolCount.value = countAllSchool();
     TeacherAllCount.value = countAllTeachers();
     TeacherCount.value = countTeachers();
@@ -152,6 +168,7 @@ onMounted(async () => {
     StudentCount.value = countStudent()
     StudentAllCount.value = countAllStudent()
     filteredTeachers.value = countTeachersBySchoolId();
+    filteredcountStudentTeachers.value = countStudentTeachers();
 });
 </script>
 
@@ -188,7 +205,7 @@ onMounted(async () => {
 
             <div class="Cards-container" v-else-if="userType.type === 'teacher'">
                 <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="ClassDataCount"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="StudentCount"></CardComponent>
+                <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="filteredcountStudentTeachers"></CardComponent>
             </div>
 
             <div class="Cards-container" v-else>
