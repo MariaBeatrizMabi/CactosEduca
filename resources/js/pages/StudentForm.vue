@@ -354,6 +354,8 @@ function openExamUpdateModal(id) {
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
+            <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção</a>
+
             <div class="modal-content-details">
                 <SelectComponent
                     labelTitle="Nível de leitura"
