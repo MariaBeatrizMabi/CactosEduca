@@ -6,6 +6,7 @@ use App\Models\Scopes\ClassScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class ClassModel extends Model
 {
@@ -42,10 +43,10 @@ class ClassModel extends Model
 
     public function studentsInClass(): HasMany
     {
-        return $this->hasMany(StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
+        return $this->hasMany(StudentInClass::class, 'class_id', 'id');
     }
 
-    public function students()
+    public function students(): HasManyThrough
     {
         return $this->hasManyThrough(Student::class, StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
     }
@@ -55,4 +56,3 @@ class ClassModel extends Model
         return $this->belongsTo(ManagementSchool::class, 'school_id', 'id');
     }
 }
-

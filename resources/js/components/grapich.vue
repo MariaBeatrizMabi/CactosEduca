@@ -137,6 +137,18 @@ export default {
         
       } else if (this.userType === 'teacher') {
         url = '/ClassSchool';
+        axios.get(url)
+        .then(response => {
+          this.data = response.data.map(classData => ({
+            nameValue: classData.name,
+            value: classData.students_in_class.length
+          }));
+          this.updateChart();
+        })
+        .catch(error => {
+          console.error("Error fetching data: ", error);
+        });
+
       } else {
         url = '/ClassSchool';
       }

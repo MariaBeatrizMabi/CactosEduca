@@ -110,6 +110,18 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
+      } else if (this.userType === 'teacher') {
+        axios.get('/ClassSchool')
+        .then(response => {
+          const data = response.data.map(classData => ({
+            nameValue: classData.name,
+            value: classData.students_in_class.length
+          }));
+          this.series.data.setAll(data);
+        })
+        .catch(error => {
+          console.error("Error fetching data: ", error);
+        });
       }
     },
       
