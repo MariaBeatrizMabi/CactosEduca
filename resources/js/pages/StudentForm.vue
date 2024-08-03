@@ -656,6 +656,7 @@ textarea {
     resize: none;
     color: var(--primary-color);
     font-weight: 500;
+    font-size: 1.1rem;
 }
 
 .tests-content {
