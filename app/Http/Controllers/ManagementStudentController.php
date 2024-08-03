@@ -26,18 +26,32 @@ class ManagementStudentController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $school = User::where('id', $user->id)->get();
 
-        if ($user && $user->id) {
-            $schoolIds = $school->pluck('id');
-            $classes = Student::with('user')
-                ->whereIn('school_id', $schoolIds)
+        if ($user && $user->id && $user->type === 'school') {
+            $school = ManagementSchool::where('user_id', $user->id)->first();
+
+            if ($school) {
+                $students = Student::where('school_id', $school->id)
+                    ->with('classData')
+                    ->get();
+            } else {
+                $students = collect();
+            }
+        } else if ($user && $user->id && $user->type === 'teacher') {
+            $teacher = Teacher::where('user_id', $user->id)->first();
+
+            if ($teacher) {
+                $students = Student::where('school_id', $teacher->school_id)
+                ->with('classData')
                 ->get();
+            } else {
+                $students = collect();
+            }
         } else {
-            $classes = collect();
+            $students = collect();
         }
 
-        return response()->json($classes);
+        return response()->json($students);
     }
 
     public function show(Student $student)
