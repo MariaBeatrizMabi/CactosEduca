@@ -26,6 +26,38 @@ class ManagementStudentController extends Controller
     public function index()
     {
         $user = Auth::user();
+        
+        if ($user && $user->id && $user->type === 'school') {
+            $school = ManagementSchool::where('user_id', $user->id)->first();
+            
+            if ($school) {
+                $students = Student::where('school_id', $school->id)
+                    ->with('classData') 
+                    ->get();
+            } else {
+                $students = collect(); 
+            }
+        } else if ($user && $user->id && $user->type === 'teacher') {
+            $teacher = Teacher::where('user_id', $user->id)->first();
+            
+            if ($teacher) {
+                $students = Student::whereHas('classData', function ($query) use ($teacher) {
+                    $query->where('teacher_id', $teacher->id);
+                })->with('classData') 
+                ->get();
+            } else {
+                $students = collect();
+            }
+        } else {
+            $students = collect(); 
+        }
+        
+        return response()->json($students);
+    }
+
+    public function indexChart()
+    {
+        $user = Auth::user();
         $school = ManagementSchool::where('user_id', $user->id)->first();
         $teacher = Teacher::where('user_id', $user->id)->first();
     

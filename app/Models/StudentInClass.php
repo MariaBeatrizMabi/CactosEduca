@@ -35,4 +35,9 @@ class StudentInClass extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    public function studentsChart(): BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

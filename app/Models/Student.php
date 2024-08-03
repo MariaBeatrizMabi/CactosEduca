@@ -26,6 +26,7 @@ class Student extends Model
         'people_with_disabilities' => 'boolean'
     ];
 
+   
     protected static function booted(): void
     {
         static::addGlobalScope(new StudentScope);
@@ -35,14 +36,13 @@ class Student extends Model
     {
         return $this->belongsToMany(ClassModel::class, 'student_class', 'student_id', 'class_id');
     }
-        
 
     public function managementSchool(): BelongsTo
     {
         return $this->belongsTo(ManagementSchool::class);
     }
 
-    public function activeClass(): ?ClassModel
+    public function activeClass(): ClassModel
     {
         return $this->classData()->where('active', true)->latest()->first();
     }
