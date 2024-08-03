@@ -325,6 +325,15 @@ function openExamUpdateModal(id) {
                                 </td>
                             </tr>
                         </table>
+
+                        <span class="textarea-wrapper">
+                            <h3>Ações de Intervenção</h3>
+                            <textarea
+                                disabled
+                                :value="row.action"
+                                rows="8"
+                            ></textarea>
+                        </span>
                     </div>
                     <h3 v-else>O aluno não possui nenhuma sondagem</h3>
 
