@@ -42,16 +42,6 @@ class ClassModel extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
-    public function studentsChart(): BelongsToMany
-    {
-        return $this->hasMany(StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
-    }
-
-    public function students()
-    {
-        return $this->hasManyThrough(Student::class, StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
-    }
-
     public function studentsInClass(): HasMany
     {
         return $this->hasMany(StudentInClass::class, 'class_id', 'id');
