@@ -23,7 +23,7 @@ const availableStudents = ref([]);
 const availableTeachers = ref([]);
 const students = ref([]);
 
-const selectedStudentToAdd = ref(null);
+const selectedStudentToAdd = ref('');
 
 const classData = ref({
     id: null,
@@ -71,7 +71,7 @@ async function fetchAvailableTeachers() {
 
 async function fetchStudents() {
     const { data } = await api.get(`/api/classes/${route.params.class}/students`)
-    return data.map(({ id, name, age }) => ({ id, name, age }));
+    return data.map(({ id, name }) => ({ id, name }));
 }
 
 async function fetchAvailableStudents() {
@@ -100,6 +100,7 @@ async function submitAddStudent() {
     await api.post(`/api/classes/${classData.value.id}/students/${selectedStudentToAdd.value}`);
     students.value = await fetchStudents();
     showAddStudentModal.value = false;
+    selectedStudentToAdd.value = '';
 }
 
 function openRemoveStudentModal(id) {
@@ -147,7 +148,7 @@ function resetForm() {
                         </svg>
                         <hr>
                         <select v-model="selectedStudentToAdd">
-                            <option v-bind:value="null" disabled selected>Selecione um aluno</option>
+                            <option value="" disabled selected>Selecione um aluno</option>
                             <option v-for="row in availableStudents" v-bind:value="row.id">{{ row.name }}</option>
                         </select>
                     </div>
@@ -267,7 +268,7 @@ function resetForm() {
 
         <TableComponent
             TitleValue="ALUNOS DA TURMA"
-            :TableHeader="['Nome', 'Idade']"
+            :TableHeader="['Nome']"
             :TableContent="students"
             :TableActions="true"
             :TableActionVisibility="true"

@@ -158,6 +158,19 @@ function resetFormClass() {
         name: "",
         school_id: schoolId.value,
         teacher_id: "",
+        shift: ''
+    };
+}
+
+function resetFormStudent() {
+    formDataStudentAdd.value = {
+        name: "",
+        gender: "",
+        enrollment_date: "",
+        enrollment: "",
+        date_of_birth: "",
+        people_with_disabilities: '',
+        school_id: userID.value,
     };
 }
 
@@ -226,6 +239,8 @@ async function submitForm() {
 
         showModalCreation.value = false;
 
+        resetForm();
+
         setTimeout(() => {
             isLoading.value = false;
         }, 800);
@@ -246,8 +261,8 @@ async function submitStudentForm() {
         });
 
         getTableStudentData();
-
         showModalStudentCreation.value = false;
+        resetFormStudent();
 
         setTimeout(() => {
             isLoading.value = false;
@@ -269,6 +284,8 @@ async function submitFormClass() {
         getTableClassData();
 
         ShowModalClassCreation.value = false;
+
+        resetFormClass();
 
         setTimeout(() => {
             isLoading.value = false;
@@ -1086,9 +1103,7 @@ onMounted(async () => {
                         icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"
                         :value="formDataStudentAdd.enrollment"
                         typeValue="text"
-                        @input="
-                            formDataStudentAdd.enrollment = $event.target.value
-                        "
+                        @input="formDataStudentAdd.enrollment = $event.target.value"
                     />
 
                     <NewSelectComponent
