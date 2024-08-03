@@ -15,6 +15,43 @@ use Illuminate\Support\Facades\Log;
 
 class ManagementSchoolController extends Controller
 {
+    private function getGradeValue($grade)
+    {
+        $grades = [
+            'pré-silábico' => 1,
+            'silábico' => 2,
+            'silábico-alfabético' => 3,
+            'alfabético' => 4,
+        ];
+
+        return $grades[$grade] ?? 0;
+    }
+
+    public function calculateAverageGrades($schoolId)
+    {
+        $school = ManagementSchool::with(['classes.students.exams'])->find($schoolId);
+
+        if (!$school) {
+            return null;
+        }
+
+        $totalGrades = 0;
+        $count = 0;
+
+        foreach ($school->classes as $class) {
+            foreach ($class->students as $student) {
+                foreach ($student->exams as $exam) {
+                    $totalGrades += $this->getGradeValue($exam->reading);
+                    $totalGrades += $this->getGradeValue($exam->writing);
+                    $totalGrades += $this->getGradeValue($exam->action);
+                    $count += 3;
+                }
+            }
+        }
+
+        return $count > 0 ? $totalGrades / $count : null;
+    }
+
     public function index()
     {
         $schools = ManagementSchool::with('user')->get();
@@ -26,6 +63,7 @@ class ManagementSchoolController extends Controller
         $response = $cities->map(function ($city) use ($groupedSchools, $locations) {
             $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
                 $location = $locations->firstWhere('id', $school->location_id);
+                $averageGrades = $this->calculateAverageGrades($school->id);
                 return [
                     'id' => $school->id,
                     'name' => $school->name,
@@ -35,7 +73,8 @@ class ManagementSchoolController extends Controller
                         'id' => $school->user->id,
                         'user_name' => $school->user->user_name,
                         'acess_cod' => $school->user->acess_cod,
-                    ]
+                    ],
+                    'average_grades' => $averageGrades
                 ];
             });
 
@@ -52,23 +91,45 @@ class ManagementSchoolController extends Controller
 
     public function show($id)
     {
-        $school = ManagementSchool::with('user')->find($id);
-
+        $school = ManagementSchool::with(['user', 'classes.students.exams'])->find($id);
+    
         if (!$school) {
             return response()->json(['message' => 'School not found'], 404);
         }
-
+    
         $location = Location::find($school->location_id);
         $city = Cities::find($school->city_id);
-
-        return response()->json([
+    
+        $schoolData = [
             'id' => $school->id,
             'name' => $school->name,
-            'city_id' => $city ?? null,
-            'location' => $location ?? null,
+            'city' => $city,
+            'location' => $location,
             'acess_cod' => $school->user->acess_cod,
-            'password' => $school->user->password
-        ]);
+            'password' => $school->user->password,
+            'classes' => $school->classes->map(function ($class) {
+                return [
+                    'id' => $class->id,
+                    'name' => $class->name,
+                    'students' => $class->students->map(function ($student) {
+                        return [
+                            'id' => $student->id,
+                            'name' => $student->name,
+                            'exams' => $student->exams->map(function ($exam) {
+                                return [
+                                    'id' => $exam->id,
+                                    'reading' => $exam->reading,
+                                    'writing' => $exam->writing,
+                                    'action' => $exam->action,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            }),
+        ];
+    
+        return response()->json($schoolData);
     }
 
     public function listTeachers(ManagementSchool $managementSchool): JsonResponse

@@ -54,4 +54,5 @@ class ClassModel extends Model
     {
         return $this->belongsTo(ManagementSchool::class, 'school_id', 'id');
     }
+    
 }

@@ -1,8 +1,7 @@
 <script setup>
-import MenuComponent from '../components/menu.vue'
-import userWelcomeComponent from '../components/userWelcome.vue'
-import ButtonComponent from '../components/button.vue'
-
+import MenuComponent from '../components/menu.vue';
+import userWelcomeComponent from '../components/userWelcome.vue';
+import ButtonComponent from '../components/button.vue';
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -30,11 +29,10 @@ function showSchools(cityName) {
     selectedCity.value = cityName;
     schoolSelected.value = true;
     const cityData = citiesSchools.value.find(({ city }) => selectedCity.value === city);
-    selectedSchools.value = cityData ? cityData.schools : []; // Garante que selectedSchools é um array
+    selectedSchools.value = cityData ? cityData.schools : []; // Ensure selectedSchools is an array
 }
 
 function navigateToSchool(cityName, schoolName) {
-    console.log('selectedSchools:', selectedSchools.value);
     if (Array.isArray(selectedSchools.value)) {
         const selectedSchool = selectedSchools.value.find(school => school.name === schoolName);
         if (selectedSchool) {
@@ -43,7 +41,7 @@ function navigateToSchool(cityName, schoolName) {
                 params: {
                     city: cityName,
                     schoolName: schoolName,
-                    schoolId: selectedSchool.id 
+                    schoolId: selectedSchool.id
                 }
             });
         } else {
@@ -53,6 +51,7 @@ function navigateToSchool(cityName, schoolName) {
         console.error('selectedSchools is not an array:', selectedSchools.value);
     }
 }
+
 
 const filteredCities = computed(() => !search.value
     ? cities.value
@@ -64,6 +63,28 @@ const filteredSchools = computed(() => !search.value
     ? selectedSchools.value
     : selectedSchools.value?.filter(({ name }) => name.toLowerCase().includes(search.value.toLowerCase()))
 );
+
+function selectAllCities() {
+    search.value = '';
+    selectedCity.value = '';
+    schoolSelected.value = false;
+    // Redirect to the general school details page without filters
+    router.push({
+        name: 'SchoolDetailsAll'
+    });
+}
+
+function selectAllSchools() {
+    if (selectedCity.value) {
+        router.push({
+            name: 'SchoolDetailsAllByCity',
+            params: { city: selectedCity.value }
+        });
+    } else {
+        console.error('Selected city is not defined');
+    }
+}
+
 </script>
 
 <template>
@@ -86,6 +107,11 @@ const filteredSchools = computed(() => !search.value
                     Pesquisar
                 </a>
             </div>
+            
+            <ButtonComponent
+                TextValue="Selecionar Todas"
+                @click="selectAllCities"
+            />
 
             <ButtonComponent
                 v-for="(cityName, index) in filteredCities"
@@ -98,13 +124,23 @@ const filteredSchools = computed(() => !search.value
         <div v-if="schoolSelected" class="register-content">
             <h1>Você gostaria de visualizar os dados de leitura e escrita de qual escola?</h1>
             <div class="searcheble">
-                <input class="seacheble-camp" placeholder="Digite o nome do múnicipio">
+                <input
+                    class="seacheble-camp"
+                    placeholder="Digite o nome do múnicipio"
+                    :value="search"
+                    @input="search = $event.target.value"
+                >
                 <a class="send-searche">
                     <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                         <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
                     Pesquisar
                 </a>
             </div>
+
+            <ButtonComponent
+                TextValue="Selecionar Todas"
+                @click="selectAllSchools"
+            />
 
             <ButtonComponent
                 v-for="({ name }, index) in filteredSchools"
@@ -115,6 +151,7 @@ const filteredSchools = computed(() => !search.value
         </div>
     </div>
 </template>
+
 
 <style scoped>
     .searcheble {

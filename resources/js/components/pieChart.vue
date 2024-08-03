@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     async initChart() {
-      await this.getUserType(); // Fetch the user type first
+      await this.getUserType();
       this.createChart();
       this.fetchData();
     },
@@ -32,7 +32,7 @@ export default {
       try {
         const response = await axios.get('/loginUser');
         this.userType = response.data.type;
-        console.log("User type:", this.userType); // Debugging
+        console.log("User type:", this.userType);
       } catch (error) {
         console.error("Error fetching user type: ", error);
       }

@@ -34,13 +34,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails', [SchoolDetails::class, 'index'])->name('index');
     Route::get('/Filters', [SchoolDetails::class, 'filteredScreen'])->name('filteredScreen');
 
-    Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
-    ->where(['city' => '[\pL\s]+', 'schoolName' => '[\pL\s]+'])
-    ->name('SchoolDetailsByCityAndSchool');
+    Route::get('/schoolDetails/{cityId}/{schoolNames}', [SchoolDetails::class, 'indexMultipleSchools'])
+    ->where(['cityId' => '[0-9]+', 'schoolNames' => '[\pL\s,]+'])
+    ->name('SchoolDetailsByCityAndSchools');
 
-    // Route::get('/schoolDetails/{city}/{schoolName}', [SchoolDetails::class, 'indexFiltered'])
-    // ->where(['city' => '[\pL0-9\s]+', 'schoolName' => '[a-zA-Z0-9\s]+'])
-    // ->name('SchoolDetailsByCityAndSchool');
+    Route::get('/schoolDetails/all', [SchoolDetails::class, 'indexAll'])
+    ->name('SchoolDetailsAll');
+
+    Route::get('/schoolDetails/{city}/all', [SchoolDetails::class, 'indexAllByCity'])
+    ->where(['city' => '[\pL\s]+'])
+    ->name('SchoolDetailsAllByCity');
 
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
