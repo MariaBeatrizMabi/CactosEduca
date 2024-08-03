@@ -1,120 +1,139 @@
 <template>
     <div class="dashboard">
-        <MenuComponent />    
-        <div class="dashboard-content">
-            <TitleComponent title="Análise Geral das escolas"/>
-            <div class="tableContent">
-                <div class="table-container" style="overflow-x: auto;">
-                    <div class="titleTable">
-                        <h1>Média Geral</h1>
-                    </div>
-                    <table>
-                        <tr>
-                            <th>Escolas</th>
-                            <th>Média Geral de leitura</th>
-                            <th style="text-align: left;">Média Geral de escrita</th>
-                        </tr>
-                        <tr v-for="school in schoolsWithAverages" :key="school.id">
-                            <td>{{ school.name }}</td>
-                            <td>{{ translateGrade(school.averageReading) }}</td>
-                            <td>{{ translateGrade(school.averageWriting) }}</td>
-                        </tr>
-                    </table>
-                </div>
+      <MenuComponent />    
+      <div class="dashboard-content">
+        <TitleComponent title="Análise Geral das escolas"/>
+        <div class="tableContent">
+          <div class="table-container" style="overflow-x: auto;">
+            <div class="titleTable">
+              <h1>Média Geral</h1>
             </div>
-            <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
-            <TitleComponent title="Análise geral média turmas - Leitura"/>
-            <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
-            <TitleComponent title="Análise geral média turmas - Escrita"/>
-            <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
+            <table>
+              <tr>
+                <th>Escolas</th>
+                <th>Média Geral de Leitura</th>
+                <th style="text-align: left;">Média Geral de Escrita</th>
+              </tr>
+              <tr v-for="school in schoolsWithAverages" :key="school.id">
+                <td>{{ school.name }}</td>
+                <td>{{ translateGrade(school.averageReading) }}</td>
+                <td>{{ translateGrade(school.averageWriting) }}</td>
+              </tr>
+            </table>
+          </div>
         </div>
+        <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
+        <TitleComponent title="Análise geral média turmas - Leitura"/>
+        <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
+        <TitleComponent title="Análise geral média turmas - Escrita"/>
+        <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
+      </div>
     </div>
-</template>
-
-<script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from 'vue-router';
-import axios from "axios";
-import MenuComponent from '../components/menu.vue';
-import TitleComponent from '/resources/js/components/title.vue';
-import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
-import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
-import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
-
-const route = useRoute();
-const schoolId = route.params.schoolId; 
-const formDataStudentPreview = ref([]);
-const schoolsWithAverages = ref([]);
-
-const gradeTranslations = {
+  </template>
+  
+  <script setup>
+  import { ref, onMounted } from "vue";
+  import { useRoute } from 'vue-router';
+  import axios from "axios";
+  import MenuComponent from '../components/menu.vue';
+  import TitleComponent from '/resources/js/components/title.vue';
+  import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
+  import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
+  import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+  
+  const route = useRoute();
+  const schoolId = route.params.schoolId; 
+  const formDataStudentPreview = ref([]);
+  const schoolsWithAverages = ref([]);
+  
+  const gradeTranslations = {
     'not_reader': 'Não leitor',
-    'syllable_reader': 'Leitor de silabas',
+    'syllable_reader': 'Leitor de sílabas',
     'word_reader': 'Leitor de palavras',
     'sentence_reader': 'Leitor de frases',
     'no_fluent_text_reader': 'Leitor de texto sem fluência',
     'fluent_text_reader': 'Leitor de texto com fluência',
-    'pre_syllabic': 'Pré silábico',
+    'pre_syllabic': 'Pré-silábico',
     'syllabic': 'Silábico',
     'alphabetical_syllabic': 'Silábico alfabético',
     'alphabetical': 'Alfabético'
-};
-
-const fetchSchools = async () => {
+  };
+  
+  const fetchSchools = async () => {
     try {
-        const response = await axios.get(`/ManagementSchool/${schoolId}`);
-        formDataStudentPreview.value = response.data ? [response.data] : [];
-        calculateAverages();
+      const response = await axios.get('/ManagementSchool/examsAll');
+      console.log(response);
+      formDataStudentPreview.value = response.data ? response.data : [];
+      calculateAverages();
     } catch (error) {
-        console.error('Error fetching schools:', error);
-        formDataStudentPreview.value = [];
+      console.error('Error fetching schools:', error);
+      formDataStudentPreview.value = [];
     }
-};
-
-const calculateAverages = () => {
-    console.log(formDataStudentPreview.value, 'formDataStudentPreview at start of calculateAverages');
+  };
+  
+  const calculateAverages = () => {
     if (!Array.isArray(formDataStudentPreview.value)) {
-        console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
-        return;
+      console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+      return;
     }
-    schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
-        let readingCounts = { 'not_reader': 0, 'syllable_reader': 0, 'word_reader': 0, 'sentence_reader': 0, 'no_fluent_text_reader': 0, 'fluent_text_reader': 0 };
-        let writingCounts = { 'pre_syllabic': 0, 'syllabic': 0, 'alphabetical_syllabic': 0, 'alphabetical': 0 };
+    schoolsWithAverages.value = formDataStudentPreview.value.flatMap(cityData => {
+      return cityData.schools.map(school => {
+        let totalReading = 0;
+        let totalWriting = 0;
         let examCount = 0;
-
-        school.classes.forEach(classData => {
-            classData.students.forEach(student => {
-                student.exams.forEach(exam => {
-                    readingCounts[exam.reading] = (readingCounts[exam.reading] || 0) + 1;
-                    writingCounts[exam.writing] = (writingCounts[exam.writing] || 0) + 1;
-                    examCount++;
-                });
-            });
+  
+        school.exams.forEach(exam => {
+          totalReading += getGradeValue(exam.reading);
+          totalWriting += getGradeValue(exam.writing);
+          examCount++;
         });
-
-        const mostFrequentReading = getMostFrequentGrade(readingCounts);
-        const mostFrequentWriting = getMostFrequentGrade(writingCounts);
-
+  
+        const averageReading = examCount ? totalReading / examCount : null;
+        const averageWriting = examCount ? totalWriting / examCount : null;
+  
         return {
-            ...school,
-            averageReading: mostFrequentReading,
-            averageWriting: mostFrequentWriting
+          ...school,
+          averageReading: averageReading ? translateGradeBack(averageReading) : null,
+          averageWriting: averageWriting ? translateGradeBack(averageWriting) : null
         };
+      });
     });
-};
-
-const getMostFrequentGrade = (counts) => {
-    return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-};
-
-const translateGrade = (grade) => {
+  };
+  
+  const getGradeValue = (grade) => {
+    const grades = {
+      'not_reader': 1,
+      'syllable_reader': 2,
+      'word_reader': 3,
+      'sentence_reader': 4,
+      'no_fluent_text_reader': 5,
+      'fluent_text_reader': 6,
+      'pre_syllabic': 1,
+      'syllabic': 2,
+      'alphabetical_syllabic': 3,
+      'alphabetical': 4
+    };
+    return grades[grade] || 0;
+  };
+  
+  const translateGrade = (grade) => {
     return gradeTranslations[grade] || grade;
-};
-
-onMounted(() => {
+  };
+  
+  const translateGradeBack = (average) => {
+    if (average <= 1) return 'not_reader';
+    if (average <= 2) return 'syllable_reader';
+    if (average <= 3) return 'word_reader';
+    if (average <= 4) return 'sentence_reader';
+    if (average <= 5) return 'no_fluent_text_reader';
+    return 'fluent_text_reader';
+  };
+  
+  onMounted(() => {
     fetchSchools();
-});
-</script>
-
+  });
+  </script>
+  
 <style scoped>
 .dashboard {
     display: flex;

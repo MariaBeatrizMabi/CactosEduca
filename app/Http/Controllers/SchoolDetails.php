@@ -10,7 +10,7 @@ class SchoolDetails extends Controller
     public function indexAll()
     {
         $schools = ManagementSchool::all();
-        return view('schoolDetailsAll', compact('schools'));
+        return view('schoolDetails', ['schools' => $schools]);
     }
 
     public function index() {
@@ -49,18 +49,16 @@ class SchoolDetails extends Controller
         return view('schoolDetails', ['city' => $city, 'schools' => $cityData]);
     }
 
-
     public function indexMultipleSchools($cityId, $schoolNames = null)
-{
-    $schoolNamesArray = $schoolNames ? explode(',', $schoolNames) : [];
-    $schools = ManagementSchool::where('city_id', $cityId)
-        ->whereIn('name', $schoolNamesArray)
-        ->get();
+    {
+        $schoolNamesArray = $schoolNames ? explode(',', $schoolNames) : [];
+        $schools = ManagementSchool::where('city_id', $cityId)
+            ->whereIn('name', $schoolNamesArray)
+            ->get();
 
-    return view('schoolDetails', [
-        'city' => $cityId,
-        'schools' => $schools,
-    ]);
-}
-
+        return view('schoolDetails', [
+            'city' => $cityId,
+            'schools' => $schools,
+        ]);
+    }
 }

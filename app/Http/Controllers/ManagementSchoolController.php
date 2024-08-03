@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cities;
-use App\Models\ClassModel;
 use App\Models\Location;
 use App\Models\ManagementSchool;
 use App\Models\Teacher;
@@ -15,6 +14,44 @@ use Illuminate\Support\Facades\Log;
 
 class ManagementSchoolController extends Controller
 {
+    public function examsAll(): JsonResponse
+    {
+        $schools = ManagementSchool::with('exams')->get();
+        
+        $groupedSchools = $schools->groupBy('city_id');
+        
+        $response = Cities::all()->map(function ($city) use ($groupedSchools) {
+            $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) {
+                $averageGrades = $this->calculateAverageGrades($school->exams);
+                
+                $exams = $school->exams->map(function ($exam) {
+                    return [
+                        'id' => $exam->id,
+                        'reading' => $exam->reading,
+                        'writing' => $exam->writing,
+                        'action' => $exam->action,
+                    ];
+                });
+                
+                return [
+                    'id' => $school->id,
+                    'name' => $school->name,
+                    'average_grades' => $averageGrades,
+                    'exams' => $exams, 
+                ];
+            });
+            
+            return [
+                'city' => $city->name,
+                'schools' => $citySchools
+            ];
+        })->filter(function ($cityData) {
+            return $cityData['schools']->isNotEmpty();
+        });
+        
+        return response()->json($response->values());
+    }
+
     private function getGradeValue($grade)
     {
         $grades = [
@@ -27,26 +64,20 @@ class ManagementSchoolController extends Controller
         return $grades[$grade] ?? 0;
     }
 
-    public function calculateAverageGrades($schoolId)
+    private function calculateAverageGrades($exams)
     {
-        $school = ManagementSchool::with(['classes.students.exams'])->find($schoolId);
-
-        if (!$school) {
+        if ($exams->isEmpty()) {
             return null;
         }
 
         $totalGrades = 0;
         $count = 0;
 
-        foreach ($school->classes as $class) {
-            foreach ($class->students as $student) {
-                foreach ($student->exams as $exam) {
-                    $totalGrades += $this->getGradeValue($exam->reading);
-                    $totalGrades += $this->getGradeValue($exam->writing);
-                    $totalGrades += $this->getGradeValue($exam->action);
-                    $count += 3;
-                }
-            }
+        foreach ($exams as $exam) {
+            $totalGrades += $this->getGradeValue($exam->reading);
+            $totalGrades += $this->getGradeValue($exam->writing);
+            $totalGrades += $this->getGradeValue($exam->action);
+            $count += 3;
         }
 
         return $count > 0 ? $totalGrades / $count : null;

@@ -18,7 +18,7 @@ onMounted(async () => {
     try {
         const { data } = await axios.get('/ManagementSchool');
         citiesSchools.value = data;
-        cities.value = new Set(data.map(item => item.city));
+        cities.value = Array.from(new Set(data.map(item => item.city)));
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -28,8 +28,8 @@ function showSchools(cityName) {
     search.value = '';
     selectedCity.value = cityName;
     schoolSelected.value = true;
-    const cityData = citiesSchools.value.find(({ city }) => selectedCity.value === city);
-    selectedSchools.value = cityData ? cityData.schools : []; // Ensure selectedSchools is an array
+    const cityData = citiesSchools.value.find(({ city }) => city === selectedCity.value);
+    selectedSchools.value = cityData ? cityData.schools : [];
 }
 
 function navigateToSchool(cityName, schoolName) {
@@ -52,26 +52,23 @@ function navigateToSchool(cityName, schoolName) {
     }
 }
 
+const filteredCities = computed(() => {
+    return !search.value
+        ? cities.value
+        : cities.value.filter(name => name.toLowerCase().includes(search.value.toLowerCase()));
+});
 
-const filteredCities = computed(() => !search.value
-    ? cities.value
-    : Array.from(cities.value)
-        ?.filter((name) => name.toLowerCase().includes(search.value.toLowerCase()))
-);
-
-const filteredSchools = computed(() => !search.value
-    ? selectedSchools.value
-    : selectedSchools.value?.filter(({ name }) => name.toLowerCase().includes(search.value.toLowerCase()))
-);
+const filteredSchools = computed(() => {
+    return !search.value
+        ? selectedSchools.value
+        : selectedSchools.value.filter(({ name }) => name.toLowerCase().includes(search.value.toLowerCase()));
+});
 
 function selectAllCities() {
     search.value = '';
     selectedCity.value = '';
     schoolSelected.value = false;
-    // Redirect to the general school details page without filters
-    router.push({
-        name: 'SchoolDetailsAll'
-    });
+    router.push({ name: 'SchoolDetailsAll' });
 }
 
 function selectAllSchools() {
@@ -84,7 +81,6 @@ function selectAllSchools() {
         console.error('Selected city is not defined');
     }
 }
-
 </script>
 
 <template>
@@ -97,7 +93,7 @@ function selectAllSchools() {
             <div class="searcheble">
                 <input
                     class="seacheble-camp"
-                    placeholder="Digite o nome do múnicipio"
+                    placeholder="Digite o nome do município"
                     :value="search"
                     @input="search = $event.target.value"
                 >
@@ -126,7 +122,7 @@ function selectAllSchools() {
             <div class="searcheble">
                 <input
                     class="seacheble-camp"
-                    placeholder="Digite o nome do múnicipio"
+                    placeholder="Digite o nome do município"
                     :value="search"
                     @input="search = $event.target.value"
                 >
@@ -151,6 +147,7 @@ function selectAllSchools() {
         </div>
     </div>
 </template>
+
 
 
 <style scoped>

@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('SchoolDetailsAllByCity');
 
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
+    Route::get('/ManagementSchool/all', 'App\Http\Controllers\ManagementSchoolController@examsAll')->name('management_school.examsAll');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
     Route::put('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
     Route::get('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
