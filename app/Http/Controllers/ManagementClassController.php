@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
+use App\Models\ManagementSchool;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,25 @@ class ManagementClassController extends Controller
 
     public function index()
     {
-        return response()->json(ClassModel::where('active', true)->with('teacher')->get());
+        $user = Auth::user();
+        $school = ManagementSchool::where('user_id', $user->id)->first();
+        $teacher = Teacher::where('user_id', $user->id)->first();
+        
+        if ($user && $user->id && $user->type === 'school') {
+            $schoolIds = [$school->id]; 
+            $classes = ClassModel::with(['teacher', 'studentsInClass.studentsChart'])
+                ->whereIn('school_id', $schoolIds)
+                ->get();
+        } else if ($user && $user->id && $user->type === 'teacher') {
+            $teacherIds = [$teacher->id]; 
+            $classes = ClassModel::with(['teacher', 'studentsInClass.studentsChart'])
+                ->where('teacher_id', $teacherIds)
+                ->get();
+        } else {
+            $classes = collect();
+        }
+        
+        return response()->json($classes);
     }
 
     public function create(Request $request)
@@ -27,8 +46,8 @@ class ManagementClassController extends Controller
         try {
             $school = ClassModel::create([
                 'name' => $request->input('name'),
-                'shift' => $request->input('shift'),
                 'year' => $request->input('year'),
+                'shift' => $request->input('shift'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -52,8 +71,8 @@ class ManagementClassController extends Controller
             $ClassData = ClassModel::where('id', $id)->firstOrFail();
             $ClassData->update([
                 'name' => $request->input('name'),
-                'shift' => $request->input('shift'),
                 'year' => $request->input('year'),
+                'shift' => $request->input('shift'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -100,10 +119,5 @@ class ManagementClassController extends Controller
     public function detachStudent(ClassModel $classModel, Student $student): void
     {
         $classModel->students()->detach($student);
-    }
-
-    public function close(ClassModel $classModel): void
-    {
-        $classModel->update(['active' => false]);
     }
 }

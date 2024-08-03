@@ -6,23 +6,16 @@ use App\Models\Scopes\ClassScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ClassModel extends Model
 {
     protected $fillable = [
-        'id',
         'name',
-        'shift',
-        'active',
         'year',
-        'school_id',
+        'shift',
+        'school_id',            
         'teacher_id'
-    ];
-
-    protected $casts = [
-        'active' => 'boolean'
     ];
 
     protected $table = 'class';
@@ -42,14 +35,19 @@ class ClassModel extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
+    public function studentsChart(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'student_class', 'class_id', 'student_id');
+    }
+
     public function studentsInClass(): HasMany
     {
         return $this->hasMany(StudentInClass::class, 'class_id', 'id');
     }
 
-    public function students(): HasManyThrough
+    public function students(): BelongsToMany
     {
-        return $this->hasManyThrough(Student::class, StudentInClass::class, 'class_id', 'id', 'id', 'student_id');
+        return $this->belongsToMany(Student::class, 'student_class', 'class_id', 'student_id');
     }
 
     public function school(): BelongsTo
@@ -57,4 +55,3 @@ class ClassModel extends Model
         return $this->belongsTo(ManagementSchool::class, 'school_id', 'id');
     }
 }
-

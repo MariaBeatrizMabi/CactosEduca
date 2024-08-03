@@ -41,8 +41,8 @@ export default {
       let cursor = this.chart.set("cursor", am5xy.XYCursor.new(root, {}));
       cursor.lineY.set("visible", false);
 
-      let xRenderer = am5xy.AxisRendererX.new(root, {
-        minGridDistance: 30,
+      let xRenderer = am5xy.AxisRendererX.new(root, { 
+        minGridDistance: 30, 
         minorGridEnabled: true
       });
 
@@ -100,16 +100,7 @@ export default {
         if (this.chart && this.chart.get("colors") && columnIndex !== -1) {
           return this.chart.get("colors").getIndex(columnIndex);
         }
-        return am5.color("#000000");
-      });
-    },
-    fetchData() {
-      let url;
-      if (this.userType === 'admin') {
-        url = '/ManagementSchool';
-
-        axios.get(url)
-        return am5.color("#000000");
+        return am5.color("#000000"); 
       });
     },
     fetchData() {
@@ -143,7 +134,7 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
-
+        
       } else if (this.userType === 'teacher') {
         url = '/ClassSchool';
 
@@ -162,7 +153,7 @@ export default {
         url = '/ClassSchool';
       }
 
-
+      
     },
     getUserType() {
       axios.get('/loginUser')

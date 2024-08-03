@@ -110,9 +110,21 @@ export default {
         .catch(error => {
           console.error("Error fetching data: ", error);
         });
+      } else if (this.userType === 'teacher') {
+        axios.get('/ClassSchool')
+        .then(response => {
+          const data = response.data.map(classData => ({
+            nameValue: classData.name,
+            value: classData.students_in_class.length
+          }));
+          this.series.data.setAll(data);
+        })
+        .catch(error => {
+          console.error("Error fetching data: ", error);
+        });
       }
     },
-
+      
     assignColor(value) {
       const colorMap = {
         1: "#0D5413",
@@ -123,7 +135,7 @@ export default {
         6: "#FF0000",
         7: "#9747FF"
       };
-      return colorMap[value] || "#000000";
+      return colorMap[value] || "#000000"; 
     }
   },
   beforeDestroy() {
