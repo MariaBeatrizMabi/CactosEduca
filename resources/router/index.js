@@ -44,7 +44,7 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/schoolDetails/:city/:schoolName',
+            path: '/schoolDetails/:city/:schoolName/:schoolId', // Atualiza a rota para incluir schoolId
             name: 'SchoolDetailsByCityAndSchool',
             component: SchoolDetails,
             props: true,

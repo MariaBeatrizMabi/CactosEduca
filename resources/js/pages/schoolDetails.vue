@@ -1,9 +1,33 @@
 <script setup>
-import MenuComponent from '../components/menu.vue'
+import { ref, onMounted } from "vue";
+import { useRoute } from 'vue-router'; // Importa useRoute para acessar parâmetros da URL
+import axios from "axios";
+import MenuComponent from '../components/menu.vue';
 import TitleComponent from '/resources/js/components/title.vue';
-import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
+import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
 import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
 import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+
+const route = useRoute();
+const schoolId = route.params.schoolId; 
+const formDataStudentPreview = ref([]);
+
+async function getTableStudentData() {
+    try {
+        const response = await axios.get(`/ManagementSchool/${schoolId}`);
+        formDataStudentPreview.value = response.data.map((take) => ({
+            id: take.id,
+            name: take.name,
+            enrollment: take.enrollment,
+        }));
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+onMounted(async () => {
+    await getTableStudentData();
+});
 </script>
 
 <template>
@@ -11,105 +35,28 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
         <MenuComponent />    
         <div class="dashboard-content">
             <TitleComponent title="Análise Geral das escolas"/>
-            <div class="searcheble">
-                <input class="seacheble-camp" placeholder="Digite o nome do múnicipio">
-                <a class="send-searche">
-                    <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
-                    Pesquisar
-                </a>
-            </div>
             <div class="tableContent">
-   <div class="table-container" style="overflow-x: auto;">
-    <div class="titleTable">
-        <h1>Escolas cadastrados - turma 01 | Ensino fundamental</h1>
-    </div>
-    <table>
-        <tr>
-            <th>Nome</th>
-            <th>Matrícula</th>
-            <th class="registration">Data de matrícula</th>
-            <th>Última Nota - Leitura</th>
-            <th>Última Nota - Escrita</th>
-            <th class="stage">Etapa</th>
-        </tr>
-        <tr>
-            <td> ANNY BEATRYZ SANTOS </td>
-            <td> 3113 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de silabas </td>
-            <td> pré-silábico </td>
-            <td class="stage"> 1° ano </td>
-        </tr>
-        <tr>
-            <td> GABRIEL SCHNEIDER COGO </td>
-            <td> 3114 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de palavras </td>
-            <td> silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> JOÃO MIGUEL FRAGA DA SILVA </td>
-            <td> 3115 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> não leitor </td>
-            <td> Pré-silábico </td>
-            <td class="stage"> 1° ano </td>
-        </tr>
-        <tr>
-            <td> LUIZ FERNANDO NUNES DA SILVA  </td>
-            <td> 3117 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> alfabético </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> PAULO DANIEL DE SOUZA  </td>
-            <td> 3118 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> VANDENBERG ENZO DE SOUZA PEREIRA  </td>
-            <td> 3119 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto com fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> GABRIEL DA ROCHA BROCOLI </td>
-            <td> 3237 </td>
-            <td class="registration"> 08/02/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> MARIA VITORIA DE ALENCAR SILVA </td>
-            <td> 3241 </td>
-            <td class="registration"> 14/02/2024 </td>
-            <td> leitor de texto com fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> MIGUEL AMADEUS DA SILVA BOEING </td>
-            <td> 3313 </td>
-            <td class="registration"> 14/03/2024 </td>
-            <td> não leitor </td>
-            <td> pré-silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-    </table>
-   </div>
-
-    </div>
-            <UserWelcomeComponet class="welcome-component"></UserWelcomeComponet>
+                <div class="table-container" style="overflow-x: auto;">
+                    <div class="titleTable">
+                        <h1>Escolas cadastradas - turma 01 | Ensino fundamental</h1>
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th class="registration">Data de matrícula</th>
+                            <th>Última Nota - Leitura</th>
+                            <th>Última Nota - Escrita</th>
+                            <th class="stage">Etapa</th>
+                        </tr>
+                        <tr v-for="student in formDataStudentPreview" :key="student.id">
+                            <td>{{ student.name }}</td>
+                            <td>{{ student.enrollment }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
             <TitleComponent title="Análise geral média turmas - Leitura"/>
             <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
             <TitleComponent title="Análise geral média turmas - Escrita"/>
