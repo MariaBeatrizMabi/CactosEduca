@@ -14,7 +14,8 @@ class StoreStudentRequest extends FormRequest
             'gender' => ['required', 'in:male,female'],
             'enrollment' => ['required', 'string'],
             'enrollment_date' => ['required', 'date'],
-            'school_id' => ['required', 'exists:management_schools,id'],
+            'people_with_disabilities' => ['required', 'boolean'],
+            'school_id' => ['required', 'exists:management_schools,id']
         ];
     }
 }

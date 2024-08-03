@@ -19,7 +19,8 @@ const studentData = ref({
     enrollment_date: '',
     needAction: false,
     actionStatus: '',
-    comments: ''
+    comments: '',
+    people_with_disabilities: ''
 });
 
 const formData = ref({
@@ -29,7 +30,7 @@ const formData = ref({
     enrollment_date: '',
     needAction: false,
     actionStatus: '',
-    comments: ''
+    people_with_disabilities: ''
 });
 
 const classData = ref({
@@ -66,23 +67,15 @@ const hasChangesToUpdate = computed(() =>
 )
 
 async function updateStudent() {
+    const peopleWithDisabilities = JSON.parse(formData.value?.people_with_disabilities);
+
+    console.log(peopleWithDisabilities)
+
     await api.put(`/api/students/${route.params.student}`, {
         ...formData.value,
-        comments: studentData.value.comments
+        people_with_disabilities: peopleWithDisabilities
     });
-    studentData.value = {
-        ...formData.value,
-        comments: studentData.value.comments
-    };
-}
-
-async function updateStudentComments() {
-    await api.put(`/api/students/${route.params.student}`, {
-        ...studentData.value,
-        comments: formData.value.comments
-    });
-
-    studentData.value.comments = formData.value.comments;
+    studentData.value = { ...formData.value };
 }
 
 async function submitExamCreate() {
@@ -253,6 +246,21 @@ function openExamUpdateModal(id) {
                                 :value="formData.enrollment_date"
                                 @input="formData = { ...formData, enrollment_date: $event.target.value }"
                             />
+                        </label>
+
+                        <label>
+                            PCD
+                            <select
+                                id="class"
+                                name="class"
+                                class="input"
+                                :value="formData.people_with_disabilities"
+                                @input="formData = { ...formData, people_with_disabilities: $event.target.value }"
+                            >
+                                <option value="" disabled>Selecione uma opção</option>
+                                <option :value="true">Sim</option>
+                                <option :value="false">Não</option>
+                            </select>
                         </label>
                     </div>
 

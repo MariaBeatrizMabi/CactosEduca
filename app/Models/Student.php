@@ -10,16 +10,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
+    protected $table = 'students';
+
     protected $fillable = [
         'name',
         'date_of_birth',
         'gender',
         'enrollment_date',
         'enrollment',
+        'people_with_disabilities',
         'school_id'
     ];
 
-    protected $table = 'students';
+    protected $casts = [
+        'people_with_disabilities' => 'boolean'
+    ];
 
     protected static function booted(): void
     {

@@ -14,6 +14,7 @@ class UpdateStudentRequest extends FormRequest
             'gender' => ['required', 'in:male,female'],
             'enrollment' => ['required', 'string'],
             'enrollment_date' => ['required', 'date'],
+            'people_with_disabilities' => ['required', 'boolean'],
         ];
     }
 }
