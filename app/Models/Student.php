@@ -43,7 +43,7 @@ class Student extends Model
 
     public function activeClass(): ?ClassModel
     {
-        return $this->classData()->latest()->first();
+        return $this->classData()->where('active', true)->latest()->first();
     }
 
     public function exams(): HasMany

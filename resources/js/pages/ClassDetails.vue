@@ -38,6 +38,8 @@ const formData = ref({
     teacher_id: null
 });
 
+const showCloseClass = ref(false);
+
 const hasChangesToUpdate = computed(() =>
     Object.entries(classData.value)
         .map(([key, value]) => value === formData.value[key])
@@ -130,6 +132,11 @@ async function updateClassData() {
 function resetForm() {
     formData.value = classData.value
 }
+
+async function submitCloseClass() {
+    await api.post(`/api/classes/${route.params.class}/close`);
+    window.location.href = '/Management';
+}
 </script>
 
 <template>
@@ -187,6 +194,26 @@ function resetForm() {
                     <path fill="red" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
                 </svg>
                 Remover aluno
+            </a>
+        </div>
+    </ModalComponentDeleted>
+
+    <ModalComponentDeleted v-if="showCloseClass" Titlevalue="Fechar turma">
+        <h1 class="deleted-title">
+            Você realmente deseja fechar essa turma? Esta é uma ação permanente que não poderá ser desfeita.
+        </h1>
+        <div class="modal-end-deleted">
+            <a class="close-modal-deleted" @click="showCloseClass = false">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="var(--black-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                </svg>
+                Cancelar
+            </a>
+            <a ref="link" @click="submitCloseClass">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                </svg>
+                Continuar
             </a>
         </div>
     </ModalComponentDeleted>
@@ -279,11 +306,27 @@ function resetForm() {
             @viewDetails="redirectToStudentScreen"
             @deletedAction="openRemoveStudentModal"
         />
+
+        <button class="close-class" @click="showCloseClass = true">
+            Fechar turma
+        </button>
     </div>
 </div>
 </template>
 
 <style scoped>
+.close-class {
+    all: unset;
+    cursor: pointer;
+    width: 84%;
+    padding: 1rem;
+    background-color: #F00;
+    text-align: center;
+    border-radius: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+}
+
 .content-wrapper {
     display: flex;
     width: 100vw;

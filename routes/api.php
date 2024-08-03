@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('classes')->name('classes.')->group(function () {
         Route::get('/{classModel}', [ManagementClassController::class, 'show']);
+        Route::post('/{classModel}/close', [ManagementClassController::class, 'close']);
         Route::get('/{classModel}/students', [ManagementClassController::class, 'listStudents']);
         Route::post('/{classModel}/students/{student}', [ManagementClassController::class, 'attachStudent']);
         Route::delete('/{classModel}/students/{student}', [ManagementClassController::class, 'detachStudent']);

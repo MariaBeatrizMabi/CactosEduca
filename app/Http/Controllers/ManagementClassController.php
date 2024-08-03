@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
-use App\Models\ManagementSchool;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +17,7 @@ class ManagementClassController extends Controller
 
     public function index()
     {
-        return response()->json(ClassModel::with('teacher')->get());
+        return response()->json(ClassModel::where('active', true)->with('teacher')->get());
     }
 
     public function create(Request $request)
@@ -27,6 +26,7 @@ class ManagementClassController extends Controller
             $school = ClassModel::create([
                 'name' => $request->input('name'),
                 'shift' => $request->input('shift'),
+                'year' => $request->input('year'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -51,6 +51,7 @@ class ManagementClassController extends Controller
             $ClassData->update([
                 'name' => $request->input('name'),
                 'shift' => $request->input('shift'),
+                'year' => $request->input('year'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -97,5 +98,10 @@ class ManagementClassController extends Controller
     public function detachStudent(ClassModel $classModel, Student $student): void
     {
         $classModel->students()->detach($student);
+    }
+
+    public function close(ClassModel $classModel): void
+    {
+        $classModel->update(['active' => false]);
     }
 }

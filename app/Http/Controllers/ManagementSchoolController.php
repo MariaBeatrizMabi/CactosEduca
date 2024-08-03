@@ -78,7 +78,7 @@ class ManagementSchoolController extends Controller
         );
     }
 
-    public function listAvailableStudentsClass(ManagementSchool $managementSchool, ClassModel $class): JsonResponse
+    public function listAvailableStudentsClass(ManagementSchool $managementSchool): JsonResponse
     {
         return response()->json(
             $managementSchool->students->whereNotIn(
@@ -86,8 +86,9 @@ class ManagementSchoolController extends Controller
                 DB::table('students')
                     ->select('students.*')
                     ->join('student_class', 'student_class.student_id', '=', 'students.id')
+                    ->join('class', 'class.id', '=', 'student_class.class_id')
                     ->where('students.school_id', $managementSchool->id)
-                    ->where('student_class.class_id', $class->id)
+                    ->where('class.active', true)
                     ->get()
                     ->pluck('id')
                     ->toArray()

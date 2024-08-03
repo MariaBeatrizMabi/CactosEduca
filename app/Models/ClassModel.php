@@ -12,8 +12,14 @@ class ClassModel extends Model
     protected $fillable = [
         'name',
         'shift',
+        'active',
+        'year',
         'school_id',
         'teacher_id'
+    ];
+
+    protected $casts = [
+        'active' => 'boolean'
     ];
 
     protected $table = 'class';

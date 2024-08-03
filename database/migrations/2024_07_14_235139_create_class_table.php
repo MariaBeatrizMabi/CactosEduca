@@ -16,6 +16,8 @@ return new class extends Migration
 
             $table->string('name', 255);
             $table->enum('shift', ['morning', 'afternoon', 'night'])->nullable();
+            $table->boolean('active')->default(true);
+            $table->year('year');
 
             $table->unsignedBigInteger('school_id');
             $table->foreignId('teacher_id')->constrained('teacher');
