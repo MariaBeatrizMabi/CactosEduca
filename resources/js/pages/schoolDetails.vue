@@ -47,6 +47,7 @@
   const schoolsWithAverages = ref([]);
   
   const gradeTranslations = {
+    null: 'não informado',
     'not_reader': 'Não leitor',
     'syllable_reader': 'Leitor de sílabas',
     'word_reader': 'Leitor de palavras',
@@ -61,7 +62,7 @@
   
   const fetchSchools = async () => {
     try {
-      const response = await axios.get('/ManagementSchool/examsAll');
+      const response = await axios.get('/ManagementSchool/all');
       console.log(response);
       formDataStudentPreview.value = response.data ? response.data : [];
       calculateAverages();
@@ -71,7 +72,49 @@
     }
   };
   
-  const calculateAverages = () => {
+
+  const getGradeValue = (grade) => {
+    const grades = {
+      'not_reader': 1,
+      'syllable_reader': 2,
+      'word_reader': 3,
+      'sentence_reader': 4,
+      'no_fluent_text_reader': 5,
+      'fluent_text_reader': 6,
+      'pre_syllabic': 1,
+      'syllabic': 2,
+      'alphabetical_syllabic': 3,
+      'alphabetical': 4
+    };
+    return grades[grade] || 0;
+  };
+  
+  const translateGrade = (grade) => {
+    return gradeTranslations[grade] || grade;
+  };
+  
+  const translateReadingGradeBack = (average) => {
+    const roundedAverage = Math.round(average);
+
+    if (roundedAverage === null) return 'não informado';
+    if (roundedAverage <= 1) return 'not_reader';
+    if (roundedAverage <= 2) return 'syllable_reader';
+    if (roundedAverage <= 3) return 'word_reader';
+    if (roundedAverage <= 4) return 'sentence_reader';
+    if (roundedAverage <= 5) return 'no_fluent_text_reader';
+    return 'fluent_text_reader';
+};
+
+const translateWritingGradeBack = (average) => {
+    const roundedAverage = Math.round(average);
+
+    if (roundedAverage <= 1) return 'pre_syllabic';
+    if (roundedAverage <= 2) return 'syllabic';
+    if (roundedAverage <= 3) return 'alphabetical_syllabic';
+    return 'alphabetical';
+};
+
+const calculateAverages = () => {
     if (!Array.isArray(formDataStudentPreview.value)) {
       console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
       return;
@@ -93,40 +136,11 @@
   
         return {
           ...school,
-          averageReading: averageReading ? translateGradeBack(averageReading) : null,
-          averageWriting: averageWriting ? translateGradeBack(averageWriting) : null
+          averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+          averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
         };
       });
     });
-  };
-  
-  const getGradeValue = (grade) => {
-    const grades = {
-      'not_reader': 1,
-      'syllable_reader': 2,
-      'word_reader': 3,
-      'sentence_reader': 4,
-      'no_fluent_text_reader': 5,
-      'fluent_text_reader': 6,
-      'pre_syllabic': 1,
-      'syllabic': 2,
-      'alphabetical_syllabic': 3,
-      'alphabetical': 4
-    };
-    return grades[grade] || 0;
-  };
-  
-  const translateGrade = (grade) => {
-    return gradeTranslations[grade] || grade;
-  };
-  
-  const translateGradeBack = (average) => {
-    if (average <= 1) return 'not_reader';
-    if (average <= 2) return 'syllable_reader';
-    if (average <= 3) return 'word_reader';
-    if (average <= 4) return 'sentence_reader';
-    if (average <= 5) return 'no_fluent_text_reader';
-    return 'fluent_text_reader';
   };
   
   onMounted(() => {

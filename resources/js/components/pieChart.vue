@@ -85,7 +85,7 @@ export default {
     },
     fetchData() {
       if(this.userType === 'admin') {
-        axios.get('/ManagementSchool')
+        axios.get('/ManagementSchool/all')
         .then(response => {
           const data = response.data.map(item => ({
             nameValue: item.city,

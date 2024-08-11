@@ -16,7 +16,7 @@ const search = ref('');
 
 onMounted(async () => {
     try {
-        const { data } = await axios.get('/ManagementSchool');
+        const { data } = await axios.get('/ManagementSchool/all');
         citiesSchools.value = data;
         cities.value = Array.from(new Set(data.map(item => item.city)));
     } catch (error) {

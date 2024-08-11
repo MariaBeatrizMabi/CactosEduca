@@ -47,10 +47,6 @@ async function getClassData() {
     return data;
 }
 
-// async function submitExamCreate() {
-//     await api.post(`/api/students/${studentId}/class/${classId}/exam`);
-// }
-
 onMounted(async () => {
     studentData.value = await getStudentData();
     classData.value = await getClassData();

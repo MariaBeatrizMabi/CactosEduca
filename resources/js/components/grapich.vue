@@ -106,7 +106,7 @@ export default {
     fetchData() {
       let url;
       if (this.userType === 'admin') {
-        url = '/ManagementSchool';
+        url = '/ManagementSchool/all';
 
         axios.get(url)
         .then(response => {

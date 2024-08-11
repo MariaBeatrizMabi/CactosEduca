@@ -17,12 +17,14 @@ class ManagementSchoolController extends Controller
     public function examsAll(): JsonResponse
     {
         $schools = ManagementSchool::with('exams')->get();
+        $locations = Location::all();
         
         $groupedSchools = $schools->groupBy('city_id');
         
-        $response = Cities::all()->map(function ($city) use ($groupedSchools) {
-            $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) {
-                $averageGrades = $this->calculateAverageGrades($school->exams);
+        $response = Cities::all()->map(function ($city) use ($groupedSchools, $locations) {
+            $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
+            $location = $locations->firstWhere('id', $school->location_id);
+            $averageGrades = $this->calculateAverageGrades($school->exams);
                 
                 $exams = $school->exams->map(function ($exam) {
                     return [
@@ -36,6 +38,9 @@ class ManagementSchoolController extends Controller
                 return [
                     'id' => $school->id,
                     'name' => $school->name,
+                    'city_id' => $school->city_id,
+                    'location' => $location ? $location->name : null,
+                    'acess_cod' => $school->user->acess_cod,
                     'average_grades' => $averageGrades,
                     'exams' => $exams, 
                 ];
