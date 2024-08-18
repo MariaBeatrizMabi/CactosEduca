@@ -80,20 +80,20 @@ class ManagementSchoolController extends Controller
 
     public function listAvailableStudentsClass(ManagementSchool $managementSchool): JsonResponse
     {
-        return response()->json(
-            $managementSchool->students->whereNotIn(
-                'id',
-                DB::table('students')
-                    ->select('students.*')
-                    ->join('student_class', 'student_class.student_id', '=', 'students.id')
-                    ->join('class', 'class.id', '=', 'student_class.class_id')
-                    ->where('students.school_id', $managementSchool->id)
-                    ->where('class.active', true)
-                    ->get()
-                    ->pluck('id')
-                    ->toArray()
-            )
+        $data = $managementSchool->students->whereNotIn(
+            'id',
+            DB::table('students')
+                ->select('students.*')
+                ->join('student_class', 'student_class.student_id', '=', 'students.id')
+                ->join('class', 'class.id', '=', 'student_class.class_id')
+                ->where('students.school_id', $managementSchool->id)
+                ->where('class.active', true)
+                ->get()
+                ->pluck('id')
+                ->toArray()
         );
+
+        return response()->json(array_values($data->toArray()));
     }
 
     public function create(Request $request)
