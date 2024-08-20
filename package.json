@@ -23,6 +23,7 @@
         "@vitejs/plugin-vue": "^5.0.4",
         "radix-vue": "^1.9.2",
         "vue": "^3.4.19",
-        "vue-router": "^4.0.13"
+        "vue-router": "^4.0.13",
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
     }
 }

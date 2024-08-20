@@ -29,8 +29,8 @@ return new class extends Migration {
             ])->default('pre_syllabic');
             $table->text('action')->nullable();
 
-            $table->foreignId('student_id')->constrained();
-            $table->foreignId('class_id')->constrained('class');
+            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained('class')->cascadeOnDelete();
 
             $table->timestamps();
         });
