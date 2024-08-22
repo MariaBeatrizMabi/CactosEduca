@@ -9,8 +9,10 @@ import Breadcrumb from '../components/Breadcrumb'
 import Modal from "../components/modal.vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import { translate } from '../utils/translate';
+import axios from "axios";
 
 const route = useRoute();
+const schoolId = ref();
 
 const studentData = ref({
     name: '',
@@ -52,6 +54,15 @@ const updateExamData = ref({
     action: null
 })
 
+const userID = ref("");
+const userType = ref("");
+
+async function getUserType() {
+    const { data: loginUserData } = await axios.get("/loginUser");
+    userType.value = loginUserData.type;
+    userID.value = loginUserData.id;
+}
+
 const showExamCreateModal = ref(false);
 const showExamViewModal = ref(false);
 const showExamUpdateModal = ref(false);
@@ -76,6 +87,26 @@ async function updateStudent() {
         people_with_disabilities: peopleWithDisabilities
     });
     studentData.value = { ...formData.value };
+}
+
+const pollData = ref({
+    name: '',
+    school_id: null,
+    class_id: null,
+    active: true,
+    average: null,
+    year: null,
+});
+
+async function submitPollCreated(name) {
+    await axios.post(`/PollCreate`, {
+        name: studentExams.value.length + 1 + '° Período de sondagem',
+        class_id: name,
+        school_id: userID.value,
+        year: classData.value.id
+    });
+
+    submitExamCreate();
 }
 
 async function submitExamCreate() {
@@ -122,6 +153,7 @@ function resetForm() {
 }
 
 onMounted(async () => {
+    await getUserType();
     const { data } = await api.get(`/api/students/${route.params.student}`);
 
     studentData.value = {
@@ -415,7 +447,7 @@ function openExamUpdateModal(id) {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitExamCreate">
+            <a class="school-add" @click="submitPollCreated">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"

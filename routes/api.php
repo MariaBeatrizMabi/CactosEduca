@@ -22,21 +22,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
+// Rotas protegidas com autenticação via Sanctum
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Rotas relacionadas ao usuário
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/school', [UserController::class, 'school']);
     });
 
+    // Rotas relacionadas aos professores
     Route::prefix('teachers')->name('teachers.')->group(function () {
         Route::get('/{teacher}', [TeacherController::class, 'show']);
         Route::put('/{teacher}', [TeacherController::class, 'update']);
         Route::delete('/{teacher}', [TeacherController::class, 'delete']);
     });
 
+    // Rotas para gerenciamento de escolas
     Route::prefix('management-schools')->name('management-schools.')->group(function () {
         Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
         Route::get('/{managementSchool}/teachers', [ManagementSchoolController::class, 'listTeachers']);
@@ -45,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
     });
 
+    // Rotas relacionadas aos estudantes
     Route::prefix('students')->name('students.')->group(function () {
         Route::get('/{student}', [ManagementStudentController::class, 'show']);
         Route::post('/', [StudentController::class, 'store']);
@@ -54,11 +56,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{student}/class', [StudentController::class, 'getActiveClass']);
     });
 
+    // Rotas relacionadas aos usuários
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/{user}/management-schools', [UserController::class, 'showManagementSchools']);
         Route::get('/{user}/teacher', [UserController::class, 'showTeacher']);
     });
 
+    // Rotas relacionadas às turmas
     Route::prefix('classes')->name('classes.')->group(function () {
         Route::get('/{classModel}', [ManagementClassController::class, 'show']);
         Route::post('/{classModel}/close', [ManagementClassController::class, 'close']);
@@ -67,12 +71,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{classModel}/students/{student}', [ManagementClassController::class, 'detachStudent']);
     });
 
+    // Rotas relacionadas às cidades
     Route::prefix('cities')->name('cities.')->group(function () {
         Route::get('/', [CitiesController::class, 'index']);
         Route::post('/', [CitiesController::class, 'store']);
         Route::delete('/{city}', [CitiesController::class, 'delete']);
     });
 
+    // Rotas relacionadas aos exames
     Route::prefix('exams')->name('exams.')->group(function () {
         Route::post('/', [ExamController::class, 'store']);
         Route::put('/{exam}', [ExamController::class, 'update']);

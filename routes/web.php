@@ -45,6 +45,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->where(['city' => '[\pL\s]+'])
     ->name('SchoolDetailsAllByCity');
 
+    Route::get('/Poll', 'App\Http\Controllers\PollController@all')->name('poll.index');
+    Route::post('/PollCreate', 'App\Http\Controllers\PollController@create')->name('poll.create');
+    
     Route::get('/ManagementSchool', 'App\Http\Controllers\ManagementSchoolController@index')->name('management_school.index');
     Route::get('/ManagementSchool/all', 'App\Http\Controllers\ManagementSchoolController@examsAll')->name('management_school.examsAll');
     Route::post('/ManagementSchoolCreate', 'App\Http\Controllers\ManagementSchoolController@create')->name('management_school.create');
