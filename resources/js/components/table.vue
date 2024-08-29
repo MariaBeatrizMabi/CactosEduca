@@ -93,7 +93,6 @@ async function getTableData() {
                     location_id: school.location,
                     acess_cod: school.acess_cod,
                 });
-        console.log(city)
     });
         });
 

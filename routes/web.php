@@ -10,16 +10,6 @@ use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use Illuminate\Support\Facades\Auth;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 Route::get('/', function () {
     return view('welcome');
 })->name('login');
@@ -54,6 +44,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
     Route::get('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
     Route::delete('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@delete')->name('management_school.delete');
+
+
+    Route::get('/schoolDetails/{city}/all', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCityName')->name('management_school.getSchoolsByCityName');
+    // Route::get('/ManagementSchool/city/{city_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCity')->name('management_school.getSchoolsByCity');
+    Route::get('/ManagementSchool/city/{city_id}/school/{school_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolDetailsByCity')->name('management_school.getSchoolDetailsByCity');
+
+
 
     Route::get('/Teachers', 'App\Http\Controllers\TeacherController@all')->name('teacher.all');
     Route::get('/TeachersSchool', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');

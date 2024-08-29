@@ -80,8 +80,6 @@ const hasChangesToUpdate = computed(() =>
 async function updateStudent() {
     const peopleWithDisabilities = JSON.parse(formData.value?.people_with_disabilities);
 
-    console.log(peopleWithDisabilities)
-
     await api.put(`/api/students/${route.params.student}`, {
         ...formData.value,
         people_with_disabilities: peopleWithDisabilities

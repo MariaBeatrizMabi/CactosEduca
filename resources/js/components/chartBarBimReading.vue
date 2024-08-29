@@ -20,7 +20,6 @@ const props = defineProps({
             </div>
             <div class="grapich">
                 <GrapichBarBimReading></GrapichBarBimReading>
-                <SubtitleGrapichReading></SubtitleGrapichReading>
             </div>
         </div>
         
@@ -32,7 +31,6 @@ const props = defineProps({
             </div>
             <div class="grapich">
                 <PieChart></PieChart>
-                <SubtitleGrapichReading></SubtitleGrapichReading>
             </div>
         </div>
     </div>  
@@ -73,6 +71,7 @@ const props = defineProps({
         & .grapich {
             width: 100%;
             display: flex;
+            justify-content: center;
             flex-direction: column;
             padding: 1rem;
             border-radius: 0 0 1rem 1rem;

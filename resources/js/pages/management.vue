@@ -223,7 +223,6 @@ async function getTableStudentData() {
             name: take.name,
             enrollment: take.enrollment,
         }));
-        console.log(response.data, 'a');
     } catch (error) {
         console.error(error);
     }
