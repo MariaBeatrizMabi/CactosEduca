@@ -33,7 +33,10 @@ export async function xlsxToJson(expectedKeys) {
             const sheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(sheet, { raw: false, dateNF: 'dd/mm/yyyy' });
 
+
             const keys = Object.keys(data[0]).map((key) => normalize(key));
+            console.log(expectedKeys);
+            console.log(keys);
             if (!expectedKeys.every((item) => keys.includes(item))) {
                 reject('Planilha inválida.');
             }
