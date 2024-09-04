@@ -4,7 +4,7 @@ export const exportClassesData = (data) => jsonToXlsx({
     name: 'Turmas',
     data: data.map((row) => ({
         'Turma': row.name,
-        'Professor reponsável': row.teacher_name
+        'Professor responsável': row.teacher_name
     })),
 });
 
@@ -12,7 +12,7 @@ export const exportClassesSampleData = () => jsonToXlsx({
     name: 'Planilha Modelo - Turmas',
     data: [{
         'Nome da Turma': '',
-        'Professor Reponsável': '',
+        'Professor Responsável': '',
         'Turno': '',
         'Ano': ''
     }],

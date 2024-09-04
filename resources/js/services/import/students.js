@@ -1,3 +1,4 @@
+import moment from "moment";
 import { normalize } from "../../utils/normalize";
 import { xlsxToJson } from "../../utils/xlsx";
 import { api } from "../api";
@@ -24,10 +25,10 @@ export async function importStudents(school) {
         students.map(async (data) => {
             await api.post('/api/students', {
                 name: data.nome_do_aluno,
-                date_of_birth: (new Date(data.data_de_nascimento)).toISOString().slice(0, 10),
+                date_of_birth: moment(data.data_de_nascimento, "DD/MM/YYYY").toISOString().slice(0, 10),
                 gender: genders[normalize(data.sexo)],
                 enrollment: data.matricula,
-                enrollment_date: (new Date(data.data_da_matricula)).toISOString().slice(0, 10),
+                enrollment_date: moment(data.data_da_matricula, "DD/MM/YYYY").toISOString().slice(0, 10),
                 people_with_disabilities: pcdLabel[normalize(data.pcd)],
                 school_id: school
             });

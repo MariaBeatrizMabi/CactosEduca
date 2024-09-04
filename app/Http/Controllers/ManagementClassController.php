@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassModel;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -103,5 +104,12 @@ class ManagementClassController extends Controller
     public function close(ClassModel $classModel): void
     {
         $classModel->update(['active' => false]);
+    }
+
+    public function monitoringForm(ClassModel $classModel)
+    {
+        $classModel->load('students');
+        $pdf = Pdf::loadView('pdf.monitoring-form', ['class' => $classModel]);
+        return $pdf->download('Ficha de Acompanhamento.pdf');
     }
 }
