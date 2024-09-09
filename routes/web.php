@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/all', [SchoolDetails::class, 'indexAll'])
     ->name('SchoolDetailsAll');
 
-    Route::get('/schoolDetails/{city}/all', [SchoolDetails::class, 'indexAllByCity'])
+    Route::get('/ManagementSchool/{city}/all', [SchoolDetails::class, 'indexAllByCity'])
     ->where(['city' => '[\pL\s]+'])
     ->name('SchoolDetailsAllByCity');
 
@@ -48,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/schoolDetails/{city}/all', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCityName')->name('management_school.getSchoolsByCityName');
     // Route::get('/ManagementSchool/city/{city_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCity')->name('management_school.getSchoolsByCity');
-    Route::get('/ManagementSchool/city/{city_id}/school/{school_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolDetailsByCity')->name('management_school.getSchoolDetailsByCity');
+    Route::get('/ManagementSchool/{city_id}/{school_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolDetailsByCity')->name('management_school.getSchoolDetailsByCity');
 
 
 

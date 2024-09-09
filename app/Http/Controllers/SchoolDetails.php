@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ManagementSchool;
+use App\Models\Cities; // Certifique-se de importar a classe Cities corretamente
 use Illuminate\Http\Request;
 
 class SchoolDetails extends Controller
@@ -43,12 +44,19 @@ class SchoolDetails extends Controller
         ]);
     }
 
-    public function indexAllByCity($city)
+    public function indexAllByCity($cityName)
     {
-        $cityData = ManagementSchool::where('city', $city)->get();
-        return view('schoolDetails', ['city' => $city, 'schools' => $cityData]);
-    }
+        $city = Cities::where('name', $cityName)->first();
 
+        if (!$city) {
+            return response()->json(['error' => 'Cidade não encontrada.'], 404);
+        }
+
+        $cityData = ManagementSchool::where('city_id', $city->id)->get();
+        
+        return response()->json($cityData);
+    }
+    
     public function indexMultipleSchools($cityId, $schoolNames = null)
     {
         $schoolNamesArray = $schoolNames ? explode(',', $schoolNames) : [];

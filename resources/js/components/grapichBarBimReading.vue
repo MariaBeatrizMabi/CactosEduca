@@ -19,7 +19,6 @@ const translationMap = {
 const fetchSchools = async () => {
   try {
     const response = await axios.get('/ManagementSchool/all');
-    console.log(response);
 
     const statusCount = {
       not_reader: 0,

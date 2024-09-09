@@ -128,21 +128,21 @@ class ManagementSchoolController extends Controller
         $school = ManagementSchool::with(['user', 'classes.students.exams'])
             ->where('city_id', $city_id)
             ->find($school_id);
-
+    
         if (!$school) {
-            return response()->json(['message' => 'School not found in this city'], 404);
+            return response()->json(['error' => 'Escola não encontrada.'], 404);
         }
-
+    
         $location = Location::find($school->location_id);
         $city = Cities::find($school->city_id);
-
+    
         $schoolData = [
             'id' => $school->id,
             'name' => $school->name,
-            'city' => $city->name,
-            'location' => $location ? $location->name : null,
-            'acess_cod' => $school->user->acess_cod,
-            'password' => $school->user->password,
+            'city' => $city ? $city->name : 'Cidade não encontrada',
+            'location' => $location ? $location->name : 'Localização não encontrada',
+            'acess_cod' => $school->user ? $school->user->acess_cod : 'Não disponível',
+            'password' => $school->user ? $school->user->password : 'Não disponível',
             'classes' => $school->classes->map(function ($class) {
                 return [
                     'id' => $class->id,
@@ -164,10 +164,9 @@ class ManagementSchoolController extends Controller
                 ];
             }),
         ];
-
+    
         return response()->json($schoolData);
     }
-
 
     private function calculateAverageGrades($exams)
     {

@@ -1,3 +1,131 @@
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
+import MenuComponent from '../components/menu.vue';
+import TitleComponent from '/resources/js/components/title.vue';
+import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
+import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
+import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+
+const route = useRoute();
+const formDataStudentPreview = ref([]);
+const schoolsWithAverages = ref([]);
+const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
+
+const getGradeValue = (grade) => {
+  const grades = {
+    'not_reader': 1,
+    'syllable_reader': 2,
+    'word_reader': 3,
+    'sentence_reader': 4,
+    'no_fluent_text_reader': 5,
+    'fluent_text_reader': 6,
+    'pre_syllabic': 1,
+    'syllabic': 2,
+    'alphabetical_syllabic': 3,
+    'alphabetical': 4
+  };
+  return grades[grade] || 0;
+};
+
+const fetchAllSchools = async () => {
+  try {
+    const response = await axios.get('/ManagementSchool/all');
+    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+    calculateAverages();
+  } catch (error) {
+    console.error('Error fetching all schools:', error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const fetchSchoolsByCity = async (city) => {
+  try {
+    console.log('response.data');
+    const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
+    console.log(response);
+    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+    calculateAverages();
+  } catch (error) {
+    console.error(`Error fetching schools in city ${city.schools[0].city_id}:`, error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const fetchSpecificSchoolInCity = async (city, schoolNames) => {
+  try {
+    const response = await axios.get(`/ManagementSchool/${city}/${schoolNames}`);
+    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+    calculateAverages();
+  } catch (error) {
+    console.error(`Error fetching specific school ${schoolNames} in city ${city}:`, error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const calculateAverages = () => {
+  if (!Array.isArray(formDataStudentPreview.value)) {
+    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+    return;
+  }
+  schoolsWithAverages.value = formDataStudentPreview.value.flatMap(cityData => {
+    if (!Array.isArray(cityData.schools)) {
+      console.error('cityData.schools is not an array:', cityData.schools);
+      return [];
+    }
+    return cityData.schools.map(school => {
+      let totalReading = 0;
+      let totalWriting = 0;
+      let examCount = 0;
+
+      school.exams.forEach(exam => {
+        totalReading += getGradeValue(exam.reading);
+        totalWriting += getGradeValue(exam.writing);
+        examCount++;
+      });
+
+      const averageReading = examCount ? totalReading / examCount : null;
+      const averageWriting = examCount ? totalWriting / examCount : null;
+
+      return {
+        ...school,
+        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      };
+    });
+  });
+};
+
+watch(selectedFilter, async (newFilter) => {
+
+  if (selectedFilter.filterType === 'All Cities') {
+    console.log('all cities selected')
+    await fetchAllSchools();
+  } else if (selectedFilter.filterType === 'All Schools in City') {
+    const city = selectedFilter.city; 
+    await fetchSchoolsByCity(city);
+  } else if (selectedFilter.filterType === 'Specific School in City') {
+    console.log('Specific school in City')
+    await fetchSpecificSchoolInCity(newFilter.city, newFilter.schoolNames);
+  }
+}, { immediate: true });
+
+onMounted(() => {
+  if (selectedFilter && selectedFilter.filterType) {
+    if (selectedFilter.filterType === 'All Cities') {
+      fetchAllSchools();
+    } else if (selectedFilter.filterType === 'All Schools in City') {
+      fetchSchoolsByCity(selectedFilter.city);
+    } else if (selectedFilter.filterType === 'Specific School in City') {
+      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames);
+    }
+  } else {
+    console.warn('selectedFilter is undefined or missing filterType');
+  }
+});
+</script>
+
 <template>
   <div class="dashboard">
     <MenuComponent />
@@ -30,174 +158,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRoute } from 'vue-router';
-import axios from "axios";
-import MenuComponent from '../components/menu.vue';
-import TitleComponent from '/resources/js/components/title.vue';
-import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
-import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
-import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
-
-const route = useRoute();
-const schoolId = route.params.schoolId;
-const formDataStudentPreview = ref([]);
-const schoolsWithAverages = ref([]);
-const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
-
-const gradeTranslations = {
-  null: 'não informado',
-  'not_reader': 'Não leitor',
-  'syllable_reader': 'Leitor de sílabas',
-  'word_reader': 'Leitor de palavras',
-  'sentence_reader': 'Leitor de frases',
-  'no_fluent_text_reader': 'Leitor de texto sem fluência',
-  'fluent_text_reader': 'Leitor de texto com fluência',
-  'pre_syllabic': 'Pré-silábico',
-  'syllabic': 'Silábico',
-  'alphabetical_syllabic': 'Silábico alfabético',
-  'alphabetical': 'Alfabético'
-};
-
-const fetchAllSchools = async () => {
-  try {
-    const response = await axios.get('/ManagementSchool/all');
-    console.log('fetchAllSchools data:', response);
-    formDataStudentPreview.value = response.data ? response.data : [];
-    calculateAverages();
-  } catch (error) {
-    console.error('Error fetching all schools:', error);
-    formDataStudentPreview.value = [];
-  }
-};
-
-const fetchSchoolsByCity = async (city) => {
-  console.log(city)
-  try {
-    const response = await axios.get(`/ManagementSchool/${city}/all`);
-    console.log(`Todas as escolas do estado (${city}) data:`, response);
-    formDataStudentPreview.value = response.data ? response.data : [];
-    calculateAverages();
-  } catch (error) {
-    console.error(`Todas as escolas do estado ${city}:`, error);
-    formDataStudentPreview.value = [];
-  }
-};
-
-const fetchSpecificSchoolInCity = async (city, schoolNames) => {
-  try {
-    const response = await axios.get(`/ManagementSchool/${city}/${schoolNames}`);
-    console.log(`fetchSpecificSchoolInCity(${city}, ${schoolNames}) data:`, response.data);
-    formDataStudentPreview.value = response.data ? response.data : [];
-    calculateAverages();
-  } catch (error) {
-    console.error(`Error fetching specific schools ${schoolNames} in city ${city}:`, error);
-    formDataStudentPreview.value = [];
-  }
-};
-
-const getGradeValue = (grade) => {
-  const grades = {
-    'not_reader': 1,
-    'syllable_reader': 2,
-    'word_reader': 3,
-    'sentence_reader': 4,
-    'no_fluent_text_reader': 5,
-    'fluent_text_reader': 6,
-    'pre_syllabic': 1,
-    'syllabic': 2,
-    'alphabetical_syllabic': 3,
-    'alphabetical': 4
-  };
-  return grades[grade] || 0;
-};
-
-const translateGrade = (grade) => {
-  return gradeTranslations[grade] || grade;
-};
-
-const translateReadingGradeBack = (average) => {
-  const roundedAverage = Math.round(average);
-
-  if (roundedAverage === null) return 'não informado';
-  if (roundedAverage <= 1) return 'not_reader';
-  if (roundedAverage <= 2) return 'syllable_reader';
-  if (roundedAverage <= 3) return 'word_reader';
-  if (roundedAverage <= 4) return 'sentence_reader';
-  if (roundedAverage <= 5) return 'no_fluent_text_reader';
-  return 'fluent_text_reader';
-};
-
-const translateWritingGradeBack = (average) => {
-  const roundedAverage = Math.round(average);
-
-  if (roundedAverage <= 1) return 'pre_syllabic';
-  if (roundedAverage <= 2) return 'syllabic';
-  if (roundedAverage <= 3) return 'alphabetical_syllabic';
-  return 'alphabetical';
-};
-
-const calculateAverages = () => {
-  if (!Array.isArray(formDataStudentPreview.value)) {
-    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
-    return;
-  }
-  schoolsWithAverages.value = formDataStudentPreview.value.flatMap(cityData => {
-    return cityData.schools.map(school => {
-      let totalReading = 0;
-      let totalWriting = 0;
-      let examCount = 0;
-
-      school.exams.forEach(exam => {
-        totalReading += getGradeValue(exam.reading);
-        totalWriting += getGradeValue(exam.writing);
-        examCount++;
-      });
-
-      const averageReading = examCount ? totalReading / examCount : null;
-      const averageWriting = examCount ? totalWriting / examCount : null;
-
-      return {
-        ...school,
-        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
-      };
-    });
-  });
-};
-
-watch(selectedFilter, async (newFilter) => {
-  if (!newFilter) {
-    return;
-  }
-
-  if (newFilter.filterType === "All Cities") {
-    await fetchAllSchools();
-  } else if (newFilter.filterType === "All Schools in City") {
-    await fetchSchoolsByCity(newFilter.city);
-  } else if (newFilter.filterType === "Specific School in City") {
-    await fetchSpecificSchoolInCity(newFilter.city, newFilter.schoolNames);
-  }
-}, { immediate: true });
-
-
-
-onMounted(() => {
-  if (selectedFilter && selectedFilter.filterType) {
-    if (selectedFilter.filterType === "All Cities") {
-      fetchAllSchools();
-    } else if (selectedFilter.filterType === "All Schools in City") {
-      fetchSchoolsByCity(selectedFilter.city);
-    } else if (selectedFilter.filterType === "Specific School in City") {
-      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames);
-    }
-  } else {
-    console.warn('selectedFilter is undefined or missing filterType');
-  }
-});
-</script>
 
 <style scoped>
 .dashboard {

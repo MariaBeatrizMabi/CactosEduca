@@ -14,38 +14,35 @@ const schoolSelected = ref(false);
 const selectedSchools = ref([]);
 const search = ref('');
 
-onMounted(async () => {
-    try {
-        const { data } = await axios.get('/ManagementSchool/all');
-        citiesSchools.value = data;
-        cities.value = Array.from(new Set(data.map(item => item.city)));
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-    console.log(citiesSchools.value, 'aaaaaaaaaaaaaaa')
-
-});
-
 function showSchools(cityName) {
     search.value = '';
-    selectedCity.value = cityName;
+    selectedCity.value = citiesSchools.value.find(({ city }) => city === cityName);
     schoolSelected.value = true;
 
-    const cityData = citiesSchools.value.find(({ city }) => city === selectedCity.value);
-    selectedSchools.value = cityData ? cityData.schools : [];
+    if (selectedCity.value) {
+        selectedSchools.value = selectedCity.value.schools || [];
+
+        localStorage.setItem('selectedFilter', JSON.stringify({
+            filterType: 'All Schools in City',
+            cityId: selectedCity.value.id
+        }));
+    }
 }
 
 function navigateToSchool(cityName, schoolName) {
     if (Array.isArray(selectedSchools.value)) {
         const selectedSchool = selectedSchools.value.find(school => school.name === schoolName);
-        if (selectedSchool) {
-            // Armazenar o filtro no localStorage
-            localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'Specific School', city: cityName, school: schoolName }));
+        if (selectedSchool && selectedCity.value) {
+            localStorage.setItem('selectedFilter', JSON.stringify({
+                filterType: 'Specific School',
+                cityId: selectedCity.value.id,
+                school: schoolName
+            }));
 
             router.push({
                 name: 'SchoolDetailsByCityAndSchool',
                 params: {
-                    city: cityName,
+                    cityId: selectedCity.value.id, 
                     schoolName: schoolName,
                     schoolId: selectedSchool.id
                 }
@@ -76,25 +73,33 @@ function selectAllCities() {
     selectedCity.value = '';
     schoolSelected.value = false;
 
-    // Armazenar o filtro no localStorage
     localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Cities' }));
-
+    
     router.push({ name: 'SchoolDetailsAll' });
 }
 
 function selectAllSchools() {
     if (selectedCity.value) {
-        // Armazenar o filtro no localStorage
         localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Schools in City', city: selectedCity.value }));
 
         router.push({
             name: 'SchoolDetailsAllByCity',
-            params: { city: selectedCity.value }
+            params: { city: selectedCity.value.schools[0].city_id }
         });
     } else {
         console.error('Selected city is not defined');
     }
 }
+
+onMounted(async () => {
+    try {
+        const { data } = await axios.get('/ManagementSchool/all');
+        citiesSchools.value = data;
+        cities.value = Array.from(new Set(data.map(item => item.city)));
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+});
 </script>
 
 <template>
