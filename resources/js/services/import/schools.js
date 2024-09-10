@@ -12,8 +12,8 @@ export async function importSchools(cities, locations) {
     ]);
 
     for (const row of teachers) {
-        const cityExists = cities.find(({ name }) => normalize(name) === normalize(row.municipio));
-        const locationExists = cities.find(({ name }) => normalize(name) === normalize(row.localidade));
+        const cityExists = Array.isArray(cities) && cities.find(({ name }) => normalize(name) === normalize(row.municipio));
+        const locationExists = Array.isArray(locations) && locations.find(({ name }) => normalize(name) === normalize(row.localidade));
 
         if (!cityExists) {
             const { data } = await api.post('/api/cities', { name: row.municipio });
@@ -25,7 +25,6 @@ export async function importSchools(cities, locations) {
             locations.push(data);
         }
     }
-
     await Promise.all(
         teachers.map(async ({
             nome,

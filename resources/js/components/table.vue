@@ -287,7 +287,14 @@ async function handleSelectedCityChangeUpdate(value) {
 }
 
 async function handleImportSchools() {
-    await importSchools(toRaw(cities.value), toRaw(locations.value));
+    if (!Array.isArray(cities.value)) {
+        cities.value = [];
+    }
+    if (!Array.isArray(locations.value)) {
+        locations.value = [];
+    }
+
+    await importSchools(cities.value, locations.value);
     await getTableData();
 }
 
