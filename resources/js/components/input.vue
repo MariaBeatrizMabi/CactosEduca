@@ -27,7 +27,7 @@
             type: String,
             required: false
         },
-    })
+    });
 </script>
 
 <template>
@@ -46,7 +46,7 @@
     .input-component {
         display: flex;
         flex-direction: column;
-        
+
         & label {
             font-size: 14px;
             margin-bottom: 3px;

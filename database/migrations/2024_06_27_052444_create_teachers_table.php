@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('teacher', function (Blueprint $table) {
             $table->id();
+
             $table->string('name', 255);
-            $table->string('acess_cod')->unique();
-            $table->enum('type',['admin','admin_seduc','school','teacher']);
-            $table->string('password');
-            $table->unsignedBigInteger('school_id');
+
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('school_id')->constrained('management_schools');
+
+            $table->softDeletes();
             $table->timestamps();
         });
     }

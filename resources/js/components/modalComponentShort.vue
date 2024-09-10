@@ -29,20 +29,15 @@
     .modal-background-deleted {
         left: 0 !important;
         top: 0 !important;
-        z-index: 1;
-        
         margin: 0 auto !important;
-
-        position: absolute !important;
-
+        position: fixed !important;
         height: 100vh !important;
         width: 100vw !important;
-
         background-color: rgba(0, 0, 0, 0.219);
-
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 9999;
         
         & .modal-content-deleted{
             display: flex;

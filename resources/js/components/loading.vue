@@ -41,7 +41,7 @@ onMounted(() => {
         top: 0;
         left: 0;
 
-        position: absolute;
+        position: fixed;
         z-index: 9999;
 
         display: flex;
