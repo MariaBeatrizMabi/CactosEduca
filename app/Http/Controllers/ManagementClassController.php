@@ -6,6 +6,7 @@ use App\Models\ClassModel;
 use App\Models\ManagementSchool;
 use App\Models\Student;
 use App\Models\Teacher;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -119,5 +120,17 @@ class ManagementClassController extends Controller
     public function detachStudent(ClassModel $classModel, Student $student): void
     {
         $classModel->students()->detach($student);
+    }
+
+    public function close(ClassModel $classModel): void
+    {
+        $classModel->update(['active' => false]);
+    }
+
+    public function monitoringForm(ClassModel $classModel)
+    {
+        $classModel->load('students');
+        $pdf = Pdf::loadView('pdf.monitoring-form', ['class' => $classModel]);
+        return $pdf->download('Ficha de Acompanhamento.pdf');
     }
 }

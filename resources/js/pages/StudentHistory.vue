@@ -6,7 +6,7 @@ import Title from "../components/title.vue";
 import Modal from "../components/modal.vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import { useRoute } from "vue-router";
-import { api } from '../api'
+import { api } from '../services/api'
 import { ref, onMounted } from 'vue'
 
 

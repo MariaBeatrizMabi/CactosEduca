@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, defineEmits } from "vue";
+import { ref, onMounted, defineEmits, computed, toRaw, watch } from "vue";
 import axios from "axios";
-import { api } from "../api";
+import { api } from "../services/api";
 import MenuComponent from "../components/menu.vue";
 import TitleComponent from "../components/title.vue";
 import userWelcomeComponent from "../components/userWelcome.vue";
@@ -16,6 +16,19 @@ import ModalComponentDeleted from "../components/modalComponentShort.vue";
 import SelectComponent from "../components/select.vue";
 import NewSelectComponent from "../components/SelectComponent.vue";
 import Breadcrumb from "../components/Breadcrumb";
+import {
+    exportStudentsData,
+    exportStudentsSampleData,
+    exportTeachersData,
+    exportTeachersSampleData,
+    exportClassesData,
+    exportClassesSampleData,
+} from '../services/export';
+import {
+    importStudents,
+    importClasses,
+    importTeachers
+} from '../services/import';
 
 const emit = defineEmits(["viewDetails", "updateAction", "deletedAction"]);
 
@@ -73,6 +86,12 @@ let formDataClassPreview = ref({
 });
 
 let formDataStudentPreview = ref({
+    name: "",
+    enrollment: "",
+    school_id: userID.value,
+});
+
+const formDataStudentExport = ref({
     name: "",
     enrollment: "",
     school_id: userID.value,
@@ -223,6 +242,8 @@ async function getTableStudentData() {
             name: take.name,
             enrollment: take.enrollment,
         }));
+
+        formDataStudentExport.value = response.data;
     } catch (error) {
         console.error(error);
     }
@@ -451,15 +472,11 @@ async function deletedModalClassShow(id) {
     deletedClassDataModal.value = true;
     resetForm();
     try {
-        const response = await axios.get(`/ClassSchool/${id}`);
-
-        const ClassData = response.data.find(
-            (classData) => classData.id === id
-        );
-        idToDeleted.value = id;
+        const { data } = await api.get(`/api/classes/${id}`);
+        idToDeleted.value = data.id;
 
         formDataClassDeleted.value = {
-            name: ClassData.name,
+            name: data.name,
         };
     } catch (error) {
         console.error("Erro ao buscar dados do professor:", error);
@@ -556,6 +573,21 @@ onMounted(async () => {
     await getTableClassData();
     await getTableStudentData();
 });
+
+async function handleImportTeachers() {
+    await importTeachers(schoolId.value);
+    await getTableTeacherData();
+}
+
+async function handleImportClasses() {
+    await importClasses(toRaw(formDataTeachersPreview.value), schoolId.value);
+    await getTableClassData();
+}
+
+async function handleImportStudents() {
+    await importStudents(schoolId.value);
+    await getTableStudentData();
+}
 </script>
 
 <template>
@@ -1060,7 +1092,7 @@ onMounted(async () => {
                             d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"
                         />
                     </svg>
-                    Apagar Professor
+                    Apagar turma
                 </a>
             </div>
         </ModalComponentDeleted>
@@ -1311,6 +1343,9 @@ onMounted(async () => {
                     @viewDetails="ShowSchoolTeachersData"
                     @updateAction="UpdateSchoolTeachersData"
                     @deletedAction="deletedModalTeachersShow"
+                    @exportData="exportTeachersData(toRaw(formDataTeachersPreview.value))"
+                    @exportSampleData="exportTeachersSampleData"
+                    @importData="handleImportTeachers"
                 />
             </template>
 
@@ -1330,7 +1365,10 @@ onMounted(async () => {
                     @viewDetails="ShowSchoolClassData"
                     @updateAction="UpdateSchoolClassData"
                     @deletedAction="deletedModalClassShow"
-                ></TableComponentComponent>
+                    @exportData="exportClassesData(toRaw(formDataClassPreview.value))"
+                    @exportSampleData="exportClassesSampleData"
+                    @importData="handleImportClasses"
+                />
             </template>
 
             <template v-if="['school', 'teacher'].includes(userType)">
@@ -1348,6 +1386,9 @@ onMounted(async () => {
                     :OpenAddModal="OpenModalStudentCreation"
                     @viewDetails="ShowStudentData"
                     @deletedAction="deletedModalStudentShow"
+                    @exportData="exportStudentsData(toRaw(formDataStudentExport.value))"
+                    @exportSampleData="exportStudentsSampleData"
+                    @importData="handleImportStudents"
                 ></TableComponentComponent>
             </template>
         </div>

@@ -22,8 +22,10 @@
         "@fortawesome/vue-fontawesome": "^3.0.8",
         "@vitejs/plugin-vue": "^5.0.4",
         "chart.js": "^4.4.3",
+        "moment": "^2.30.1",
         "radix-vue": "^1.9.2",
         "vue": "^3.4.19",
-        "vue-router": "^4.0.13"
+        "vue-router": "^4.0.13",
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
     }
 }

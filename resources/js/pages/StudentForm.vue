@@ -4,11 +4,14 @@ import UserWelcomeComponent from "../components/userWelcome.vue";
 import TitleComponent from "../components/title.vue";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { api } from '../api';
+import { api } from '../services/api';
 import Breadcrumb from '../components/Breadcrumb'
 import Modal from "../components/modal.vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import { translate } from '../utils/translate';
+import { Dropdown } from "../components/Dropdown";
+import { exportExamsData, exportExamsSampleData } from "../services/export";
+import { importExams } from "../services/import";
 import axios from "axios";
 
 const route = useRoute();
@@ -182,6 +185,11 @@ function openExamUpdateModal(id) {
     activeExamId.value = id;
 
     updateExamData.value = {...activeExamData.value};
+}
+
+async function handleImportExams() {
+    await importExams(route.params.student, classData.value.id);
+    studentExams.value = await getStudentExams();
 }
 </script>
 
@@ -367,12 +375,44 @@ function openExamUpdateModal(id) {
                     </div>
                     <h3 v-else>O aluno não possui nenhuma sondagem</h3>
 
-                    <button
-                        class="create-test"
-                        @click="showExamCreateModal = true"
-                    >
-                        Adicionar sondagem
-                    </button>
+                    <div class="import-actions">
+                        <button
+                            class="create-test"
+                            @click="showExamCreateModal = true"
+                        >
+                            Adicionar sondagem
+                        </button>
+
+                        <Dropdown.Root>
+                            <Dropdown.Trigger>
+                                <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                    <path fill="var(--secondary-color)" d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                                </svg>
+                            </Dropdown.Trigger>
+                            <Dropdown.Portal>
+                                <Dropdown.Content>
+                                    <Dropdown.Item @click="handleImportExams">
+                                        <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                            <path fill="var(--secondary-color)" d="M48 448L48 64c0-8.8 7.2-16 16-16l160 0 0 80c0 17.7 14.3 32 32 32l80 0 0 288c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-293.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0L64 0zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/>
+                                        </svg>
+                                        Importar dados
+                                    </Dropdown.Item>
+                                    <Dropdown.Item @click="exportExamsSampleData">
+                                        <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                            <path fill="var(--secondary-color)" d="M48 448L48 64c0-8.8 7.2-16 16-16l160 0 0 80c0 17.7 14.3 32 32 32l80 0 0 288c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-293.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0L64 0zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/>
+                                        </svg>
+                                        Exportar planilha modelo
+                                    </Dropdown.Item>
+                                    <Dropdown.Item @click="exportExamsData(studentExams)">
+                                        <svg width="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                            <path fill="var(--secondary-color)" d="M48 448L48 64c0-8.8 7.2-16 16-16l160 0 0 80c0 17.7 14.3 32 32 32l80 0 0 288c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-293.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0L64 0zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z"/>
+                                        </svg>
+                                        Exportar dados
+                                    </Dropdown.Item>
+                                </Dropdown.Content>
+                            </Dropdown.Portal>
+                        </Dropdown.Root>
+                    </div>
                 </div>
             </template>
         </div>
@@ -700,6 +740,31 @@ textarea {
     font-size: 1.1rem;
 }
 
+.import-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    position: absolute;
+    right: 0;
+}
+
+.create-test {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    border-radius: 4rem;
+    background-color: transparent;
+    color: var(--secondary-color);
+    padding: 0.6rem 1.6rem;
+    background-color: #fff;
+    font-weight: 700;
+}
+
 .tests-content {
     display: flex;
     flex-direction: column;
@@ -707,25 +772,6 @@ textarea {
     position: relative;
     padding-bottom: 5vh;
     gap: 2rem;
-
-    & > .create-test {
-        position: absolute;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        font-size: 15px;
-        border: 2px solid var(--secondary-color);
-        text-align: center;
-        border-radius: 4rem;
-        background-color: transparent;
-        color: var(--secondary-color);
-        padding: 0.6rem 1.6rem;
-        background-color: #fff;
-        right: 0;
-        font-weight: 700;
-    }
 
     & > .test-table-container {
         display: flex;

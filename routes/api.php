@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
@@ -78,10 +79,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{city}', [CitiesController::class, 'delete']);
     });
 
-    // Rotas relacionadas aos exames
+    Route::prefix('locations')->name('locations')->group(function () {
+        Route::post('/', [LocationController::class, 'store']);
+    });
+
     Route::prefix('exams')->name('exams.')->group(function () {
         Route::post('/', [ExamController::class, 'store']);
         Route::put('/{exam}', [ExamController::class, 'update']);
         Route::delete('/{exam}', [ExamController::class, 'delete']);
     });
 });
+
+Route::get('/{classModel}/monitoring-form', [ManagementClassController::class, 'monitoringForm']);

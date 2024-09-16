@@ -3,13 +3,14 @@ import MenuComponent from "../components/menu.vue";
 import UserWelcomeComponent from "../components/userWelcome.vue";
 import TitleComponent from "../components/title.vue";
 import TableComponent from '../components/tableComponent.vue';
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, toRaw} from "vue";
 import { useRoute } from "vue-router";
-import {api} from "../api.js"
+import { api } from "../services/api"
 import ModalComponent from "../components/modal.vue";
-import Input from "../components/input.vue";
 import ModalComponentDeleted from "../components/modalComponentShort.vue";
 import Breadcrumb from '../components/Breadcrumb'
+import { exportClassStudentsData, exportClassStudentsSampleData } from '../services/export';
+import { importClassStudents } from '../services/import';
 
 const route = useRoute();
 
@@ -77,7 +78,7 @@ async function fetchStudents() {
 }
 
 async function fetchAvailableStudents() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`)
+    const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`);
     return data
 }
 
@@ -86,6 +87,7 @@ onMounted(async () => {
     classData.value = await fetchClassData()
     formData.value = classData.value
     availableTeachers.value = await fetchAvailableTeachers();
+    availableStudents.value = await fetchAvailableStudents();
     students.value = await fetchStudents()
 });
 
@@ -94,7 +96,6 @@ function redirectToStudentScreen(id) {
 }
 
 async function openAddStudentModal() {
-    availableStudents.value = await fetchAvailableStudents();
     showAddStudentModal.value = true;
 }
 
@@ -136,6 +137,12 @@ function resetForm() {
 async function submitCloseClass() {
     await api.post(`/api/classes/${route.params.class}/close`);
     window.location.href = '/Management';
+}
+
+async function handleImportData() {
+    await importClassStudents(toRaw(availableStudents.value), classData.value.id);
+    students.value = await fetchStudents();
+    availableStudents.value = await fetchAvailableStudents();
 }
 </script>
 
@@ -305,6 +312,12 @@ async function submitCloseClass() {
             :OpenAddModal="openAddStudentModal"
             @viewDetails="redirectToStudentScreen"
             @deletedAction="openRemoveStudentModal"
+            @exportData="exportClassStudentsData(students.map(({ name }) => ({
+                studentName: name,
+                className: classData.name
+            })))"
+            @exportSampleData="exportClassStudentsSampleData"
+            @importData="handleImportData"
         />
 
         <button class="close-class" @click="showCloseClass = true">
