@@ -12,8 +12,10 @@ import { translate } from '../utils/translate';
 import { Dropdown } from "../components/Dropdown";
 import { exportExamsData, exportExamsSampleData } from "../services/export";
 import { importExams } from "../services/import";
+import axios from "axios";
 
 const route = useRoute();
+const schoolId = ref();
 
 const studentData = ref({
     name: '',
@@ -55,6 +57,15 @@ const updateExamData = ref({
     action: null
 })
 
+const userID = ref("");
+const userType = ref("");
+
+async function getUserType() {
+    const { data: loginUserData } = await axios.get("/loginUser");
+    userType.value = loginUserData.type;
+    userID.value = loginUserData.id;
+}
+
 const showExamCreateModal = ref(false);
 const showExamViewModal = ref(false);
 const showExamUpdateModal = ref(false);
@@ -72,13 +83,31 @@ const hasChangesToUpdate = computed(() =>
 async function updateStudent() {
     const peopleWithDisabilities = JSON.parse(formData.value?.people_with_disabilities);
 
-    console.log(peopleWithDisabilities)
-
     await api.put(`/api/students/${route.params.student}`, {
         ...formData.value,
         people_with_disabilities: peopleWithDisabilities
     });
     studentData.value = { ...formData.value };
+}
+
+const pollData = ref({
+    name: '',
+    school_id: null,
+    class_id: null,
+    active: true,
+    average: null,
+    year: null,
+});
+
+async function submitPollCreated(name) {
+    await axios.post(`/PollCreate`, {
+        name: studentExams.value.length + 1 + '° Período de sondagem',
+        class_id: name,
+        school_id: userID.value,
+        year: classData.value.id
+    });
+
+    submitExamCreate();
 }
 
 async function submitExamCreate() {
@@ -125,6 +154,7 @@ function resetForm() {
 }
 
 onMounted(async () => {
+    await getUserType();
     const { data } = await api.get(`/api/students/${route.params.student}`);
 
     studentData.value = {
@@ -455,7 +485,7 @@ async function handleImportExams() {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitExamCreate">
+            <a class="school-add" @click="submitPollCreated">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"

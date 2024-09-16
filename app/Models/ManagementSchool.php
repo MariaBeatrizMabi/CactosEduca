@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class ManagementSchool extends Model
 {
@@ -58,5 +59,10 @@ class ManagementSchool extends Model
     public function classes(): HasMany
     {
         return $this->hasMany(ClassModel::class, 'school_id');
+    }
+
+    public function exams(): HasManyThrough
+    {
+        return $this->hasManyThrough(Exam::class, Student::class, 'school_id', 'student_id');
     }
 }

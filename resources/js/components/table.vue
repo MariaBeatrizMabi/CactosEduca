@@ -84,7 +84,7 @@ const searchCity = ref("");
 
 async function getTableData() {
     try {
-        const { data } = await axios.get("/ManagementSchool");
+        const { data } = await axios.get('/ManagementSchool/all');
 
         const formattedData = [];
 
@@ -95,9 +95,9 @@ async function getTableData() {
                     name: school.name,
                     city_name: city.city,
                     location_id: school.location,
-                    acess_cod: school.user.acess_cod,
+                    acess_cod: school.acess_cod,
                 });
-            });
+    });
         });
 
         formData.value = formattedData;
@@ -117,7 +117,7 @@ async function ShowSchoolData(id) {
             id: school.id,
             name: school.name,
             location_id: school.location_id,
-            city_name: school.city_id.name,
+            city_name: school.city.name,
             acess_cod: school.acess_cod,
             type: "school",
         };
@@ -184,7 +184,7 @@ async function fetchSchoolData(id) {
             id: managementSchool.id,
             name: managementSchool.name,
             location_id: managementSchool.location.id,
-            city_id: managementSchool.city_id.id,
+            city_id: managementSchool.city.id,
             acess_cod: managementSchool.acess_cod,
             type: "school",
         };
