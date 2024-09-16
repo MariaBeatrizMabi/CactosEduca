@@ -69,7 +69,7 @@ const fetchSchools = async () => {
                     },
                     tooltip: {
                         callbacks: {
-                            label: function(tooltipItem) {
+                            label: function (tooltipItem) {
                                 const label = tooltipItem.label;
                                 return `${label}: ${tooltipItem.raw}`;
                             }
@@ -90,7 +90,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <canvas ref="chartRef" id="myChart"></canvas>
-  </div>
+    <div>
+        <canvas ref="chartRef" id="myChart"></canvas>
+    </div>
 </template>

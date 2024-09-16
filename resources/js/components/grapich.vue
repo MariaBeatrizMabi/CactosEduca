@@ -127,5 +127,8 @@ onMounted(() => {
 .chart-container {
   width: 100%;
   height: 250px;
+  display: flex;
+  justify-content: center !important;
+  align-items: center;
 }
 </style>

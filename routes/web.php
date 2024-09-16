@@ -31,9 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/all', [SchoolDetails::class, 'indexAll'])
     ->name('SchoolDetailsAll');
 
-    Route::get('/ManagementSchool/{city}/all', [SchoolDetails::class, 'indexAllByCity'])
-    ->where(['city' => '[\pL\s]+'])
+    Route::get('/ManagementSchool/{city_id}/all', [SchoolDetails::class, 'indexAllByCity'])
+    ->where(['city_id' => '[0-9]+'])
     ->name('SchoolDetailsAllByCity');
+    
 
     Route::get('/Poll', 'App\Http\Controllers\PollController@all')->name('poll.index');
     Route::post('/PollCreate', 'App\Http\Controllers\PollController@create')->name('poll.create');
@@ -49,8 +50,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/{city}/all', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCityName')->name('management_school.getSchoolsByCityName');
     // Route::get('/ManagementSchool/city/{city_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCity')->name('management_school.getSchoolsByCity');
     Route::get('/ManagementSchool/{city_id}/{school_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolDetailsByCity')->name('management_school.getSchoolDetailsByCity');
-
-
 
     Route::get('/Teachers', 'App\Http\Controllers\TeacherController@all')->name('teacher.all');
     Route::get('/TeachersSchool', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');

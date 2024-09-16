@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
 
-const imageSrc = ref('');
 const props = defineProps({
     imageCard: {
         type: String,
@@ -17,11 +16,7 @@ const props = defineProps({
     }
 })
 
-import('/public/assets/' + props.imageCard).then(image => {
-    imageSrc.value = image.default;
-}).catch(error => {
-    console.error('Erro ao carregar a imagem do card:', error);
-});
+const imageSrc = ref(`/assets/${props.imageCard}`);
 </script>
 
 <template>

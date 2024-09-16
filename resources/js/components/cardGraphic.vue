@@ -93,17 +93,6 @@ onMounted(() => {
                 <PieChart></PieChart>
             </div>
         </div>
-
-        <!-- <div class="card-grapich" v-else>
-            <div class="card-grapich-content">
-                <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
-                </div>
-            </div>
-            <div class="grapich">
-                <h1 class="user-not-Found">Tipo de usuário não encontrado</h1>
-            </div>
-        </div> -->
     </div>
 </template>
 
@@ -143,6 +132,8 @@ onMounted(() => {
             width: 100%;
             display: flex;
             padding: 1rem;
+            justify-content: center !important;
+            align-items: center;
             border-radius: 0 0 1rem 1rem;
             background-color: white;
         }
@@ -194,5 +185,4 @@ onMounted(() => {
 
     }
 }
-
 </style>

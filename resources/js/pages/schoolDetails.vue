@@ -32,6 +32,7 @@ const getGradeValue = (grade) => {
 const fetchAllSchools = async () => {
   try {
     const response = await axios.get('/ManagementSchool/all');
+    console.log(response);
     formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
     calculateAverages();
   } catch (error) {
@@ -42,13 +43,23 @@ const fetchAllSchools = async () => {
 
 const fetchSchoolsByCity = async (city) => {
   try {
-    console.log('response.data');
     const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
-    console.log(response);
-    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+
+    if (response.data && response.data.length > 0) {
+      const data = response.data[0]; 
+      
+      console.log('Dados filtrados:', data); 
+
+      formDataStudentPreview.value = data || [];
+      
+      console.log(formDataStudentPreview.value)
+    } else {
+      formDataStudentPreview.value = [];
+    }
+
     calculateAverages();
   } catch (error) {
-    console.error(`Error fetching schools in city ${city.schools[0].city_id}:`, error);
+    console.error(`Erro ao buscar escolas na cidade ${city.schools[0].city_id}:`, error);
     formDataStudentPreview.value = [];
   }
 };
@@ -62,6 +73,39 @@ const fetchSpecificSchoolInCity = async (city, schoolNames) => {
     console.error(`Error fetching specific school ${schoolNames} in city ${city}:`, error);
     formDataStudentPreview.value = [];
   }
+};
+
+const translateGrade = (grade) => {
+    return gradeTranslations[grade] || grade;
+  };
+  
+  const translateReadingGradeBack = (average) => {
+  if (average <= 1) return 'not_reader';
+  if (average <= 2) return 'syllable_reader';
+  if (average <= 3) return 'word_reader';
+  if (average <= 4) return 'sentence_reader';
+  if (average <= 5) return 'no_fluent_text_reader';
+  return 'fluent_text_reader';
+};
+const translateWritingGradeBack = (average) => {
+  if (average <= 1) return 'not_reader';
+  if (average <= 2) return 'syllable_reader';
+  if (average <= 3) return 'word_reader';
+  if (average <= 4) return 'sentence_reader';
+  if (average <= 5) return 'no_fluent_text_reader';
+  return 'fluent_text_reader';
+};
+const gradeTranslations = {
+  'not_reader': 'Não Leitor',
+  'syllable_reader': 'Leitor Silábico',
+  'word_reader': 'Leitor de Palavras',
+  'sentence_reader': 'Leitor de Frases',
+  'no_fluent_text_reader': 'Leitor de Texto sem Fluência',
+  'fluent_text_reader': 'Leitor de Texto Fluente',
+  'pre_syllabic': 'Pré-Silábico',
+  'syllabic': 'Silábico',
+  'alphabetical_syllabic': 'Alfabetização Silábica',
+  'alphabetical': 'Alfabetização'
 };
 
 const calculateAverages = () => {

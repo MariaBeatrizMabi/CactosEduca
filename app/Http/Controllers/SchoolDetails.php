@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ManagementSchool;
-use App\Models\Cities; // Certifique-se de importar a classe Cities corretamente
 use Illuminate\Http\Request;
+use App\Models\Cities;
+use App\Models\Location;
 
 class SchoolDetails extends Controller
 {
@@ -13,6 +14,38 @@ class SchoolDetails extends Controller
         $schools = ManagementSchool::all();
         return view('schoolDetails', ['schools' => $schools]);
     }
+
+    private function getGradeValue($grade)
+    {
+        $grades = [
+            'pré-silábico' => 1,
+            'silábico' => 2,
+            'silábico-alfabético' => 3,
+            'alfabético' => 4,
+        ];
+
+        return $grades[$grade] ?? 0;
+    }
+
+    private function calculateAverageGrades($exams)
+    {
+        if ($exams->isEmpty()) {
+            return null;
+        }
+
+        $totalGrades = 0;
+        $count = 0;
+
+        foreach ($exams as $exam) {
+            $totalGrades += $this->getGradeValue($exam->reading);
+            $totalGrades += $this->getGradeValue($exam->writing);
+            $totalGrades += $this->getGradeValue($exam->action);
+            $count += 3;
+        }
+
+        return $count > 0 ? $totalGrades / $count : null;
+    }
+
 
     public function index() {
         return view('schoolDetails');
@@ -44,18 +77,52 @@ class SchoolDetails extends Controller
         ]);
     }
 
-    public function indexAllByCity($cityName)
-    {
-        $city = Cities::where('name', $cityName)->first();
-
-        if (!$city) {
-            return response()->json(['error' => 'Cidade não encontrada.'], 404);
-        }
-
-        $cityData = ManagementSchool::where('city_id', $city->id)->get();
+ 
+        public function indexAllByCity($cityName)
+        {
+            // Procura a cidade pelo nome ao invés de ID
+            $city = Cities::where('id', $cityName)->first();
         
-        return response()->json($cityData);
-    }
+            // Verifica se a cidade foi encontrada
+            if (!$city) {
+                return response()->json(['error' => 'Cidade não encontrada.'], 404);
+            }
+        
+            // Filtra as escolas pela cidade encontrada
+            $schools = ManagementSchool::where('city_id', $city->id)->with('exams')->get();
+            $locations = Location::all();
+        
+            // Agrupa as escolas pela cidade (nesse caso, será apenas uma cidade)
+            $groupedSchools = $schools->groupBy('city_id');
+        
+            // Mapeia as escolas e seus dados
+            $response = $groupedSchools->map(function ($schools, $cityId) use ($locations) {
+                return $schools->map(function ($school) use ($locations) {
+                    $location = $locations->firstWhere('id', $school->location_id);
+                    $averageGrades = $this->calculateAverageGrades($school->exams);
+        
+                    $exams = $school->exams->map(function ($exam) {
+                        return [
+                            'id' => $exam->id,
+                            'reading' => $exam->reading,
+                            'writing' => $exam->writing,
+                            'action' => $exam->action,
+                        ];
+                    });
+        
+                    return [
+                        'id' => $school->id,
+                        'name' => $school->name,
+                        'city_id' => $school->city_id,
+                        'location' => $location ? $location->name : null,
+                        'acess_cod' => $school->user->acess_cod,
+                        'average_grades' => $averageGrades,
+                        'exams' => $exams,
+                    ];
+                });
+            });
+            return response()->json($response->values());
+        }
     
     public function indexMultipleSchools($cityId, $schoolNames = null)
     {
