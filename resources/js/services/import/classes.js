@@ -10,9 +10,22 @@ export async function importClasses(teachers, schoolId) {
         noite: 'night'
     };
 
+    const normalizeText = text => text.trim().toLowerCase();
+
     await Promise.all(
         groups.map(async (data) => {
-            const { id: teacherId } = teachers.find(({ name }) => normalize(name) === normalize(data.professor_responsavel));
+            const normalizedProfessorName = normalizeText(data.professor_responsavel);
+            console.log('Normalized professor name:', normalizedProfessorName);
+
+            const teacher = teachers.find(({ name }) => normalizeText(name) === normalizedProfessorName);
+
+            if (!teacher) {
+                console.error(`Professor não encontrado para o nome: ${data.professor_responsavel}`);
+                return;
+            }
+
+            const { id: teacherId } = teacher;
+
             const shift = data.turno.normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .replace(/\s+/g, '_')
