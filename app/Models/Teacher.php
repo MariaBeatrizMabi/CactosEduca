@@ -37,14 +37,14 @@ class Teacher extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function classTeacher()
+    
+    public function classTeacher(): BelongsTo
     {
-        return $this->belongsTo(ClassModel::class);
+        return $this->belongsTo(ClassModel::class, 'teacher_id');
     }
 
     public function school(): BelongsTo
     {
-        return $this->belongsTo(ManagementSchool::class);
+        return $this->belongsTo(ManagementSchool::class, 'school_id');
     }
 }

@@ -19,7 +19,6 @@ import Subtitle from './subtitleGrapichWriting.vue';
             </div>
             <div class="grapich">
                 <GrapichBarBimWriting></GrapichBarBimWriting>
-                <Subtitle></Subtitle>
             </div>
         </div>
         
@@ -31,7 +30,6 @@ import Subtitle from './subtitleGrapichWriting.vue';
             </div>
             <div class="grapich">
                 <PieChart></PieChart>
-                <Subtitle></Subtitle>
             </div>
         </div>
     </div>  
@@ -72,6 +70,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
         & .grapich {
             width: 100%;
             display: flex;
+            justify-content: center;
             flex-direction: column;
             padding: 1rem;
             border-radius: 0 0 1rem 1rem;

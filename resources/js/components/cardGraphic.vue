@@ -23,12 +23,12 @@ const getUserType = () => {
 onMounted(() => {
     getUserType();
 });
-    
+
 </script>
 
 <template>
     <div class="cards">
-        <div class="card-grapich">
+        <div class="card-grapich" v-if="userType === 'admin'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -38,7 +38,7 @@ onMounted(() => {
                 <Grapich></Grapich>
             </div>
         </div>
-        
+
         <div class="card-grapich" v-if="userType === 'admin'">
             <div class="card-grapich-content">
                 <div class="card-title">
@@ -50,7 +50,18 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="card-grapich" v-else-if="userType === 'school'">
+        <div class="card-grapich" v-if="userType === 'school'">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <Grapich></Grapich>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-if="userType === 'school'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -61,7 +72,18 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="card-grapich" v-else-if="userType === 'teacher'">
+        <div class="card-grapich" v-if="userType === 'teacher'">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>{{ titleGrapichCard }}</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <Grapich></Grapich>
+            </div>
+        </div>
+
+        <div class="card-grapich" v-if="userType === 'teacher'">
             <div class="card-grapich-content">
                 <div class="card-title">
                     <h1>{{ titleGrapichCard }}</h1>
@@ -71,18 +93,7 @@ onMounted(() => {
                 <PieChart></PieChart>
             </div>
         </div>
-
-        <div class="card-grapich" v-else>
-            <div class="card-grapich-content">
-                <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
-                </div>
-            </div>
-            <div class="grapich">
-                <h1 class="user-not-Found">Tipo de usuário não encontrado</h1>
-            </div>
-        </div>
-    </div>  
+    </div>
 </template>
 
 <style scoped>
@@ -111,7 +122,7 @@ onMounted(() => {
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -121,6 +132,8 @@ onMounted(() => {
             width: 100%;
             display: flex;
             padding: 1rem;
+            justify-content: center !important;
+            align-items: center;
             border-radius: 0 0 1rem 1rem;
             background-color: white;
         }
@@ -145,7 +158,7 @@ onMounted(() => {
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -169,8 +182,7 @@ onMounted(() => {
             width: 84%;
         }
 
-       
+
     }
 }
-
 </style>

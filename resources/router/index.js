@@ -37,6 +37,12 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
+            path: '/schoolDetails/all',
+            name: 'SchoolDetailsAll',
+            component: SchoolDetails,
+            meta: { requiresAuth: true }
+        },
+        {
             path: '/schoolDetails/:city',
             name: 'SchoolDetailsByCity',
             component: Filters,
@@ -44,9 +50,16 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/schoolDetails/:city/:schoolName',
+            path: '/schoolDetails/:city/all',
+            name: 'SchoolDetailsAllByCity',
+            component: SchoolDetails,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/schoolDetails/:city/:schoolName/:schoolId', 
             name: 'SchoolDetailsByCityAndSchool',
-            component: SchoolDetails, // Corrigido para apontar para o componente SchoolDetails
+            component: SchoolDetails,
             props: true,
             meta: { requiresAuth: true }
         },
@@ -87,8 +100,7 @@ router.beforeEach((to, from, next) => {
 });
 
 function isAuthenticated() {
-    return true
+    return true;
 }
-
 
 export default router;

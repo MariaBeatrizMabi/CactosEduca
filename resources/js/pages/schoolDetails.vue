@@ -1,205 +1,292 @@
 <script setup>
-import MenuComponent from '../components/menu.vue'
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
+import MenuComponent from '../components/menu.vue';
 import TitleComponent from '/resources/js/components/title.vue';
-import UserWelcomeComponet from '/resources/js/components/userWelcome.vue';
+import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
 import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
 import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+
+const route = useRoute();
+const formDataStudentPreview = ref([]);
+const schoolsWithAverages = ref([]);
+const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
+
+const getGradeValue = (grade) => {
+  const grades = {
+    'not_reader': 1,
+    'syllable_reader': 2,
+    'word_reader': 3,
+    'sentence_reader': 4,
+    'no_fluent_text_reader': 5,
+    'fluent_text_reader': 6,
+    'pre_syllabic': 1,
+    'syllabic': 2,
+    'alphabetical_syllabic': 3,
+    'alphabetical': 4
+  };
+  return grades[grade] || 0;
+};
+
+const fetchAllSchools = async () => {
+  try {
+    const response = await axios.get('/ManagementSchool/all');
+    console.log(response);
+    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+    calculateAverages();
+  } catch (error) {
+    console.error('Error fetching all schools:', error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const fetchSchoolsByCity = async (city) => {
+  try {
+    const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
+
+    if (response.data && response.data.length > 0) {
+      const data = response.data[0]; 
+      
+      console.log('Dados filtrados:', data); 
+
+      formDataStudentPreview.value = data || [];
+      
+      console.log(formDataStudentPreview.value)
+    } else {
+      formDataStudentPreview.value = [];
+    }
+
+    calculateAverages();
+  } catch (error) {
+    console.error(`Erro ao buscar escolas na cidade ${city.schools[0].city_id}:`, error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const fetchSpecificSchoolInCity = async (city, schoolNames) => {
+  try {
+    const response = await axios.get(`/ManagementSchool/${city}/${schoolNames}`);
+    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
+    calculateAverages();
+  } catch (error) {
+    console.error(`Error fetching specific school ${schoolNames} in city ${city}:`, error);
+    formDataStudentPreview.value = [];
+  }
+};
+
+const translateGrade = (grade) => {
+    return gradeTranslations[grade] || grade;
+  };
+  
+  const translateReadingGradeBack = (average) => {
+  if (average <= 1) return 'not_reader';
+  if (average <= 2) return 'syllable_reader';
+  if (average <= 3) return 'word_reader';
+  if (average <= 4) return 'sentence_reader';
+  if (average <= 5) return 'no_fluent_text_reader';
+  return 'fluent_text_reader';
+};
+const translateWritingGradeBack = (average) => {
+  if (average <= 1) return 'not_reader';
+  if (average <= 2) return 'syllable_reader';
+  if (average <= 3) return 'word_reader';
+  if (average <= 4) return 'sentence_reader';
+  if (average <= 5) return 'no_fluent_text_reader';
+  return 'fluent_text_reader';
+};
+const gradeTranslations = {
+  'not_reader': 'Não Leitor',
+  'syllable_reader': 'Leitor Silábico',
+  'word_reader': 'Leitor de Palavras',
+  'sentence_reader': 'Leitor de Frases',
+  'no_fluent_text_reader': 'Leitor de Texto sem Fluência',
+  'fluent_text_reader': 'Leitor de Texto Fluente',
+  'pre_syllabic': 'Pré-Silábico',
+  'syllabic': 'Silábico',
+  'alphabetical_syllabic': 'Alfabetização Silábica',
+  'alphabetical': 'Alfabetização'
+};
+
+const calculateAverages = () => {
+  if (!Array.isArray(formDataStudentPreview.value)) {
+    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+    return;
+  }
+  schoolsWithAverages.value = formDataStudentPreview.value.flatMap(cityData => {
+    if (!Array.isArray(cityData.schools)) {
+      console.error('cityData.schools is not an array:', cityData.schools);
+      return [];
+    }
+    return cityData.schools.map(school => {
+      let totalReading = 0;
+      let totalWriting = 0;
+      let examCount = 0;
+
+      school.exams.forEach(exam => {
+        totalReading += getGradeValue(exam.reading);
+        totalWriting += getGradeValue(exam.writing);
+        examCount++;
+      });
+
+      const averageReading = examCount ? totalReading / examCount : null;
+      const averageWriting = examCount ? totalWriting / examCount : null;
+
+      return {
+        ...school,
+        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      };
+    });
+  });
+};
+
+watch(selectedFilter, async (newFilter) => {
+
+  if (selectedFilter.filterType === 'All Cities') {
+    console.log('all cities selected')
+    await fetchAllSchools();
+  } else if (selectedFilter.filterType === 'All Schools in City') {
+    const city = selectedFilter.city; 
+    await fetchSchoolsByCity(city);
+  } else if (selectedFilter.filterType === 'Specific School in City') {
+    console.log('Specific school in City')
+    await fetchSpecificSchoolInCity(newFilter.city, newFilter.schoolNames);
+  }
+}, { immediate: true });
+
+onMounted(() => {
+  if (selectedFilter && selectedFilter.filterType) {
+    if (selectedFilter.filterType === 'All Cities') {
+      fetchAllSchools();
+    } else if (selectedFilter.filterType === 'All Schools in City') {
+      fetchSchoolsByCity(selectedFilter.city);
+    } else if (selectedFilter.filterType === 'Specific School in City') {
+      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames);
+    }
+  } else {
+    console.warn('selectedFilter is undefined or missing filterType');
+  }
+});
 </script>
 
 <template>
-    <div class="dashboard">
-        <MenuComponent />    
-        <div class="dashboard-content">
-            <TitleComponent title="Análise Geral das escolas"/>
-            <div class="searcheble">
-                <input class="seacheble-camp" placeholder="Digite o nome do múnicipio">
-                <a class="send-searche">
-                    <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
-                    Pesquisar
-                </a>
-            </div>
-            <div class="tableContent">
-   <div class="table-container" style="overflow-x: auto;">
-    <div class="titleTable">
-        <h1>Escolas cadastrados - turma 01 | Ensino fundamental</h1>
-    </div>
-    <table>
-        <tr>
-            <th>Nome</th>
-            <th>Matrícula</th>
-            <th class="registration">Data de matrícula</th>
-            <th>Última Nota - Leitura</th>
-            <th>Última Nota - Escrita</th>
-            <th class="stage">Etapa</th>
-        </tr>
-        <tr>
-            <td> ANNY BEATRYZ SANTOS </td>
-            <td> 3113 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de silabas </td>
-            <td> pré-silábico </td>
-            <td class="stage"> 1° ano </td>
-        </tr>
-        <tr>
-            <td> GABRIEL SCHNEIDER COGO </td>
-            <td> 3114 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de palavras </td>
-            <td> silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> JOÃO MIGUEL FRAGA DA SILVA </td>
-            <td> 3115 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> não leitor </td>
-            <td> Pré-silábico </td>
-            <td class="stage"> 1° ano </td>
-        </tr>
-        <tr>
-            <td> LUIZ FERNANDO NUNES DA SILVA  </td>
-            <td> 3117 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> alfabético </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> PAULO DANIEL DE SOUZA  </td>
-            <td> 3118 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> VANDENBERG ENZO DE SOUZA PEREIRA  </td>
-            <td> 3119 </td>
-            <td class="registration"> 04/01/2024 </td>
-            <td> leitor de texto com fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> GABRIEL DA ROCHA BROCOLI </td>
-            <td> 3237 </td>
-            <td class="registration"> 08/02/2024 </td>
-            <td> leitor de texto sem fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> MARIA VITORIA DE ALENCAR SILVA </td>
-            <td> 3241 </td>
-            <td class="registration"> 14/02/2024 </td>
-            <td> leitor de texto com fluência </td>
-            <td> ortográfico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-        <tr>
-            <td> MIGUEL AMADEUS DA SILVA BOEING </td>
-            <td> 3313 </td>
-            <td class="registration"> 14/03/2024 </td>
-            <td> não leitor </td>
-            <td> pré-silábico </td>
-            <td class="stage"> 1° ano  </td>
-        </tr>
-    </table>
-   </div>
-
-    </div>
-            <UserWelcomeComponet class="welcome-component"></UserWelcomeComponet>
-            <TitleComponent title="Análise geral média turmas - Leitura"/>
-            <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
-            <TitleComponent title="Análise geral média turmas - Escrita"/>
-            <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
+  <div class="dashboard">
+    <MenuComponent />
+    <div class="dashboard-content">
+      <TitleComponent title="Análise Geral das escolas" />
+      <div class="tableContent">
+        <div class="table-container" style="overflow-x: auto;">
+          <div class="titleTable">
+            <h1>Média Geral</h1>
+          </div>
+          <table>
+            <tr>
+              <th>Escolas</th>
+              <th>Média Geral de Leitura</th>
+              <th style="text-align: left;">Média Geral de Escrita</th>
+            </tr>
+            <tr v-for="school in schoolsWithAverages" :key="school.id">
+              <td>{{ school.name }}</td>
+              <td>{{ translateGrade(school.averageReading) }}</td>
+              <td>{{ translateGrade(school.averageWriting) }}</td>
+            </tr>
+          </table>
         </div>
+      </div>
+      <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
+      <TitleComponent title="Análise geral média turmas - Leitura" />
+      <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
+      <TitleComponent title="Análise geral média turmas - Escrita" />
+      <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
     </div>
+  </div>
 </template>
 
 <style scoped>
 .dashboard {
+  display: flex;
+
+  & .dashboard-content {
     display: flex;
+    align-items: center;
+    margin: 7rem 0;
+    width: 100%;
+    flex-direction: column;
 
-    & .dashboard-content{
-        display: flex;
-        align-items: center;
-        margin: 7rem 0;
-        width: 100%;
-        flex-direction: column;
-        
-    }
+  }
 
-    & .table-container {
-        padding: 2rem 0 3rem 0;
-    }
+  & .table-container {
+    padding: 2rem 0 3rem 0;
+  }
 }
 
 .searcheble {
-        display: flex;
-        align-items: center;
-        gap: 5%;
-        width: 85%;
-        margin: 2rem 0 0 0;
-        
-        & .seacheble-camp{
-            padding: 0.7rem 1rem;
-            width: 80%;
-            border: 2px solid var(--black-color);
-            border-radius: 4rem;
-            outline: 0;
-            font-size: 14px;
-        }
+  display: flex;
+  align-items: center;
+  gap: 5%;
+  width: 85%;
+  margin: 2rem 0 0 0;
 
-        & .send-searche {
-            width: 15%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            font-size: 15px;
-            border: 2px solid var(--black-color);
-            text-align: center;
-            border-radius: 4rem;
-            background-color: var(--white-color);
-            color: var(--black-color);
-            padding: 0.6rem;
-        }
-    }
+  & .seacheble-camp {
+    padding: 0.7rem 1rem;
+    width: 80%;
+    border: 2px solid var(--black-color);
+    border-radius: 4rem;
+    outline: 0;
+    font-size: 14px;
+  }
 
-@media (max-width: 1270px){
-    .cards{
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-    }
+  & .send-searche {
+    width: 15%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--black-color);
+    text-align: center;
+    border-radius: 4rem;
+    background-color: var(--white-color);
+    color: var(--black-color);
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 1270px) {
+  .cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
 }
 
 @media (max-width: 900px) {
-    .titleTable{
-        font-size: 9px;
-    }
+  .titleTable {
+    font-size: 9px;
+  }
 
-    .stage, .registration {
-        display: none;
-    }
+  .stage,
+  .registration {
+    display: none;
+  }
 }
 
 
 @media (max-width: 550px) {
-        .searcheble {
-            display: flex;
-            flex-direction: column !important;
-            margin: 2rem 0;
-        & .seacheble-camp{
-            width: 100% !important;
-        }
+  .searcheble {
+    display: flex;
+    flex-direction: column !important;
+    margin: 2rem 0;
 
-        & .send-searche {
-            width: 100%;
-        }
+    & .seacheble-camp {
+      width: 100% !important;
     }
+
+    & .send-searche {
+      width: 100%;
+    }
+  }
 }
 </style>
