@@ -42,25 +42,36 @@ function showSchools(cityName) {
     }
 }
 
-
 function navigateToSchool(cityName, schoolName) {
     if (Array.isArray(selectedSchools.value)) {
         const selectedSchool = selectedSchools.value.find(school => school.name === schoolName);
-        if (selectedSchool && selectedCity.value) {
-            localStorage.setItem('selectedFilter', JSON.stringify({
-                filterType: 'Specific School',
-                cityId: selectedCity.value.id,
-                school: schoolName
-            }));
 
-            router.push({
-                name: 'SchoolDetailsByCityAndSchool',
-                params: {
-                    cityId: selectedCity.value.id, 
-                    schoolName: schoolName,
+        if (selectedSchool && selectedCity.value) {
+            console.log(selectedCity.value.schools, 'selectedCity inside if');
+
+            const cityId = selectedCity.value.schools[0]?.city_id || null;
+
+            if (cityId) {
+                localStorage.setItem('selectedFilter', JSON.stringify({
+                    filterType: 'Specific School',
+                    city: cityId,
+                    school: schoolName,
                     schoolId: selectedSchool.id
-                }
-            }).catch(error => console.error('Navigation error:', error));
+                }));
+                
+                console.log(selectedSchool.id, 'id')
+
+                router.push({
+                    name: 'SchoolDetailsByCityAndSchool',
+                    params: {
+                        city: cityId,
+                        schoolName: schoolName,
+                        schoolId: selectedSchool.id
+                    }
+                }).catch(error => console.error('Navigation error:', error));
+            } else {
+                console.error('City ID not found');
+            }
         } else {
             console.error('School not found:', schoolName);
         }
@@ -68,8 +79,6 @@ function navigateToSchool(cityName, schoolName) {
         console.error('selectedSchools is not an array:', selectedSchools.value);
     }
 }
-
-
 
 const filteredCities = computed(() => {
     return !search.value
@@ -89,14 +98,14 @@ function selectAllCities() {
     schoolSelected.value = false;
 
     localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Cities' }));
-    
+
     router.push({ name: 'SchoolDetailsAll' });
 }
 
 function selectAllSchools() {
     if (selectedCity.value) {
         localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Schools in City', city: selectedCity.value }));
-
+        console.log(selectedCity.value.schools[0].city_id)
         router.push({
             name: 'SchoolDetailsAllByCity',
             params: { city: selectedCity.value.schools[0].city_id }
