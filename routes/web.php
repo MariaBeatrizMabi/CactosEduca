@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use Illuminate\Support\Facades\Auth;
 
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('login');
@@ -31,11 +33,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/all', [SchoolDetails::class, 'indexAll'])
     ->name('SchoolDetailsAll');
 
+    Route::get('/schoolDetails/{city}/all', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCityName')
+    ->name('management_school.getSchoolsByCityName');
+
+    Route::get('/schoolDetails/{city}/{schoolName}/{schoolId}', 'App\Http\Controllers\SchoolDetails@indexSchoolDetailsByCityAndSchoolView')
+    ->name('SchoolDetailsByCityAndSchool');
+
+    Route::get('/schoolDetails/json/{city}/{schoolName}/{schoolId}', [SchoolDetails::class, 'getSchoolDetails'])
+    ->name('school_details.SchoolDetailsJson');
+
     Route::get('/ManagementSchool/{city_id}/all', [SchoolDetails::class, 'indexAllByCity'])
     ->where(['city_id' => '[0-9]+'])
     ->name('SchoolDetailsAllByCity');
     
-
     Route::get('/Poll', 'App\Http\Controllers\PollController@all')->name('poll.index');
     Route::post('/PollCreate', 'App\Http\Controllers\PollController@create')->name('poll.create');
     
@@ -45,12 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@update')->name('management_school.update');
     Route::get('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@show')->name('management_school.show');
     Route::delete('/ManagementSchool/{managementSchool}', 'App\Http\Controllers\ManagementSchoolController@delete')->name('management_school.delete');
-
-
-    Route::get('/schoolDetails/{city}/all', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCityName')->name('management_school.getSchoolsByCityName');
-    // Route::get('/ManagementSchool/city/{city_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolsByCity')->name('management_school.getSchoolsByCity');
-    Route::get('/ManagementSchool/{city_id}/{school_id}', 'App\Http\Controllers\ManagementSchoolController@getSchoolDetailsByCity')->name('management_school.getSchoolDetailsByCity');
-
+    
     Route::get('/Teachers', 'App\Http\Controllers\TeacherController@all')->name('teacher.all');
     Route::get('/TeachersSchool', 'App\Http\Controllers\TeacherController@index')->name('teacher.index');
     Route::post('/TeacherCreate', 'App\Http\Controllers\TeacherController@create')->name('teacher.create');
