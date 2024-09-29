@@ -16,7 +16,6 @@ const search = ref('');
 
 function logLocalStorage() {
     const filter = localStorage.getItem('selectedFilter');
-    console.log('Selected Filter from localStorage:', filter ? JSON.parse(filter) : 'No filter found');
 }
 
 
@@ -47,7 +46,6 @@ function navigateToSchool(cityName, schoolName) {
         const selectedSchool = selectedSchools.value.find(school => school.name === schoolName);
 
         if (selectedSchool && selectedCity.value) {
-            console.log(selectedCity.value.schools, 'selectedCity inside if');
 
             const cityId = selectedCity.value.schools[0]?.city_id || null;
 
@@ -59,8 +57,6 @@ function navigateToSchool(cityName, schoolName) {
                     schoolId: selectedSchool.id
                 }));
                 
-                console.log(selectedSchool.id, 'id')
-
                 router.push({
                     name: 'SchoolDetailsByCityAndSchool',
                     params: {
@@ -105,7 +101,6 @@ function selectAllCities() {
 function selectAllSchools() {
     if (selectedCity.value) {
         localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Schools in City', city: selectedCity.value }));
-        console.log(selectedCity.value.schools[0].city_id)
         router.push({
             name: 'SchoolDetailsAllByCity',
             params: { city: selectedCity.value.schools[0].city_id }

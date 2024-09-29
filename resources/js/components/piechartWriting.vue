@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const chartRef = ref(null);
 const writingStatuses = ref([]);
+const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
 
 const translationMap = {
   null: 'não informado',
@@ -16,7 +17,7 @@ const translationMap = {
 
 const fetchSchools = async () => {
   try {
-    const response = await axios.get('/ManagementSchool/all');
+    let response;
 
     const statusCount = {
       pre_syllabic: 0,
@@ -25,15 +26,50 @@ const fetchSchools = async () => {
       alphabetical: 0,
     };
 
-    response.data.forEach(city => {
-      city.schools.forEach(school => {
-        school.exams.forEach(exam => {
-          if (statusCount[exam.writing] !== undefined) {
-            statusCount[exam.writing]++;
+    if (selectedFilter && selectedFilter.filterType) {
+      if (selectedFilter.filterType === 'All Cities') {
+        response = await axios.get('/ManagementSchool/all');
+        response.data.forEach(city => {
+
+          city.schools.forEach(school => {
+            school.exams.forEach(exam => {
+              if (statusCount[exam.writing] !== undefined) {
+                statusCount[exam.writing]++;
+              }
+            });
+          });
+        });
+      } else if (selectedFilter.filterType === 'All Schools in City') {
+        response = await axios.get(`/ManagementSchool/${selectedFilter.city.schools[0].city_id}/all`);
+
+        const schools = response.data[0];
+
+        schools.forEach(school => {
+          if (school.exams) {
+            school.exams.forEach(exam => {
+              if (statusCount[exam.writing] !== undefined) {
+                statusCount[exam.writing]++;
+              }
+            });
           }
         });
-      });
-    });
+
+      } else if (selectedFilter.filterType === 'Specific School') {
+
+        response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
+
+        const school = response.data;
+
+        if (school.exams) {
+          school.exams.forEach(exam => {
+        if (statusCount[exam.writing] !== undefined) {
+              statusCount[exam.writing]++;
+            }
+          });
+        }
+
+      }
+    }
 
     writingStatuses.value = Object.entries(statusCount);
 
