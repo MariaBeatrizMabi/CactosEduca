@@ -102,7 +102,7 @@ const pollData = ref({
 async function submitPollCreated(name) {
     await axios.post(`/PollCreate`, {
         name: studentExams.value.length + 1 + '° Período de sondagem',
-        class_id: name,
+        class_id: classData.value.id,
         school_id: userID.value,
         year: classData.value.id
     });

@@ -16,16 +16,13 @@ class PollController extends Controller
 
     public function create(Request $request)
     {
-        $classId = StudentInClass::where('student_id', '=', $request->input('class_id'))->pluck('class_id')->first();
-        
         $poll = Poll::create([
             'name' => $request->input('name'),
             'school_id' => $request->input('school_id'),
-            'class_id' => $classId,
+            'class_id' => $request->input('class_id'),
             'active' => 1,
             'year' => Carbon::now()->year
         ]);
-
         return response()->json($poll, 201);
     }
 
