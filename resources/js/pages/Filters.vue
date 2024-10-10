@@ -5,6 +5,7 @@ import ButtonComponent from '../components/button.vue';
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { api } from "../services/api"
 
 const router = useRouter();
 const citiesSchools = ref([]);
@@ -14,17 +15,41 @@ const schoolSelected = ref(false);
 const selectedSchools = ref([]);
 const search = ref('');
 
-function logLocalStorage() {
-    const filter = localStorage.getItem('selectedFilter');
-}
+const typeUser = ref('');
+const idUser = ref('');
 
+const getUser = () => {
+    return axios.get('/loginUser')
+        .then(response => {
+            console.log(response.data, 'API Response');
+            typeUser.value = response.data.type || '';
+            idUser.value = response.data.id || '';
+        })
+        .catch(error => {
+            console.log("ERROR", error);
+        });
+};
 
 function showSchools(cityName) {
     search.value = '';
     selectedCity.value = citiesSchools.value.find(({ city }) => city === cityName);
     schoolSelected.value = true;
+    
+    console.log(typeUser.value, 'TIPO DE USUARIO')
 
-    if (selectedCity.value) {
+    if (typeUser.value === 'school') {
+        localStorage.setItem('selectedFilter', JSON.stringify({
+                    filterType: 'Specific School',
+                    cityId: cityId,
+                }));
+                
+            router.push({
+                name: 'SchoolDetailsAllByClass',
+                params: { class: cityName }
+            }).catch(error => console.error('Navigation error:', error));
+    }
+
+    else if (selectedCity.value && typeUser.value === 'admin') {
         selectedSchools.value = selectedCity.value.schools || [];
 
         localStorage.setItem('selectedFilter', JSON.stringify({
@@ -32,10 +57,16 @@ function showSchools(cityName) {
             cityId: selectedCity.value.id
         }));
 
-        router.push({
-            name: 'SchoolDetailsAllByCity',
-            params: { city: selectedCity.value.id }
-        }).catch(error => console.error('Navigation error:', error));
+            router.push({
+                name: 'SchoolDetailsByCityAndSchool',
+                params: {
+                    city: cityId,
+                    schoolName: schoolName,
+                    schoolId: selectedSchool.id
+                }
+            }).catch(error => console.error('Navigation error:', error));
+        
+
     } else {
         console.error('City not found:', cityName);
     }
@@ -56,7 +87,7 @@ function navigateToSchool(cityName, schoolName) {
                     school: schoolName,
                     schoolId: selectedSchool.id
                 }));
-                
+
                 router.push({
                     name: 'SchoolDetailsByCityAndSchool',
                     params: {
@@ -105,6 +136,14 @@ function selectAllSchools() {
             name: 'SchoolDetailsAllByCity',
             params: { city: selectedCity.value.schools[0].city_id }
         });
+
+        localStorage.setItem('selectedFilter', JSON.stringify({
+                    filterType: 'Specific School',
+                    city: cityId,
+                    school: schoolName,
+                    schoolId: selectedSchool.id
+                }));
+
     } else {
         console.error('Selected city is not defined');
     }
@@ -112,13 +151,29 @@ function selectAllSchools() {
 
 onMounted(async () => {
     try {
-        const { data } = await axios.get('/ManagementSchool/all');
-        citiesSchools.value = data;
-        cities.value = Array.from(new Set(data.map(item => item.city)));
+        await getUser();
+
+        if (typeUser.value === 'school') {
+            const { data } = await api.get(`/api/management-schools/${idUser.value}/classes`);
+            console.log('Raw data:', data);
+
+            const classes = Array.isArray(data) ? data : [data];
+            console.log('Classes data:', classes);
+
+            citiesSchools.value = classes;
+
+            cities.value = Array.from(new Set(classes.map(item => item.city)));
+        }
+        else if (typeUser.value === 'admin') {
+            const { data } = await axios.get('/ManagementSchool/all');
+            citiesSchools.value = data;
+            cities.value = Array.from(new Set(data.map(item => item.city)));
+        }
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 });
+
 </script>
 
 <template>
@@ -142,28 +197,41 @@ onMounted(async () => {
 
             <ButtonComponent TextValue="Selecionar Todas" @click="selectAllCities" />
 
-            <ButtonComponent v-for="(cityName, index) in filteredCities" :key="index" :TextValue="cityName"
-                @click="showSchools(cityName)" />
+            <template v-if="typeUser === 'admin'">
+                <ButtonComponent v-for="(cityName, index) in filteredCities" :key="index" :TextValue="cityName"
+                    @click="showSchools(cityName)" />
+            </template>
+
+            <template v-else-if="typeUser === 'school'">
+                <ButtonComponent v-for="(classItem, index) in citiesSchools" :key="index" :TextValue="classItem.name"
+                    @click="() => {
+                        showSchools(classItem.name);
+                    }" />
+            </template>
         </div>
 
         <div v-if="schoolSelected" class="register-content">
-            <h1>Você gostaria de visualizar os dados de leitura e escrita de qual escola?</h1>
-            <div class="searcheble">
-                <input class="seacheble-camp" placeholder="Digite o nome do município" :value="search"
-                    @input="search = $event.target.value">
-                <a class="send-searche">
-                    <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                        <path
-                            d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                    </svg>
-                    Pesquisar
-                </a>
-            </div>
+            <template v-if="typeUser === 'admin'">
+                <h1>Você gostaria de visualizar os dados de leitura e escrita de qual escola?</h1>
+                <div class="searcheble">
+                    <input class="seacheble-camp" placeholder="Digite o nome do município" :value="search"
+                        @input="search = $event.target.value">
+                    <a class="send-searche">
+                        <svg width="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                            <path
+                                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
+                        </svg>
+                        Pesquisar
+                    </a>
+                </div>
 
-            <ButtonComponent TextValue="Selecionar Todas" @click="selectAllSchools" />
+                <ButtonComponent TextValue="Selecionar Todas" @click="selectAllSchools" />
 
-            <ButtonComponent v-for="({ name }, index) in filteredSchools" :key="index" :TextValue="name"
-                @click="() => navigateToSchool(selectedCity, name)" />
+                <ButtonComponent v-for="({ name }, index) in filteredSchools" :key="index" :TextValue="name"
+                    @click="() => navigateToSchool(selectedCity, name)" />
+            </template>
+
+
         </div>
     </div>
 </template>

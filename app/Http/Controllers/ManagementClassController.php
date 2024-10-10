@@ -19,6 +19,17 @@ class ManagementClassController extends Controller
         return ClassModel::all();
     }
 
+    public function examClass($classId)
+    {
+        $class = ClassModel::with('exams')->findOrFail($classId);
+    
+        return response()->json([
+            'class' => $class->name,
+            'exams' => $class->exams
+        ]);
+    }
+    
+
     public function index()
     {
         $user = Auth::user();

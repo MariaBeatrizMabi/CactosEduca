@@ -72,8 +72,8 @@ const router = createRouter({
         },
         {
             path: '/class/:class',
-            name: 'Class',
-            component: ClassDetails,
+            name: 'SchoolDetailsAllByClass',
+            component: SchoolDetails,
             props: true,
             meta: { requiresAuth: true }
         },

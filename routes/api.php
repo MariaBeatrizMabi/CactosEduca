@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('management-schools')->name('management-schools.')->group(function () {
         Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
         Route::get('/{managementSchool}/teachers', [ManagementSchoolController::class, 'listTeachers']);
+        Route::get('/{school}/classes', [ManagementSchoolController::class, 'listAvailableClassInSchools']);
         Route::get('/{managementSchool}/classes/{class}/students', [ManagementSchoolController::class, 'listAvailableStudentsClass']);
         Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
         Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);
@@ -70,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{classModel}/students', [ManagementClassController::class, 'listStudents']);
         Route::post('/{classModel}/students/{student}', [ManagementClassController::class, 'attachStudent']);
         Route::delete('/{classModel}/students/{student}', [ManagementClassController::class, 'detachStudent']);
+        Route::get('/{classId}/exams', [ManagementClassController::class, 'examClass']);
     });
 
     // Rotas relacionadas às cidades

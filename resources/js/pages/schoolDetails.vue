@@ -7,6 +7,7 @@ import TitleComponent from '/resources/js/components/title.vue';
 import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
 import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
 import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+import { api } from "../services/api"
 
 const route = useRoute();
 const formDataStudentPreview = ref([]);
@@ -80,6 +81,28 @@ const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
   }
 };
 
+const fetchSpecificClassInSchool = async (classId) => {
+  if (!classId) {
+    console.error('classId is undefined!');
+    return;
+  }
+
+  try {
+    console.log(classId)
+    const response = await api.get(`/api/classes/${classId}/exams`);
+    
+    if (Array.isArray(response.data)) {
+      formDataStudentPreview.value = response.data; 
+    } else {
+      formDataStudentPreview.value = [response.data];
+    }
+    calculateAveragesCityAndSchool();
+
+    console.log(response.data, 'Exams data for classId:', classId);
+  } catch (error) {
+    console.error('Error fetching exams for classId:', classId, error);
+  }
+};
 
 const translateGrade = (grade) => {
   return gradeTranslations[grade] || grade;
@@ -236,12 +259,20 @@ watch(selectedFilter, async (newFilter) => {
 
 onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
+    console.log(selectedFilter)
+    console.log(selectedFilter.schoolId, 'tipo selecionado')
     if (selectedFilter.filterType === 'All Cities') {
+      console.log("All Cities")
       fetchAllSchools();
     } else if (selectedFilter.filterType === 'All Schools in City') {
+      console.log("All Schools in City")
       fetchSchoolsByCity(selectedFilter.city);
     } else if (selectedFilter.filterType === 'Specific School in City') {
+      console.log("specifu School in city")
       fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
+    } else if (selectedFilter.filterType === 'Specific School') {
+      console.log("Specific School")
+      fetchSpecificClassInSchool(selectedFilter.schoolId);
     }
   } else {
     console.warn('selectedFilter is undefined or missing filterType');
@@ -261,12 +292,14 @@ onMounted(() => {
           </div>
           <table>
             <tr>
-              <th>Escolas</th>
+              <th v-if="selectedFilter.filterType !== 'Specific School'">Escolas</th>
+              <th v-else="selectedFilter.filterType === 'Specific School'">Classes</th>
               <th>Média Geral de Leitura</th>
               <th style="text-align: left;">Média Geral de Escrita</th>
             </tr>
             <tr v-for="school in schoolsWithAverages" :key="school.id">
-              <td>{{ school.name }}</td>
+              <td v-if="selectedFilter.filterType !== 'Specific School'">{{ school.name }}</td>
+              <td v-else="selectedFilter.filterType === 'Specific School'">{{ school.class }}</td>
               <td>{{ translateGrade(school.averageReading) }}</td>
               <td>{{ translateGrade(school.averageWriting) }}</td>
             </tr>

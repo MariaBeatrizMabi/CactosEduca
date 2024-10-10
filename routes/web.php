@@ -42,6 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/json/{city}/{schoolName}/{schoolId}', [SchoolDetails::class, 'getSchoolDetails'])
     ->name('school_details.SchoolDetailsJson');
 
+    Route::get('/ManagementSchool/{schoolName}/{class}', ['App\Http\Controllers\ManagementSchoolController@listAvailableClassInSchools'])->name('management_school.listAvailableClassInSchools');
+
     Route::get('/ManagementSchool/{city_id}/all', [SchoolDetails::class, 'indexAllByCity'])
     ->where(['city_id' => '[0-9]+'])
     ->name('SchoolDetailsAllByCity');
