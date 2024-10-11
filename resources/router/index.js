@@ -57,7 +57,7 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/schoolDetails/:city/:schoolName/:schoolId', 
+            path: '/schoolDetails/:city/:schoolName/:schoolId',
             name: 'SchoolDetailsByCityAndSchool',
             component: SchoolDetails,
             props: true,
@@ -67,6 +67,13 @@ const router = createRouter({
             path: '/student/:student',
             name: 'Student',
             component: StudentForm,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/classesFilter/:class',
+            name: 'SchoolDetailsAllByClass',
+            component: SchoolDetails,
             props: true,
             meta: { requiresAuth: true }
         },

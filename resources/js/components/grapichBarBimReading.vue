@@ -5,6 +5,8 @@ import axios from "axios";
 
 const chartRef = ref(null);
 const readingStatuses = ref([]);
+const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
+import { api } from "../services/api"
 
 const translationMap = {
   null: 'não informado',
@@ -18,7 +20,7 @@ const translationMap = {
 
 const fetchSchools = async () => {
   try {
-    const response = await axios.get('/ManagementSchool/all');
+    let response;
 
     const statusCount = {
       not_reader: 0,
@@ -29,15 +31,63 @@ const fetchSchools = async () => {
       fluent_text_reader: 0,
     };
 
-    response.data.forEach(city => {
-      city.schools.forEach(school => {
-        school.exams.forEach(exam => {
-          if (statusCount[exam.reading] !== undefined) {
-            statusCount[exam.reading]++;
+    if (selectedFilter && selectedFilter.filterType) {
+      if (selectedFilter.filterType === 'All Cities') {
+        response = await axios.get('/ManagementSchool/all');
+
+        response.data.forEach(city => {
+
+          city.schools.forEach(school => {
+            if (school.exams) {
+              school.exams.forEach(exam => {
+                if (statusCount[exam.reading] !== undefined) {
+                  statusCount[exam.reading]++;
+                }
+              });
+            }
+          });
+        });
+      }
+      else if (selectedFilter.filterType === 'All Schools in City') {
+        response = await axios.get(`/ManagementSchool/${selectedFilter.city.schools[0].city_id}/all`);
+
+        const schools = response.data[0];
+        schools.forEach(school => {
+          if (school.exams) {
+            school.exams.forEach(exam => {
+              if (statusCount[exam.reading] !== undefined) {
+                statusCount[exam.reading]++;
+              }
+            });
           }
         });
-      });
-    });
+
+      } else if (selectedFilter.filterType === 'Specific School') {
+        response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
+        const school = response.data;
+
+        if (school.exams) {
+          school.exams.forEach(exam => {
+            if (statusCount[exam.reading] !== undefined) {
+              statusCount[exam.reading]++;
+            }
+          });
+        }
+
+      } else if (selectedFilter.filterType === 'Specific School Class') {
+        response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
+
+        const school = response.data;
+
+        if (school.exams) {
+          school.exams.forEach(exam => {
+            if (statusCount[exam.reading] !== undefined) {
+              statusCount[exam.reading]++;
+            }
+          });
+        }
+      }
+    }
 
     readingStatuses.value = Object.entries(statusCount);
 
@@ -48,7 +98,7 @@ const fetchSchools = async () => {
     }
 
     const data = {
-      labels: readingStatuses.value.map(status => translationMap[status[0]]), 
+      labels: readingStatuses.value.map(status => translationMap[status[0]]),
       datasets: [{
         label: 'Quantidade de alunos',
         backgroundColor: ["#0D5413", "#76AA3B", "#FFCB00", "#FF5C00", "#008BD0", "#FF0000", "#9747FF"],

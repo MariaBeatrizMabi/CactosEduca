@@ -12,19 +12,25 @@ export async function importSchools(cities, locations) {
     ]);
 
     for (const row of teachers) {
-        const cityExists = Array.isArray(cities) && cities.find(({ name }) => normalize(name) === normalize(row.municipio));
-        const locationExists = Array.isArray(locations) && locations.find(({ name }) => normalize(name) === normalize(row.localidade));
-
+        console.log('Processando linha:', row);
+        
+        const cityExists = Array.isArray(cities) && cities.find(({ name }) => normalize(name.trim()) === normalize(row.municipio.trim()));
+        const locationExists = Array.isArray(locations) && locations.find(({ name }) => normalize(name.trim()) === normalize(row.localidade.trim()));
+        
+        console.log('Cidade existe:', cityExists);
+        console.log('Localidade existe:', locationExists);
+    
         if (!cityExists) {
             const { data } = await api.post('/api/cities', { name: row.municipio });
             cities.push(data);
         }
-
+    
         if (!locationExists) {
             const { data } = await api.post('/api/locations', { name: row.localidade });
             locations.push(data);
         }
     }
+    
     await Promise.all(
         teachers.map(async ({
             nome,

@@ -293,7 +293,6 @@ async function handleImportSchools() {
     if (!Array.isArray(locations.value)) {
         locations.value = [];
     }
-
     await importSchools(cities.value, locations.value);
     await getTableData();
 }

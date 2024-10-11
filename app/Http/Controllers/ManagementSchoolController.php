@@ -7,6 +7,7 @@ use App\Models\Location;
 use App\Models\ManagementSchool;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Models\ClassModel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,21 @@ use Illuminate\Support\Facades\Log;
 
 class ManagementSchoolController extends Controller
 {
+    public function listAvailableClassInSchools($schoolId)
+    {
+        $school = ManagementSchool::where('user_id', $schoolId)->first();
+        $userID = $school ? $school->id : null; 
+        
+        $class = ClassModel::where('school_id', $school->id)->get();
+
+        if (!$class) {
+            return response()->json(['message' => 'Escola não encontrada'], 404);
+        }
+
+        return response()->json($class);
+    }
+
+
     public function examsAll(): JsonResponse
     {
         $schools = ManagementSchool::with('exams')->get();

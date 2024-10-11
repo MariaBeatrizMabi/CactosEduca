@@ -7,6 +7,7 @@ import TitleComponent from '/resources/js/components/title.vue';
 import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
 import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
 import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+import { api } from "../services/api"
 
 const route = useRoute();
 const formDataStudentPreview = ref([]);
@@ -32,7 +33,6 @@ const getGradeValue = (grade) => {
 const fetchAllSchools = async () => {
   try {
     const response = await axios.get('/ManagementSchool/all');
-    console.log(response);
     formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
     calculateAverages();
   } catch (error) {
@@ -46,40 +46,68 @@ const fetchSchoolsByCity = async (city) => {
     const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
 
     if (response.data && response.data.length > 0) {
-      const data = response.data[0]; 
-      
-      console.log('Dados filtrados:', data); 
+      const data = response.data[0];
 
       formDataStudentPreview.value = data || [];
-      
-      console.log(formDataStudentPreview.value)
+
     } else {
       formDataStudentPreview.value = [];
     }
 
-    calculateAverages();
+    calculateAveragesAllCities();
   } catch (error) {
     console.error(`Erro ao buscar escolas na cidade ${city.schools[0].city_id}:`, error);
     formDataStudentPreview.value = [];
   }
 };
 
-const fetchSpecificSchoolInCity = async (city, schoolNames) => {
+const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
+  if (!schoolId) {
+    console.error('schoolId is undefined!');
+    return;
+  }
+
+
   try {
-    const response = await axios.get(`/ManagementSchool/${city}/${schoolNames}`);
-    formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
-    calculateAverages();
+    const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
+    if (Array.isArray(response.data)) {
+      formDataStudentPreview.value = response.data; 
+    } else {
+      formDataStudentPreview.value = [response.data];
+    }
+    calculateAveragesCityAndSchool();
   } catch (error) {
     console.error(`Error fetching specific school ${schoolNames} in city ${city}:`, error);
     formDataStudentPreview.value = [];
   }
 };
 
+const fetchSpecificClassInSchool = async (classId) => {
+  if (!classId) {
+    console.error('classId is undefined!');
+    return;
+  }
+
+  try {
+    const response = await api.get(`/api/classes/${classId.classId}/exams`);
+    
+    if (Array.isArray(response.data)) {
+      formDataStudentPreview.value = response.data; 
+    } else {
+      formDataStudentPreview.value = [response.data];
+    }
+    calculateAveragesCityAndSchool();
+
+  } catch (error) {
+    console.error('Error fetching exams for classId:', classId, error);
+  }
+};
+
 const translateGrade = (grade) => {
-    return gradeTranslations[grade] || grade;
-  };
-  
-  const translateReadingGradeBack = (average) => {
+  return gradeTranslations[grade] || grade;
+};
+
+const translateReadingGradeBack = (average) => {
   if (average <= 1) return 'not_reader';
   if (average <= 2) return 'syllable_reader';
   if (average <= 3) return 'word_reader';
@@ -87,14 +115,15 @@ const translateGrade = (grade) => {
   if (average <= 5) return 'no_fluent_text_reader';
   return 'fluent_text_reader';
 };
+
 const translateWritingGradeBack = (average) => {
-  if (average <= 1) return 'not_reader';
-  if (average <= 2) return 'syllable_reader';
-  if (average <= 3) return 'word_reader';
-  if (average <= 4) return 'sentence_reader';
-  if (average <= 5) return 'no_fluent_text_reader';
+  if (average <= 1) return 'pre_syllabic';
+  if (average <= 2) return 'syllabic';
+  if (average <= 3) return 'alphabetical_syllabic';
+  if (average <= 4) return 'alphabetical';
   return 'fluent_text_reader';
 };
+
 const gradeTranslations = {
   'not_reader': 'Não Leitor',
   'syllable_reader': 'Leitor Silábico',
@@ -104,9 +133,79 @@ const gradeTranslations = {
   'fluent_text_reader': 'Leitor de Texto Fluente',
   'pre_syllabic': 'Pré-Silábico',
   'syllabic': 'Silábico',
-  'alphabetical_syllabic': 'Alfabetização Silábica',
-  'alphabetical': 'Alfabetização'
+  'alphabetical_syllabic': 'Silabico Alfabetico',
+  'alphabetical': 'Alfabetico'
 };
+
+const calculateAveragesAllCities = () => {
+  let previewValue = formDataStudentPreview.value;
+
+  if (previewValue && previewValue._value && Array.isArray(previewValue._value)) {
+    previewValue = previewValue._value;
+  }
+
+  if (!Array.isArray(previewValue)) {
+    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+    return;
+  }
+
+  schoolsWithAverages.value = previewValue.map(school => {
+    let totalReading = 0;
+    let totalWriting = 0;
+    let examCount = 0;
+
+    if (Array.isArray(school.exams)) {
+      school.exams.forEach(exam => {
+        totalReading += getGradeValue(exam.reading);
+        totalWriting += getGradeValue(exam.writing);
+        examCount++;
+      });
+    }
+
+    const averageReading = examCount ? totalReading / examCount : null;
+    const averageWriting = examCount ? totalWriting / examCount : null;
+
+    return {
+      ...school,
+      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+    };
+  });
+};
+
+const calculateAveragesCityAndSchool = () => {
+  if (!Array.isArray(formDataStudentPreview.value)) {
+    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+    return;
+  }
+
+  schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
+
+    let totalReading = 0;
+    let totalWriting = 0;
+    let examCount = 0;
+
+    if (Array.isArray(school.exams)) {
+      school.exams.forEach(exam => {
+        totalReading += getGradeValue(exam.reading);
+        totalWriting += getGradeValue(exam.writing);
+        examCount++;
+      });
+    } else {
+      console.error('school.exams is not an array:', school.exams);
+    }
+
+    const averageReading = examCount ? totalReading / examCount : null;
+    const averageWriting = examCount ? totalWriting / examCount : null;
+
+    return {
+      ...school,
+      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+    };
+  });
+};
+
 
 const calculateAverages = () => {
   if (!Array.isArray(formDataStudentPreview.value)) {
@@ -118,6 +217,7 @@ const calculateAverages = () => {
       console.error('cityData.schools is not an array:', cityData.schools);
       return [];
     }
+
     return cityData.schools.map(school => {
       let totalReading = 0;
       let totalWriting = 0;
@@ -142,16 +242,16 @@ const calculateAverages = () => {
 };
 
 watch(selectedFilter, async (newFilter) => {
+  const city = selectedFilter.city;
+  const school = selectedFilter.school;
+  const schoolId = selectedFilter.schoolId;
 
   if (selectedFilter.filterType === 'All Cities') {
-    console.log('all cities selected')
     await fetchAllSchools();
   } else if (selectedFilter.filterType === 'All Schools in City') {
-    const city = selectedFilter.city; 
     await fetchSchoolsByCity(city);
-  } else if (selectedFilter.filterType === 'Specific School in City') {
-    console.log('Specific school in City')
-    await fetchSpecificSchoolInCity(newFilter.city, newFilter.schoolNames);
+  } else if (selectedFilter.filterType === 'Specific School') {
+    await fetchSpecificSchoolInCity(city, school, schoolId);
   }
 }, { immediate: true });
 
@@ -162,7 +262,9 @@ onMounted(() => {
     } else if (selectedFilter.filterType === 'All Schools in City') {
       fetchSchoolsByCity(selectedFilter.city);
     } else if (selectedFilter.filterType === 'Specific School in City') {
-      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames);
+      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
+    } else if (selectedFilter.filterType === 'Specific School Class') {
+      fetchSpecificClassInSchool(selectedFilter);
     }
   } else {
     console.warn('selectedFilter is undefined or missing filterType');
@@ -174,7 +276,8 @@ onMounted(() => {
   <div class="dashboard">
     <MenuComponent />
     <div class="dashboard-content">
-      <TitleComponent title="Análise Geral das escolas" />
+      <TitleComponent v-if="selectedFilter.filterType !== 'Specific School Class'" title="Análise Geral das escolas" />
+      <TitleComponent v-if="selectedFilter.filterType === 'Specific School Class'" title="Análise Geral das turmas" />
       <div class="tableContent">
         <div class="table-container" style="overflow-x: auto;">
           <div class="titleTable">
@@ -182,12 +285,14 @@ onMounted(() => {
           </div>
           <table>
             <tr>
-              <th>Escolas</th>
+              <th v-if="selectedFilter.filterType !== 'Specific School Class'">Escolas</th>
+              <th v-else="selectedFilter.filterType === 'Specific School Class'">Classes</th>
               <th>Média Geral de Leitura</th>
               <th style="text-align: left;">Média Geral de Escrita</th>
             </tr>
             <tr v-for="school in schoolsWithAverages" :key="school.id">
-              <td>{{ school.name }}</td>
+              <td v-if="selectedFilter.filterType !== 'Specific School Class'">{{ school.name }}</td>
+              <td v-else="selectedFilter.filterType === 'Specific School Class'">{{ school.class }}</td>
               <td>{{ translateGrade(school.averageReading) }}</td>
               <td>{{ translateGrade(school.averageWriting) }}</td>
             </tr>

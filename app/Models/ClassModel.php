@@ -25,6 +25,11 @@ class ClassModel extends Model
         static::addGlobalScope(new ClassScope);
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class, 'class_id', 'id');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

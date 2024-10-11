@@ -11,6 +11,7 @@ import ModalComponentDeleted from "../components/modalComponentShort.vue";
 import Breadcrumb from '../components/Breadcrumb'
 import { exportClassStudentsData, exportClassStudentsSampleData } from '../services/export';
 import { importClassStudents } from '../services/import';
+import LoadingComponent from "../components/loading.vue";
 
 const route = useRoute();
 
@@ -23,6 +24,7 @@ const school = ref({});
 const availableStudents = ref([]);
 const availableTeachers = ref([]);
 const students = ref([]);
+const isLoading = ref(false);
 
 const selectedStudentToAdd = ref('');
 
@@ -104,6 +106,10 @@ async function submitAddStudent() {
     students.value = await fetchStudents();
     showAddStudentModal.value = false;
     selectedStudentToAdd.value = '';
+    isLoading.value = true;
+    setTimeout(() => {
+        isLoading.value = false;
+    }, 800);
 }
 
 function openRemoveStudentModal(id) {
@@ -120,6 +126,11 @@ async function submitRemoveStudent() {
     await api.delete(`/api/classes/${classData.value.id}/students/${studentIdToRemove.value}`);
     students.value = await fetchStudents();
     closeRemoveStudentModal();
+    isLoading.value = true;
+    setTimeout(() => {
+        isLoading.value = false;
+        window.location.reload();
+    }, 800);
 }
 
 async function updateClassData() {
@@ -147,6 +158,7 @@ async function handleImportData() {
 </script>
 
 <template>
+<LoadingComponent :isLoading="isLoading" />
 <div class="content-wrapper">
     <MenuComponent />
     <UserWelcomeComponent />
@@ -243,7 +255,7 @@ async function handleImportData() {
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>Turmas</Breadcrumb.Item>
                 <Breadcrumb.Item>
-                    <a :href="`/class/${classData.id}`">{{ classData.name }}</a>
+                    <a :href="`/classesFilter/${classData.id}`">{{ classData.name }}</a>
                 </Breadcrumb.Item>
             </Breadcrumb.Content>
         </Breadcrumb.Root>
