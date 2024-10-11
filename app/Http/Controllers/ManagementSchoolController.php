@@ -19,13 +19,13 @@ class ManagementSchoolController extends Controller
     {
         $school = ManagementSchool::where('user_id', $schoolId)->first();
         $userID = $school ? $school->id : null; 
-
-        $class = ClassModel::where('school_id', $userID)->first();
         
+        $class = ClassModel::where('school_id', $school->id)->get();
+
         if (!$class) {
             return response()->json(['message' => 'Escola não encontrada'], 404);
         }
-    
+
         return response()->json($class);
     }
 

@@ -255,7 +255,7 @@ async function handleImportData() {
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>Turmas</Breadcrumb.Item>
                 <Breadcrumb.Item>
-                    <a :href="`/class/${classData.id}`">{{ classData.name }}</a>
+                    <a :href="`/classesFilter/${classData.id}`">{{ classData.name }}</a>
                 </Breadcrumb.Item>
             </Breadcrumb.Content>
         </Breadcrumb.Root>

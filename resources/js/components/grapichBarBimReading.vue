@@ -6,6 +6,7 @@ import axios from "axios";
 const chartRef = ref(null);
 const readingStatuses = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
+import { api } from "../services/api"
 
 const translationMap = {
   null: 'não informado',
@@ -63,7 +64,6 @@ const fetchSchools = async () => {
 
       } else if (selectedFilter.filterType === 'Specific School') {
         response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
-
         const school = response.data;
 
         if (school.exams) {
@@ -74,6 +74,18 @@ const fetchSchools = async () => {
           });
         }
 
+      } else if (selectedFilter.filterType === 'Specific School Class') {
+        response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
+
+        const school = response.data;
+
+        if (school.exams) {
+          school.exams.forEach(exam => {
+            if (statusCount[exam.reading] !== undefined) {
+              statusCount[exam.reading]++;
+            }
+          });
+        }
       }
     }
 

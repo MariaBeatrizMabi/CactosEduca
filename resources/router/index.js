@@ -71,9 +71,16 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/class/:class',
+            path: '/classesFilter/:class',
             name: 'SchoolDetailsAllByClass',
             component: SchoolDetails,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/class/:class',
+            name: 'Class',
+            component: ClassDetails,
             props: true,
             meta: { requiresAuth: true }
         },

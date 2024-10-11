@@ -94,4 +94,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/{student}', StudentController::class)->name('student');
     Route::get('/student/{student}/classes/{class}', StudentController::class);
     Route::get('/class/{class}', StudentController::class);
+    Route::get('/classesFilter/{class}', StudentController::class);
 });

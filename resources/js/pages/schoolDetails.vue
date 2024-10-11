@@ -67,6 +67,7 @@ const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
     return;
   }
 
+
   try {
     const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
     if (Array.isArray(response.data)) {
@@ -88,8 +89,7 @@ const fetchSpecificClassInSchool = async (classId) => {
   }
 
   try {
-    console.log(classId)
-    const response = await api.get(`/api/classes/${classId}/exams`);
+    const response = await api.get(`/api/classes/${classId.classId}/exams`);
     
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data; 
@@ -98,7 +98,6 @@ const fetchSpecificClassInSchool = async (classId) => {
     }
     calculateAveragesCityAndSchool();
 
-    console.log(response.data, 'Exams data for classId:', classId);
   } catch (error) {
     console.error('Error fetching exams for classId:', classId, error);
   }
@@ -118,11 +117,10 @@ const translateReadingGradeBack = (average) => {
 };
 
 const translateWritingGradeBack = (average) => {
-  if (average <= 1) return 'not_reader';
-  if (average <= 2) return 'syllable_reader';
-  if (average <= 3) return 'word_reader';
-  if (average <= 4) return 'sentence_reader';
-  if (average <= 5) return 'no_fluent_text_reader';
+  if (average <= 1) return 'pre_syllabic';
+  if (average <= 2) return 'syllabic';
+  if (average <= 3) return 'alphabetical_syllabic';
+  if (average <= 4) return 'alphabetical';
   return 'fluent_text_reader';
 };
 
@@ -135,8 +133,8 @@ const gradeTranslations = {
   'fluent_text_reader': 'Leitor de Texto Fluente',
   'pre_syllabic': 'Pré-Silábico',
   'syllabic': 'Silábico',
-  'alphabetical_syllabic': 'Alfabetização Silábica',
-  'alphabetical': 'Alfabetização'
+  'alphabetical_syllabic': 'Silabico Alfabetico',
+  'alphabetical': 'Alfabetico'
 };
 
 const calculateAveragesAllCities = () => {
@@ -259,20 +257,14 @@ watch(selectedFilter, async (newFilter) => {
 
 onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
-    console.log(selectedFilter)
-    console.log(selectedFilter.schoolId, 'tipo selecionado')
     if (selectedFilter.filterType === 'All Cities') {
-      console.log("All Cities")
       fetchAllSchools();
     } else if (selectedFilter.filterType === 'All Schools in City') {
-      console.log("All Schools in City")
       fetchSchoolsByCity(selectedFilter.city);
     } else if (selectedFilter.filterType === 'Specific School in City') {
-      console.log("specifu School in city")
       fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
-    } else if (selectedFilter.filterType === 'Specific School') {
-      console.log("Specific School")
-      fetchSpecificClassInSchool(selectedFilter.schoolId);
+    } else if (selectedFilter.filterType === 'Specific School Class') {
+      fetchSpecificClassInSchool(selectedFilter);
     }
   } else {
     console.warn('selectedFilter is undefined or missing filterType');
@@ -284,7 +276,8 @@ onMounted(() => {
   <div class="dashboard">
     <MenuComponent />
     <div class="dashboard-content">
-      <TitleComponent title="Análise Geral das escolas" />
+      <TitleComponent v-if="selectedFilter.filterType !== 'Specific School Class'" title="Análise Geral das escolas" />
+      <TitleComponent v-if="selectedFilter.filterType === 'Specific School Class'" title="Análise Geral das turmas" />
       <div class="tableContent">
         <div class="table-container" style="overflow-x: auto;">
           <div class="titleTable">
@@ -292,14 +285,14 @@ onMounted(() => {
           </div>
           <table>
             <tr>
-              <th v-if="selectedFilter.filterType !== 'Specific School'">Escolas</th>
-              <th v-else="selectedFilter.filterType === 'Specific School'">Classes</th>
+              <th v-if="selectedFilter.filterType !== 'Specific School Class'">Escolas</th>
+              <th v-else="selectedFilter.filterType === 'Specific School Class'">Classes</th>
               <th>Média Geral de Leitura</th>
               <th style="text-align: left;">Média Geral de Escrita</th>
             </tr>
             <tr v-for="school in schoolsWithAverages" :key="school.id">
-              <td v-if="selectedFilter.filterType !== 'Specific School'">{{ school.name }}</td>
-              <td v-else="selectedFilter.filterType === 'Specific School'">{{ school.class }}</td>
+              <td v-if="selectedFilter.filterType !== 'Specific School Class'">{{ school.name }}</td>
+              <td v-else="selectedFilter.filterType === 'Specific School Class'">{{ school.class }}</td>
               <td>{{ translateGrade(school.averageReading) }}</td>
               <td>{{ translateGrade(school.averageWriting) }}</td>
             </tr>
