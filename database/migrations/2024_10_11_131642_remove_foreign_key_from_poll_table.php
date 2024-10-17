@@ -9,23 +9,27 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('poll', function (Blueprint $table) {
+            // Remover a chave estrangeira
             $table->dropForeign(['school_id']);
-            
-            $table->foreign('school_id')->references('id')->on('management_schools')->onDelete('cascade');
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('poll', function (Blueprint $table) {
-            $table->dropForeign(['school_id']);
-            $table->foreign('school_id')->references('user_id')->on('management_schools')->onDelete('cascade');
+            // Restaurar a chave estrangeira (referenciando user_id, caso necessário)
+            $table->foreign('school_id')
+                  ->references('user_id')
+                  ->on('management_schools')
+                  ->onDelete('cascade');
         });
     }
 };

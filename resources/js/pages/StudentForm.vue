@@ -100,14 +100,39 @@ const pollData = ref({
 });
 
 async function submitPollCreated(name) {
-    await axios.post(`/PollCreate`, {
-        name: studentExams.value.length + 1 + '° Período de sondagem',
-        class_id: classData.value.id,
-        school_id: userID.value,
-        year: classData.value.id
-    });
+    try {
+        const response = await axios.get(`/Teachers`);
+        console.log(response, userID.value);
 
-    submitExamCreate();
+        const teacher = response.data.find(teacher => teacher.user_id === userID.value);
+
+        if (teacher) {
+            const schoolId = teacher.school_id;
+            
+            if (userType === 'teacher') {
+                await axios.post(`/PollCreate`, {
+                    name: studentExams.value.length + 1 + '° Período de sondagem',
+                    class_id: classData.value.id,
+                    school_id: schoolId,  
+                    year: classData.value.id
+                });
+            } else {
+                await axios.post(`/PollCreate`, {
+                    name: studentExams.value.length + 1 + '° Período de sondagem',
+                    class_id: classData.value.id,
+                    school_id: schoolId, 
+                    year: classData.value.id
+                });
+            }
+
+            submitExamCreate();
+
+        } else {
+            console.error("Professor não encontrado ou não possui um user_id correspondente.");
+        }
+    } catch (error) {
+        console.error("Erro ao criar a pesquisa:", error);
+    }
 }
 
 async function submitExamCreate() {
