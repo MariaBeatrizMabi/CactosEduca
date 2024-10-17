@@ -63,26 +63,26 @@ const fetchSchools = async () => {
 
         if (school.exams) {
           school.exams.forEach(exam => {
-        if (statusCount[exam.writing] !== undefined) {
+            if (statusCount[exam.writing] !== undefined) {
               statusCount[exam.writing]++;
             }
           });
         }
 
       } else if (selectedFilter.filterType === 'Specific School Class') {
-                response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
+        response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
+        const school = response.data;
 
-                const school = response.data;
-
-                if (school.exams) {
-                    school.exams.forEach(exam => {
-                        if (statusCount[exam.writing] !== undefined) {
-                            statusCount[exam.writing]++;
-                        }
-                    });
-                }
-
-            }
+        if (school.students) {
+          school.students.forEach(student => {
+            student.exams.forEach(exam => {
+              if (statusCount[exam.writing] !== undefined) {
+                statusCount[exam.writing]++;
+              }
+            });
+          });
+        }
+      }
     }
 
     writingStatuses.value = Object.entries(statusCount);
@@ -94,7 +94,7 @@ const fetchSchools = async () => {
     }
 
     const data = {
-      labels: writingStatuses.value.map(status => translationMap[status[0]]), 
+      labels: writingStatuses.value.map(status => translationMap[status[0]]),
       datasets: [{
         label: 'Quantidade de escolas',
         backgroundColor: ["#0D5413", "#76AA3B", "#FFCB00", "#FF5C00", "#008BD0", "#FF0000", "#9747FF"],

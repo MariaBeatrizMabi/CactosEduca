@@ -76,14 +76,13 @@ const fetchSchools = async () => {
         response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
         const school = response.data;
 
-        if (school.exams) {
-          school.exams.forEach(exam => {
+        school.students.forEach(student => {
+          student.exams.forEach(exam => {
             if (statusCount[exam.writing] !== undefined) {
               statusCount[exam.writing]++;
             }
           });
-        }
-
+        });
       }
     }
 

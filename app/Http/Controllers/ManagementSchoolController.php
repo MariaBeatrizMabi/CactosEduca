@@ -21,7 +21,7 @@ class ManagementSchoolController extends Controller
         $userID = $school ? $school->id : null; 
         
         $class = ClassModel::where('school_id', $school->id)->get();
-
+        
         if (!$class) {
             return response()->json(['message' => 'Escola não encontrada'], 404);
         }
@@ -41,7 +41,7 @@ class ManagementSchoolController extends Controller
             $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
                 $location = $locations->firstWhere('id', $school->location_id);
                 $averageGrades = $this->calculateAverageGrades($school->exams);
-
+                
                 $exams = $school->exams->map(function ($exam) {
                     return [
                         'id' => $exam->id,
