@@ -2,6 +2,7 @@
 import MenuComponent from '../components/menu.vue';
 import userWelcomeComponent from '../components/userWelcome.vue';
 import ButtonComponent from '../components/button.vue';
+import LoadingComponent from "../components/loading.vue";
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -17,6 +18,7 @@ const search = ref('');
 
 const typeUser = ref('');
 const idUser = ref('');
+const isLoading = ref(false);
 
 const getUser = async () => {
     try {
@@ -183,21 +185,6 @@ function selectAllCities() {
     router.push({ name: 'SchoolDetailsAll' });
 }
 
-function selectAllClass(classItem) {
-    search.value = '';
-    selectedCity.value = '';
-    schoolSelected.value = false;
-    localStorage.setItem('selectedFilter', JSON.stringify({
-        filterType: 'Specific School Class',
-        classId: classItem
-    }));
-
-    router.push({
-        name: 'SchoolDetailsAllByClass',
-        params: { class: 'all' }
-    }).catch(error => console.error('Navigation error:', error));
-}
-
 function selectAllSchools() {
     if (selectedCity.value) {
         localStorage.setItem('selectedFilter', JSON.stringify({ filterType: 'All Schools in City', city: selectedCity.value }));
@@ -219,6 +206,7 @@ function selectAllSchools() {
 }
 
 onMounted(async () => {
+    isLoading.value = true;
     try {
         await getUser();
   
@@ -242,6 +230,7 @@ onMounted(async () => {
             citiesSchools.value = data;
             cities.value = Array.from(new Set(data.map(item => item.city)));
         }
+        isLoading.value = false;
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -250,6 +239,7 @@ onMounted(async () => {
 </script>
 
 <template>
+    <LoadingComponent :isLoading="isLoading" />
     <div class="school-register">
         <userWelcomeComponent />
         <MenuComponent />
@@ -275,7 +265,7 @@ onMounted(async () => {
                     @click="showSchools(cityName)" />
             </template>
 
-            <template v-else-if="typeUser === 'school'">
+            <template v-else-if="typeUser === 'school' || 'teacher'">
                 <h1>Você gostaria de visualizar os dados de leitura e escrita de qual turma?</h1>
                 <div class="searcheble">
                     <input class="seacheble-camp" placeholder="Digite o nome da turma" :value="search"

@@ -71,7 +71,7 @@ const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
   try {
     const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
     if (Array.isArray(response.data)) {
-      formDataStudentPreview.value = response.data; 
+      formDataStudentPreview.value = response.data;
     } else {
       formDataStudentPreview.value = [response.data];
     }
@@ -90,9 +90,8 @@ const fetchSpecificClassInSchool = async (classId) => {
 
   try {
     const response = await api.get(`/api/classes/${classId.classId}/exams`);
-    
     if (Array.isArray(response.data)) {
-      formDataStudentPreview.value = response.data; 
+      formDataStudentPreview.value = response.data;
     } else {
       formDataStudentPreview.value = [response.data];
     }
@@ -180,31 +179,36 @@ const calculateAveragesCityAndSchool = () => {
   }
 
   schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
+    let students = school.students.map(student => {
+      let totalReading = 0;
+      let totalWriting = 0;
+      let examCount = 0;
 
-    let totalReading = 0;
-    let totalWriting = 0;
-    let examCount = 0;
+      if (Array.isArray(student.exams)) {
+        student.exams.forEach(exam => {
+          totalReading += getGradeValue(exam.reading);
+          totalWriting += getGradeValue(exam.writing);
+          examCount++;
+        });
+      } else {
+        console.error('student.exams is not an array:', student.exams);
+      }
 
-    if (Array.isArray(school.exams)) {
-      school.exams.forEach(exam => {
-        totalReading += getGradeValue(exam.reading);
-        totalWriting += getGradeValue(exam.writing);
-        examCount++;
-      });
-    } else {
-      console.error('school.exams is not an array:', school.exams);
-    }
-
-    const averageReading = examCount ? totalReading / examCount : null;
-    const averageWriting = examCount ? totalWriting / examCount : null;
+      const averageReading = examCount ? totalReading / examCount : null;
+      const averageWriting = examCount ? totalWriting / examCount : null;
+      return {
+        student_name: student.student_name, 
+        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      };
+    });
 
     return {
-      ...school,
-      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      school: students 
     };
   });
 };
+
 
 
 const calculateAverages = () => {
@@ -283,20 +287,34 @@ onMounted(() => {
           <div class="titleTable">
             <h1>Média Geral</h1>
           </div>
+
           <table>
             <tr>
               <th v-if="selectedFilter.filterType !== 'Specific School Class'">Escolas</th>
-              <th v-else="selectedFilter.filterType === 'Specific School Class'">Classes</th>
+              <th v-else>Alunos</th>
               <th>Média Geral de Leitura</th>
               <th style="text-align: left;">Média Geral de Escrita</th>
             </tr>
-            <tr v-for="school in schoolsWithAverages" :key="school.id">
-              <td v-if="selectedFilter.filterType !== 'Specific School Class'">{{ school.name }}</td>
-              <td v-else="selectedFilter.filterType === 'Specific School Class'">{{ school.class }}</td>
-              <td>{{ translateGrade(school.averageReading) }}</td>
-              <td>{{ translateGrade(school.averageWriting) }}</td>
-            </tr>
+
+            <template v-if="selectedFilter.filterType !== 'Specific School Class'">
+              <tr v-for="school in schoolsWithAverages" :key="school.id">
+                <td>{{ school.name }}</td>
+                <td>{{ translateGrade(school.averageReading) }}</td>
+                <td>{{ translateGrade(school.averageWriting) }}</td>
+              </tr>
+            </template>
+
+            <template v-else>
+              <template v-for="school in schoolsWithAverages" :key="school.id">
+                <tr v-for="student in school.school" :key="student.student_name">
+                  <td>{{ student.student_name }}</td>
+                  <td>{{ translateGrade(student.averageReading) }}</td>
+                  <td>{{ translateGrade(student.averageWriting) }}</td>
+                </tr>
+              </template>
+            </template>
           </table>
+
         </div>
       </div>
       <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>

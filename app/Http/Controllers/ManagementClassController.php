@@ -21,13 +21,27 @@ class ManagementClassController extends Controller
 
     public function examClass($classId)
     {
-        $class = ClassModel::with('exams')->findOrFail($classId);
+        $class = ClassModel::with(['students.exams'])->findOrFail($classId);
+        
+        $studentsWithExams = $class->students->map(function ($student) {
+            return [
+                'student_name' => $student->name,
+                'exams' => $student->exams->map(function ($exam) {
+                    return [
+                        'reading' => $exam->reading,
+                        'writing' => $exam->writing,
+                        'action' => $exam->action,
+                    ];
+                })
+            ];
+        });
     
         return response()->json([
             'class' => $class->name,
-            'exams' => $class->exams
+            'students' => $studentsWithExams  
         ]);
     }
+    
     
 
     public function index()

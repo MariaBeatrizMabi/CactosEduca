@@ -190,21 +190,21 @@ onMounted(async () => {
 
             <TitleComponent title="Análise Geral"/>
             <div class="Cards-container" v-if="userType.type === 'admin'">
-                <CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" :valueCard="SchoolCount" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassAllDataCount"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" :valueCard="TeacherAllCount"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" :valueCard="StudentAllCount"></CardComponent>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="school.gif" titleCard="Escolas Cadastradas" :valueCard="SchoolCount" :ref="CardValue"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassAllDataCount"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="student.gif" titleCard="Professores Cadastradas" :valueCard="TeacherAllCount"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="teacher.gif" titleCard="Alunos Cadastradas" :valueCard="StudentAllCount"></CardComponent></a>
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'school'">
-                <CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount" :ref="CardValue"></CardComponent>
-                <CardComponent imageCard="teacher.gif" titleCard="Professores Cadastrados"  :valueCard="filteredTeachers"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Alunos Cadastradas" :valueCard="StudentCount"></CardComponent>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="groupSchool.gif" titleCard="Turmas Cadastradas" :valueCard="ClassDataCount" :ref="CardValue"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="teacher.gif" titleCard="Professores Cadastrados"  :valueCard="filteredTeachers"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="student.gif" titleCard="Alunos Cadastradas" :valueCard="StudentCount"></CardComponent></a>
             </div>
 
             <div class="Cards-container" v-else-if="userType.type === 'teacher'">
-                <CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="ClassDataCount"></CardComponent>
-                <CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="filteredcountStudentTeachers"></CardComponent>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="teacher.gif" titleCard="Minhas Turmas" :valueCard="ClassDataCount"></CardComponent></a>
+                <a href="/Management" style="cursor: pointer;"><CardComponent imageCard="student.gif" titleCard="Meus Alunos" :valueCard="filteredcountStudentTeachers"></CardComponent></a>
             </div>
 
             <div class="Cards-container" v-else>

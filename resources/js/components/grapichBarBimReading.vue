@@ -76,16 +76,15 @@ const fetchSchools = async () => {
 
       } else if (selectedFilter.filterType === 'Specific School Class') {
         response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
-
         const school = response.data;
 
-        if (school.exams) {
-          school.exams.forEach(exam => {
+        school.students.forEach(student => {
+          student.exams.forEach(exam => {
             if (statusCount[exam.reading] !== undefined) {
               statusCount[exam.reading]++;
             }
           });
-        }
+        });
       }
     }
 
