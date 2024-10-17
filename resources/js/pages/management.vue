@@ -567,11 +567,23 @@ function closeModalUpdated() {
 }
 
 onMounted(async () => {
-    await getUserType();
+    isLoading.value = true;
+
+    try {
+        await getUserType();
     await getSchool();
     await getTableTeacherData();
     await getTableClassData();
     await getTableStudentData();
+    isLoading.value = false;
+
+    } catch (error) {
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 800);
+        console.error(error);
+    }
+    
 });
 
 async function handleImportTeachers() {

@@ -425,7 +425,7 @@ async function handleImportExams() {
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
-            <a href="/documentos/instrucoesLeitura.docx" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
+            <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
 
             <div class="modal-content-details">
                 <SelectComponent
