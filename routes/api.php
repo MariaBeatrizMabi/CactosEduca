@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{managementSchool}', [ManagementSchoolController::class, 'show']);
         Route::get('/{managementSchool}/teachers', [ManagementSchoolController::class, 'listTeachers']);
         Route::get('/{school}/classes', [ManagementSchoolController::class, 'listAvailableClassInSchools']);
+        Route::get('/{school}/teacher', [ManagementSchoolController::class, 'listAvailableClassForTeacherInSchools']);
         Route::get('/{managementSchool}/classes/{class}/students', [ManagementSchoolController::class, 'listAvailableStudentsClass']);
         Route::put('/{managementSchool}', [ManagementSchoolController::class, 'update']);
         Route::delete('/{managementSchool}', [ManagementSchoolController::class, 'delete']);

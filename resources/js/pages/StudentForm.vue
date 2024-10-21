@@ -464,7 +464,7 @@ async function handleImportExams() {
                     @input="createExamData.reading = $event.target.value"
                 >
                     <option value="not_reader">Não leitor</option>
-                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="syllable_reader">Leitor de sílabas</option>
                     <option value="word_reader">Leitor de palavras</option>
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
@@ -545,7 +545,7 @@ async function handleImportExams() {
                     RightAction="display: none;"
                 >
                     <option value="not_reader">Não leitor</option>
-                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="syllable_reader">Leitor de sílabas</option>
                     <option value="word_reader">Leitor de palavras</option>
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
@@ -613,7 +613,7 @@ async function handleImportExams() {
                     @input="updateExamData.reading = $event.target.value"
                 >
                     <option value="not_reader">Não leitor</option>
-                    <option value="syllable_reader">Leitor de silabas</option>
+                    <option value="syllable_reader">Leitor de sílabas</option>
                     <option value="word_reader">Leitor de palavras</option>
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>

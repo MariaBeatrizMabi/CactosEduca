@@ -52,37 +52,54 @@ function showSchools(cityName) {
             name: 'SchoolDetailsAllByClass',
             params: { class: cityName.id }
         }).catch(error => console.error('Navigation error:', error));
+    } else if (typeUser.value === 'teacher') {
+        localStorage.setItem('selectedFilter', JSON.stringify({
+            filterType: 'Specific School Class',
+            classId: cityName.id,
+        }));
+
+        router.push({
+            name: 'SchoolDetailsAllByClass',
+            params: { class: cityName.id }
+        }).catch(error => console.error('Navigation error:', error));
     }
 
     else if (selectedCity.value && typeUser.value === 'admin') {
         selectedSchools.value = selectedCity.value.schools || [];
 
-        localStorage.setItem('selectedFilter', JSON.stringify({
-            filterType: 'All Schools in City',
-            cityId: selectedCity.value.id
-        }));
+        console.log("Selecione uma escola da cidade:", selectedSchools.value);
 
-        router.push({
-            name: 'SchoolDetailsByCityAndSchool',
-            params: {
-                city: cityId,
-                schoolName: schoolName,
-                schoolId: selectedSchool.id
-            }
-        }).catch(error => console.error('Navigation error:', error));
+        const selectedSchool = selectedSchools.value.find(school => school.id === selectedSchoolId.value);
 
+        if (selectedSchool) {
+            localStorage.setItem('selectedFilter', JSON.stringify({
+                filterType: 'All Schools in City',
+                cityId: selectedSchool.city_id,
+            }));
 
+            router.push({
+                name: 'SchoolDetailsByCityAndSchool',
+                params: {
+                    city: selectedSchool.city_id,  
+                    schoolName: selectedSchool.name, 
+                    schoolId: selectedSchool.id 
+                }
+            }).catch(error => console.error('Navigation error:', error));
+
+        } else {
+            console.error('No school selected or found.');
+        }
     } else {
         console.error('City not found:', cityName);
     }
 }
 
+
 function showClassAllSchools() {
     const userData = JSON.parse(localStorage.getItem('userData'));
     const cityId = localStorage.getItem('cityId');
     const schoolIDStorage = localStorage.getItem('schoolId');
-    
-
+    console.log(citiesSchools.value[0].id, 'sadlççaldkç')
     search.value = '';
     selectedCity.value = cityId;
     schoolSelected.value = true;
@@ -103,6 +120,18 @@ function showClassAllSchools() {
                 schoolId: userData.id  
             }
         }).catch(error => console.error('Navigation error:', error));
+    } else if (typeUser.value ===  'teacher') {
+        localStorage.setItem('selectedFilter', JSON.stringify({
+            filterType: 'Specific School Class',
+            classId: citiesSchools.value[0].id,
+
+        }));
+
+        router.push({
+            name: 'SchoolDetailsAllByClass',
+            params: { class: citiesSchools.value[0].id }
+
+        }).catch(error => console.error('Navigation error:', error));
     }
 }
 
@@ -112,6 +141,17 @@ function showClassSchools(cityName) {
     schoolSelected.value = true;
 
     if (typeUser.value === 'school') {
+        localStorage.setItem('selectedFilter', JSON.stringify({
+            filterType: 'Specific School Class',
+            classId: cityName.id,
+        }));
+
+        console.log(cityName.id);
+        router.push({
+            name: 'SchoolDetailsAllByClass',
+            params: { class: cityName.id }
+        }).catch(error => console.error('Navigation error:', error));
+    } else if (typeUser.value === 'teacher') {
         localStorage.setItem('selectedFilter', JSON.stringify({
             filterType: 'Specific School Class',
             classId: cityName.id,
@@ -135,7 +175,7 @@ function navigateToSchool(cityName, schoolName) {
         if (selectedSchool && selectedCity.value) {
 
             const cityId = selectedCity.value.schools[0]?.city_id || null;
-
+            
             if (cityId) {
                 localStorage.setItem('selectedFilter', JSON.stringify({
                     filterType: 'Specific School',
@@ -224,6 +264,21 @@ onMounted(async () => {
             const schoolIDStorage = dataCities.data[0].schools[0].id;
             localStorage.setItem('schoolId', schoolIDStorage);
             localStorage.setItem('cityId', cityId);
+        } else if (typeUser.value === 'teacher') {
+            console.log('Teacher', idUser.value)
+            const { data } = await api.get(`/api/management-schools/${idUser.value}/teacher`);
+
+            const classes = Array.isArray(data) ? data : [data];
+
+            citiesSchools.value = classes;
+
+            cities.value = Array.from(new Set(classes.map(item => item.city)));
+
+            const dataCities = await axios.get('/ManagementSchool/all');
+            const cityId = dataCities.data[0].schools[0].city_id
+            const schoolIDStorage = dataCities.data[0].schools[0].id;
+            localStorage.setItem('schoolId', schoolIDStorage);
+            localStorage.setItem('cityId', cityId);
         }
         else if (typeUser.value === 'admin') {
             const { data } = await axios.get('/ManagementSchool/all');
@@ -280,7 +335,7 @@ onMounted(async () => {
                 </div>
 
                 <ButtonComponent TextValue="Selecionar Todas" @click="showClassAllSchools" />
-
+                
                 <ButtonComponent v-for="(classItem, index) in citiesSchools" :key="index" :TextValue="classItem.name"
                     @click="() => {
                         showClassSchools(classItem);
