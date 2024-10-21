@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails', [SchoolDetails::class, 'index'])->name('index');
     Route::get('/Filters', [SchoolDetails::class, 'filteredScreen'])->name('filteredScreen');
 
-    Route::get('/schoolDetails/{cityId}/{schoolNames}', [SchoolDetails::class, 'indexMultipleSchools'])
+    Route::get('/schoolDetails/{cityId}/school/{schoolNames}', [SchoolDetails::class, 'indexMultipleSchools'])
     ->where(['cityId' => '[0-9]+', 'schoolNames' => '[\pL\s,]+'])
     ->name('SchoolDetailsByCityAndSchools');
 
@@ -42,9 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/schoolDetails/json/{city}/{schoolName}/{schoolId}', [SchoolDetails::class, 'getSchoolDetails'])
     ->name('school_details.SchoolDetailsJson');
 
-    Route::get('/ManagementSchool/{schoolName}/{class}', ['App\Http\Controllers\ManagementSchoolController@listAvailableClassInSchools'])->name('management_school.listAvailableClassInSchools');
+    Route::get('/ManagementSchool/{schoolName}/class/{class}', ['App\Http\Controllers\ManagementSchoolController@listAvailableClassInSchools'])->name('management_school.listAvailableClassInSchools');
 
-    Route::get('/ManagementSchool/{city_id}/all', [SchoolDetails::class, 'indexAllByCity'])
+    Route::get('/ManagementSchool/{city_id}/all', 'App\Http\Controllers\SchoolDetails@indexAllByCity')
     ->where(['city_id' => '[0-9]+'])
     ->name('SchoolDetailsAllByCity');
     

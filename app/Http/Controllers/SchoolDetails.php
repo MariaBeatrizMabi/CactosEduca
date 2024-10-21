@@ -174,9 +174,9 @@ class SchoolDetails extends Controller
     {
         $schoolNamesArray = $schoolNames ? explode(',', $schoolNames) : [];
         $schools = ManagementSchool::where('city_id', $cityId)
-            ->whereIn('name', $schoolNamesArray)
-            ->get();
-
+        ->whereIn('name', $schoolNamesArray)
+        ->get();
+        
         return view('schoolDetails', [
             'city' => $cityId,
             'schools' => $schools,

@@ -43,6 +43,7 @@ const fetchAllSchools = async () => {
 
 const fetchSchoolsByCity = async (city) => {
   try {
+    console.log("AQUI")
     const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
 
     if (response.data && response.data.length > 0) {
@@ -67,7 +68,6 @@ const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
     return;
   }
 
-
   try {
     const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
     if (Array.isArray(response.data)) {
@@ -82,14 +82,38 @@ const fetchSpecificSchoolInCity = async (city, schoolNames, schoolId) => {
   }
 };
 
+const fetchSpecificSchoolInCityData = async (city, schoolNames, schoolId) => {
+  if (!schoolId) {
+    console.error('schoolId is undefined!');
+    return;
+  }
+  try {
+    const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
+    if (Array.isArray(response.data)) {
+      formDataStudentPreview.value = response.data;
+    } else {
+      formDataStudentPreview.value = [response.data];
+    }
+    calculateAveragesCityAndSchoolEspecify();
+  } catch (error) {
+    console.error(`Error fetching specific school ${schoolNames} in city ${city}:`, error);
+    formDataStudentPreview.value = [];
+  }
+};
+
 const fetchSpecificClassInSchool = async (classId) => {
   if (!classId) {
     console.error('classId is undefined!');
     return;
   }
-
+  
   try {
-    const response = await api.get(`/api/classes/${classId.classId}/exams`);
+    console.log(classId, 'recebo isso');
+      const response = await api.get(`/api/classes/${classId.classId}/exams`);
+
+    
+    
+    console.log(response.data);
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data;
     } else {
@@ -179,36 +203,84 @@ const calculateAveragesCityAndSchool = () => {
   }
 
   schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
-    let students = school.students.map(student => {
-      let totalReading = 0;
-      let totalWriting = 0;
-      let examCount = 0;
+    let totalReading = 0;
+    let totalWriting = 0;
+    let examCount = 0;
 
-      if (Array.isArray(student.exams)) {
-        student.exams.forEach(exam => {
-          totalReading += getGradeValue(exam.reading);
-          totalWriting += getGradeValue(exam.writing);
-          examCount++;
-        });
-      } else {
-        console.error('student.exams is not an array:', student.exams);
-      }
-
-      const averageReading = examCount ? totalReading / examCount : null;
-      const averageWriting = examCount ? totalWriting / examCount : null;
+    if (Array.isArray(school.students)) {
+    school.students.forEach(student => {
+        if (Array.isArray(student.exams)) {
+          student.exams.forEach(exam => {
+            totalReading += getGradeValue(exam.reading);
+            totalWriting += getGradeValue(exam.writing);
+            examCount++;
+          });
+        } else {
+          console.error('student.exams is not an array:', student);
+        }
+      });
+    } else {
+      console.error('school.students is not an array:', school.students);
       return {
-        student_name: student.student_name, 
+        name: school.class,
+        averageReading: null,
+        averageWriting: null
+      };
+    }
+
+    const averageReading = examCount ? totalReading / examCount : null;
+    const averageWriting = examCount ? totalWriting / examCount : null;
+
+      return school.students.map(student => {
+      return {
+        student_name: student.student_name,
         averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
         averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
       };
     });
-
-    return {
-      school: students 
-    };
+    
+   
   });
 };
 
+const calculateAveragesCityAndSchoolEspecify = () => {
+  if (!Array.isArray(formDataStudentPreview.value)) {
+    console.error('formDataStudentPreview is not an array:', formDataStudentPreview.value);
+    return;
+  }
+
+  schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
+    let totalReading = 0;
+    let totalWriting = 0;
+    let examCount = 0;
+
+    console.log('aaaaaaaaaaaaaaa', school);
+
+    if (Array.isArray(school.exams)) {
+      school.exams.forEach(exam => {
+        totalReading += getGradeValue(exam.reading);
+        totalWriting += getGradeValue(exam.writing);
+        examCount++;
+      });
+    } else {
+      console.error('school.exams is not an array:', school);
+      return {
+        name: school.name, 
+        averageReading: null,
+        averageWriting: null
+      };
+    }
+
+    const averageReading = examCount ? totalReading / examCount : null;
+    const averageWriting = examCount ? totalWriting / examCount : null;
+
+    return {
+      name: school.name, 
+      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
+      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+    };
+  });
+};
 
 
 const calculateAverages = () => {
@@ -261,13 +333,18 @@ watch(selectedFilter, async (newFilter) => {
 
 onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
+    console.log(selectedFilter,"AQaUI");
     if (selectedFilter.filterType === 'All Cities') {
       fetchAllSchools();
     } else if (selectedFilter.filterType === 'All Schools in City') {
       fetchSchoolsByCity(selectedFilter.city);
+    } else if (selectedFilter.filterType === 'Specific School') {
+      console.log("VEIO PRA CA")
+      fetchSpecificSchoolInCityData(selectedFilter.city, selectedFilter.school, selectedFilter.schoolId);
     } else if (selectedFilter.filterType === 'Specific School in City') {
       fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
     } else if (selectedFilter.filterType === 'Specific School Class') {
+      console.log(selectedFilter, 'asdasfesdf')
       fetchSpecificClassInSchool(selectedFilter);
     }
   } else {
@@ -296,7 +373,15 @@ onMounted(() => {
               <th style="text-align: left;">Média Geral de Escrita</th>
             </tr>
 
-            <template v-if="selectedFilter.filterType !== 'Specific School Class'">
+            <template v-if="selectedFilter.filterType === 'Specific School'">
+              <tr v-for="school in schoolsWithAverages" :key="school.id">
+                <td>{{ school.name }}</td>
+                <td>{{ translateGrade(school.averageReading) }}</td>
+                <td>{{ translateGrade(school.averageWriting) }}</td>
+              </tr>
+            </template>
+
+            <template v-else-if="selectedFilter.filterType !== 'Specific School Class' && selectedFilter.filterType !== 'Specific School'">
               <tr v-for="school in schoolsWithAverages" :key="school.id">
                 <td>{{ school.name }}</td>
                 <td>{{ translateGrade(school.averageReading) }}</td>
@@ -306,7 +391,7 @@ onMounted(() => {
 
             <template v-else>
               <template v-for="school in schoolsWithAverages" :key="school.id">
-                <tr v-for="student in school.school" :key="student.student_name">
+                <tr v-for="student in school" :key="student.student_name">
                   <td>{{ student.student_name }}</td>
                   <td>{{ translateGrade(student.averageReading) }}</td>
                   <td>{{ translateGrade(student.averageWriting) }}</td>

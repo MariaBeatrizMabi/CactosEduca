@@ -29,6 +29,20 @@ class ManagementSchoolController extends Controller
         return response()->json($class);
     }
 
+    public function listAvailableClassForTeacherInSchools($id)
+    {
+        $teacherId = Teacher::where('user_id', $id)->first();
+        $userID = $teacherId ? $teacherId->id : null; 
+        $class = ClassModel::where('teacher_id', $userID)->get();
+        
+        
+        if (!$class) {
+            return response()->json(['message' => 'Escola não encontrada'], 404);
+        }
+
+        return response()->json($class);
+    }
+
 
     public function examsAll(): JsonResponse
     {
@@ -85,29 +99,29 @@ class ManagementSchoolController extends Controller
         return $grades[$grade] ?? 0;
     }
 
-    public function getSchoolsByCityName($cityName): JsonResponse
+    public function getSchoolsByCityName($cityName)
     {
-        $city = Cities::where('name', $cityName)->first();
-
+        $city = Cities::where('id', $cityName)->first();
+    
         if (!$city) {
             return response()->json(['message' => 'City not found'], 404);
         }
-
+    
         $cityId = $city->id;
-
+    
         $schools = ManagementSchool::with('exams', 'user')
             ->where('city_id', $cityId)
             ->get();
-
+    
         $locations = Location::all();
-
+    
         $groupedSchools = $schools->groupBy('city_id');
-
+    
         $response = Cities::all()->map(function ($city) use ($groupedSchools, $locations) {
             $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
                 $location = $locations->firstWhere('id', $school->location_id);
                 $averageGrades = $this->calculateAverageGrades($school->exams);
-
+    
                 $exams = $school->exams->map(function ($exam) {
                     return [
                         'id' => $exam->id,
@@ -116,7 +130,7 @@ class ManagementSchoolController extends Controller
                         'action' => $exam->action,
                     ];
                 });
-
+    
                 return [
                     'id' => $school->id,
                     'name' => $school->name,
@@ -127,7 +141,7 @@ class ManagementSchoolController extends Controller
                     'exams' => $exams,
                 ];
             });
-
+    
             return [
                 'city' => $city->name,
                 'schools' => $citySchools
@@ -136,8 +150,9 @@ class ManagementSchoolController extends Controller
             return $cityData['schools']->isNotEmpty();
         });
 
-        return response()->json($response->values());
+        return view('schoolDetails', ['responseData' => $response->values()]);
     }
+    
 
     public function getSchoolDetailsByCity($city_id, $school_id): JsonResponse
     {
