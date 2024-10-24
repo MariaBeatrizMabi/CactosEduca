@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('poll', function (Blueprint $table) {
-            $table->dropForeign(['school_id']);
-            
-            $table->foreign('school_id')->references('id')->on('management_schools')->onDelete('cascade');
+        Schema::create('poll', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 255);
+            $table->foreignId('school_id')->constrained('management_schools', 'user_id');
+            $table->foreignId('class_id')->constrained('class');
+            $table->boolean('active')->default(true);
+            $table->year('year');
+
+            $table->timestamps();
         });
     }
 
@@ -23,9 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('poll', function (Blueprint $table) {
-            $table->dropForeign(['school_id']);
-            $table->foreign('school_id')->references('user_id')->on('management_schools')->onDelete('cascade');
-        });
+        Schema::dropIfExists('poll');
     }
 };
