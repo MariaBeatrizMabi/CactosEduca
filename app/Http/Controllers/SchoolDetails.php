@@ -6,9 +6,11 @@ use App\Models\ManagementSchool;
 use Illuminate\Http\Request;
 use App\Models\Cities;
 use App\Models\Location;
+use Illuminate\Support\Facades\Log;
 
 class SchoolDetails extends Controller
 {
+    //Quando ele seleciona todas as escolas
     public function indexAll()
     {
         $schools = ManagementSchool::all();
@@ -123,8 +125,10 @@ class SchoolDetails extends Controller
         return response()->json($response->values());
     }
 
+    // Quando ele seleciona uma escola específica
     public function indexSchoolDetailsByCityAndSchoolView($city, $schoolName, $schoolId)
     {
+        Log::info('a');
         $schoolData = $this->getSchoolDetails($city, $schoolName, $schoolId);
 
         if (isset($schoolData['error'])) {
@@ -176,7 +180,7 @@ class SchoolDetails extends Controller
         $schools = ManagementSchool::where('city_id', $cityId)
         ->whereIn('name', $schoolNamesArray)
         ->get();
-        
+
         return view('schoolDetails', [
             'city' => $cityId,
             'schools' => $schools,

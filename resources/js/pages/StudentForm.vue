@@ -108,19 +108,19 @@ async function submitPollCreated(name) {
 
         if (teacher) {
             const schoolId = teacher.school_id;
-            
+
             if (userType === 'teacher') {
                 await axios.post(`/PollCreate`, {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
-                    school_id: schoolId,  
+                    school_id: schoolId,
                     year: classData.value.id
                 });
             } else {
                 await axios.post(`/PollCreate`, {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
-                    school_id: schoolId, 
+                    school_id: schoolId,
                     year: classData.value.id
                 });
             }
@@ -136,10 +136,11 @@ async function submitPollCreated(name) {
 }
 
 async function submitExamCreate() {
-    await api.post(`/api/exams`, {
+    let response = await api.post(`/api/exams`, {
         ...createExamData.value,
         student_id: route.params.student,
-        class_id: classData.value.id
+        class_id: classData.value.id,
+        poll_id: 1,
     });
 
     studentExams.value = await getStudentExams()

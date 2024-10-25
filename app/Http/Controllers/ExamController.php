@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Exam\StoreExamRequest;
 use App\Http\Requests\Exam\UpdateExamRequest;
-use App\Http\Requests\StoreExamRequest;
 use App\Models\Exam;
 use App\Services\Exam\StoreExamService;
 use App\Services\Exam\UpdateExamService;
@@ -13,10 +13,11 @@ class ExamController extends Controller
     public function store(
         StoreExamRequest $storeExamRequest,
         StoreExamService $storeExamService
-    ): void
+    )
     {
         $data = $storeExamRequest->validated();
-        $storeExamService->run($data);
+        $exam = $storeExamService->run($data);
+        return response()->json($exam);
     }
 
     public function update(

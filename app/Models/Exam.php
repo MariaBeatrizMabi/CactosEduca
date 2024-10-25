@@ -15,7 +15,8 @@ class Exam extends Model
         'writing',
         'action',
         'student_id',
-        'class_id'
+        'class_id',
+        'poll_id',
     ];
 
     public function student(): BelongsTo

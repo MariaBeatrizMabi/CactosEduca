@@ -106,13 +106,10 @@ const fetchSpecificClassInSchool = async (classId) => {
     console.error('classId is undefined!');
     return;
   }
-  
+
   try {
     console.log(classId, 'recebo isso');
       const response = await api.get(`/api/classes/${classId.classId}/exams`);
-
-    
-    
     console.log(response.data);
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data;
@@ -238,8 +235,8 @@ const calculateAveragesCityAndSchool = () => {
         averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
       };
     });
-    
-   
+
+
   });
 };
 
@@ -265,7 +262,7 @@ const calculateAveragesCityAndSchoolEspecify = () => {
     } else {
       console.error('school.exams is not an array:', school);
       return {
-        name: school.name, 
+        name: school.name,
         averageReading: null,
         averageWriting: null
       };
@@ -275,7 +272,7 @@ const calculateAveragesCityAndSchoolEspecify = () => {
     const averageWriting = examCount ? totalWriting / examCount : null;
 
     return {
-      name: school.name, 
+      name: school.name,
       averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
       averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
     };
@@ -333,19 +330,27 @@ watch(selectedFilter, async (newFilter) => {
 
 onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
-    console.log(selectedFilter,"AQaUI");
+
     if (selectedFilter.filterType === 'All Cities') {
-      fetchAllSchools();
+
+        fetchAllSchools();
+
     } else if (selectedFilter.filterType === 'All Schools in City') {
-      fetchSchoolsByCity(selectedFilter.city);
+
+        fetchSchoolsByCity(selectedFilter.city);
+
     } else if (selectedFilter.filterType === 'Specific School') {
-      console.log("VEIO PRA CA")
-      fetchSpecificSchoolInCityData(selectedFilter.city, selectedFilter.school, selectedFilter.schoolId);
+
+        fetchSpecificSchoolInCityData(selectedFilter.city, selectedFilter.school, selectedFilter.schoolId);
+
     } else if (selectedFilter.filterType === 'Specific School in City') {
-      fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
+
+        fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
+
     } else if (selectedFilter.filterType === 'Specific School Class') {
-      console.log(selectedFilter, 'asdasfesdf')
-      fetchSpecificClassInSchool(selectedFilter);
+
+        fetchSpecificClassInSchool(selectedFilter);
+
     }
   } else {
     console.warn('selectedFilter is undefined or missing filterType');
