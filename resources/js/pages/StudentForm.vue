@@ -102,22 +102,21 @@ const pollData = ref({
 async function submitPollCreated(name) {
     try {
         const response = await axios.get(`/Teachers`);
-        console.log(response, userID.value);
-
         const teacher = response.data.find(teacher => teacher.user_id === userID.value);
 
         if (teacher) {
             const schoolId = teacher.school_id;
+            let createdPoll = null;
 
             if (userType === 'teacher') {
-                await axios.post(`/PollCreate`, {
+                createdPoll = await axios.post(`/PollCreate`, {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
                     school_id: schoolId,
                     year: classData.value.id
                 });
             } else {
-                await axios.post(`/PollCreate`, {
+                createdPoll = await axios.post(`/PollCreate`, {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
                     school_id: schoolId,
@@ -125,7 +124,7 @@ async function submitPollCreated(name) {
                 });
             }
 
-            submitExamCreate();
+            submitExamCreate(createdPoll.data.id);
 
         } else {
             console.error("Professor não encontrado ou não possui um user_id correspondente.");
@@ -135,12 +134,12 @@ async function submitPollCreated(name) {
     }
 }
 
-async function submitExamCreate() {
-    let response = await api.post(`/api/exams`, {
+async function submitExamCreate(createdPollId) {
+    await api.post(`/api/exams`, {
         ...createExamData.value,
         student_id: route.params.student,
         class_id: classData.value.id,
-        poll_id: 1,
+        poll_id: createdPollId,
     });
 
     studentExams.value = await getStudentExams()
