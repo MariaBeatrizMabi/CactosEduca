@@ -97,7 +97,7 @@ const fetchSchools = async () => {
       labels: writingStatuses.value.map(status => translationMap[status[0]]),
       datasets: [{
         label: 'Quantidade de escolas',
-        backgroundColor: ["#0D5413", "#76AA3B", "#FFCB00", "#FF5C00", "#008BD0", "#FF0000", "#9747FF"],
+        backgroundColor: ["#FF0000", "#FFCB00", "#76AA3B", "#0D5413"],
         borderWidth: 0,
         data: writingStatuses.value.map(status => status[1]),
       }]
