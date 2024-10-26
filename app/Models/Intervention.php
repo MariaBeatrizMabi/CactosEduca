@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Intervention extends Model
 {
@@ -11,8 +12,8 @@ class Intervention extends Model
 
     protected $fillable = ['code', 'description', 'evaluation_type'];
 
-    public function poll()
+    public function exam()
     {
-        return $this->belongsToMany(Poll::class, 'poll_intervention');
+        return $this->belongsToMany(Exam::class, 'exams_intervention');
     }
 }

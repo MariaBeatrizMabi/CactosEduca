@@ -9,6 +9,7 @@ use App\Http\Controllers\ManagementStudentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InterventionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -91,6 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{exam}', [ExamController::class, 'update']);
         Route::delete('/{exam}', [ExamController::class, 'delete']);
     });
+
+    Route::get('/get-exam/{studentId}/{pollId}', [InterventionController::class, 'getExamId']);
+    Route::get('/interventions/{writing}/{studentId}/{pollId}', [InterventionController::class, 'getInterventions']);
+    Route::post('/student-interventions', [InterventionController::class, 'saveStudentInterventions']);
 });
 
 Route::get('/{classModel}/monitoring-form', [ManagementClassController::class, 'monitoringForm']);

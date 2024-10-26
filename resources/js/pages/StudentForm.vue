@@ -16,6 +16,7 @@ import axios from "axios";
 
 const route = useRoute();
 const schoolId = ref();
+const studentId = route.params.student;
 
 const studentData = ref({
     name: '',
@@ -216,6 +217,68 @@ async function handleImportExams() {
     await importExams(route.params.student, classData.value.id);
     studentExams.value = await getStudentExams();
 }
+
+const showInterventionModal = ref(false);
+const interventions = ref([]);
+const selectedInterventions = ref([]);
+
+const openInterventionModal = async (writing, pollId) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`/api/interventions/${writing}/${studentId}/${pollId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        interventions.value = response.data.interventions;
+        console.log(interventions.value);
+        showInterventionModal.value = true;
+    } catch (error) {
+        console.error("erro na intervenção:", error);
+    }
+};
+
+const getExamIdForStudent = async () => {
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await api.get(`/api/get-exam/${studentId}/${pollId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        console.log(response.data.exam_id);
+        return response.data.exam_id;
+    } catch (error) {
+        console.error("getExamIdForStudent:", error);
+        return null;
+    }
+};
+
+const submitIntervention = async () => {
+    try {
+        const token = localStorage.getItem('token');
+
+        const examId = await getExamIdForStudent(); 
+
+        console.log("ID do desgraçado:", examId); 
+        console.log("selected Interventions:", selectedInterventions.value);
+
+        await api.post('/api/student-interventions', {
+            selectedInterventions: selectedInterventions.value,
+            exam_id: examId,
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        console.log("Intervenções salvas!");
+    } catch (error) {
+        console.error(error);
+    } 
+};
+
 </script>
 
 <template>
@@ -382,6 +445,11 @@ async function handleImportExams() {
                                         <div class="deleted" @click="() => submitExamDelete(row.id)">
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                 <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="intervention" @click="() => openInterventionModal(row.writing, row.id)">
+                                            <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                <path d="M40 48C26.7 48 16 58.7 16 72l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24L40 48zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L192 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l288 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-288 0zM16 232l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24l0 48c0 13.3 10.7 24 24 24l48 0c13.3 0 24-10.7 24-24l0-48c0-13.3-10.7-24-24-24l-48 0z"/>
                                             </svg>
                                         </div>
                                     </div>
@@ -672,6 +740,41 @@ async function handleImportExams() {
                     />
                 </svg>
                 Adicionar sondagem
+            </a>
+        </div>
+    </Modal>
+    <Modal
+        v-if="showInterventionModal"
+        Titlevalue="Ações de Intervenção"
+    >
+        <div class="modal-body-size">
+            <h2>Detalhes das Intervenções</h2>
+            <div class="modal-content-details">
+                <div v-if="interventions.length">
+                    <h3>Intervenções Relacionadas</h3>
+                    <div v-for="intervention in interventions" :key="intervention.id">
+                        <input
+                            type="checkbox"
+                            :value="intervention.id"
+                            v-model="selectedInterventions"
+                        />
+                        <label> {{ intervention.code }} - {{ intervention.description }}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal" @click="showInterventionModal = false">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/>
+                </svg>
+                Cancelar
+            </a>
+            <a class="school-add" @click="submitIntervention">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                </svg>
+                Adicionar Intervenção
             </a>
         </div>
     </Modal>
