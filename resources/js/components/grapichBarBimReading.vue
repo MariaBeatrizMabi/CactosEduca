@@ -32,16 +32,6 @@ const fetchSchools = async () => {
             fluent_text_reader: [],
         };
 
-        const statusCount = {
-            not_reader: 0,
-            syllable_reader: 0,
-            word_reader: 0,
-            sentence_reader: 0,
-            no_fluent_text_reader: 0,
-            fluent_text_reader: 0,
-        };
-
-
         if (selectedFilter && selectedFilter.filterType) {
 
             if (selectedFilter.filterType === 'All Cities') {
@@ -198,7 +188,6 @@ const fetchSchools = async () => {
                 response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
 
                 const school = response.data;
-                console.log('aqui: d')
                 school.students.forEach(student => {
                     student.exams.forEach(exam => {
                         let existentPoll = false
@@ -244,22 +233,15 @@ const fetchSchools = async () => {
             }
         }
 
-        if (polls.length > 0) {
-            polls.map(poll => {
-
-                graphicLabels.push(poll.label)
-                totalValuesPerLabel.not_reader.push(poll.polls_values.not_reader);
-                totalValuesPerLabel.syllable_reader.push(poll.polls_values.syllable_reader);
-                totalValuesPerLabel.word_reader.push(poll.polls_values.word_reader);
-                totalValuesPerLabel.sentence_reader.push(poll.polls_values.sentence_reader);
-                totalValuesPerLabel.no_fluent_text_reader.push(poll.polls_values.no_fluent_text_reader);
-                totalValuesPerLabel.fluent_text_reader.push(poll.polls_values.fluent_text_reader);
-            });
-
-            console.log(totalValuesPerLabel)
-        } else {
-
-        }
+        polls.map(poll => {
+            graphicLabels.push(poll.label)
+            totalValuesPerLabel.not_reader.push(poll.polls_values.not_reader);
+            totalValuesPerLabel.syllable_reader.push(poll.polls_values.syllable_reader);
+            totalValuesPerLabel.word_reader.push(poll.polls_values.word_reader);
+            totalValuesPerLabel.sentence_reader.push(poll.polls_values.sentence_reader);
+            totalValuesPerLabel.no_fluent_text_reader.push(poll.polls_values.no_fluent_text_reader);
+            totalValuesPerLabel.fluent_text_reader.push(poll.polls_values.fluent_text_reader);
+        });
 
 
         const ctx = chartRef.value?.getContext('2d');

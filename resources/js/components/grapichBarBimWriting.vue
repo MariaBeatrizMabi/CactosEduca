@@ -20,12 +20,14 @@ const fetchSchools = async () => {
   try {
     let response;
 
-    const statusCount = {
-      pre_syllabic: 0,
-      syllabic: 0,
-      alphabetical_syllabic: 0,
-      alphabetical: 0,
-    };
+      const polls = [];
+      const graphicLabels = [];
+      const totalValuesPerLabel = {
+          pre_syllabic: [],
+          syllabic: [],
+          alphabetical_syllabic: [],
+          alphabetical: [],
+      };
 
     if (selectedFilter && selectedFilter.filterType) {
       if (selectedFilter.filterType === 'All Cities') {
@@ -36,9 +38,40 @@ const fetchSchools = async () => {
           city.schools.forEach(school => {
             if (school.exams) {
               school.exams.forEach(exam => {
-                if (statusCount[exam.writing] !== undefined) {
-                  statusCount[exam.writing]++;
-                }
+
+                  let existentPoll = false
+                  polls.map(poll => {
+                      if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                          existentPoll = true
+                      }
+                  })
+
+                  if (!existentPoll) {
+                      polls.push({
+                          label: `${exam.poll_number + 'º Sondagem'}`,
+                          polls_values: {
+                              pre_syllabic: 0,
+                              syllabic: 0,
+                              alphabetical_syllabic: 0,
+                              alphabetical: 0,
+                          }
+                      })
+                  }
+
+                  polls.map(poll => {
+                      if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+
+                          if (exam.writing === 'pre_syllabic') {
+                              poll.polls_values.pre_syllabic += 1;
+                          } else if (exam.writing === 'syllabic') {
+                              poll.polls_values.syllabic += 1;
+                          } else if (exam.writing === 'alphabetical_syllabic') {
+                              poll.polls_values.alphabetical_syllabic += 1;
+                          } else if (exam.writing === 'alphabetical') {
+                              poll.polls_values.alphabetical += 1;
+                          }
+                      }
+                  })
               });
             }
           });
@@ -51,14 +84,45 @@ const fetchSchools = async () => {
         schools.forEach(school => {
           if (school.exams) {
             school.exams.forEach(exam => {
-              if (statusCount[exam.writing] !== undefined) {
-                statusCount[exam.writing]++;
-              }
+                let existentPoll = false
+                polls.map(poll => {
+                    if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                        existentPoll = true
+                    }
+                })
+
+                if (!existentPoll) {
+                    polls.push({
+                        label: `${exam.poll_number + 'º Sondagem'}`,
+                        polls_values: {
+                            pre_syllabic: 0,
+                            syllabic: 0,
+                            alphabetical_syllabic: 0,
+                            alphabetical: 0,
+                        }
+                    })
+                }
+
+                polls.map(poll => {
+                    if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+
+                        if (exam.writing === 'pre_syllabic') {
+                            poll.polls_values.pre_syllabic += 1;
+                        } else if (exam.writing === 'syllabic') {
+                            poll.polls_values.syllabic += 1;
+                        } else if (exam.writing === 'alphabetical_syllabic') {
+                            poll.polls_values.alphabetical_syllabic += 1;
+                        } else if (exam.writing === 'alphabetical') {
+                            poll.polls_values.alphabetical += 1;
+                        }
+                    }
+                })
             });
           }
         });
 
-      } else if (selectedFilter.filterType === 'Specific School') {
+      }
+      else if (selectedFilter.filterType === 'Specific School') {
 
         response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
 
@@ -66,27 +130,94 @@ const fetchSchools = async () => {
 
         if (school.exams) {
           school.exams.forEach(exam => {
-            if (statusCount[exam.writing] !== undefined) {
-              statusCount[exam.writing]++;
-            }
+              let existentPoll = false
+              polls.map(poll => {
+                  if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                      existentPoll = true
+                  }
+              })
+
+              if (!existentPoll) {
+                  polls.push({
+                      label: `${exam.poll_number + 'º Sondagem'}`,
+                      polls_values: {
+                          pre_syllabic: 0,
+                          syllabic: 0,
+                          alphabetical_syllabic: 0,
+                          alphabetical: 0,
+                      }
+                  })
+              }
+
+              polls.map(poll => {
+                  if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+
+                      if (exam.writing === 'pre_syllabic') {
+                          poll.polls_values.pre_syllabic += 1;
+                      } else if (exam.writing === 'syllabic') {
+                          poll.polls_values.syllabic += 1;
+                      } else if (exam.writing === 'alphabetical_syllabic') {
+                          poll.polls_values.alphabetical_syllabic += 1;
+                      } else if (exam.writing === 'alphabetical') {
+                          poll.polls_values.alphabetical += 1;
+                      }
+                  }
+              })
           });
         }
 
-      } else if (selectedFilter.filterType === 'Specific School Class') {
+      }
+      else if (selectedFilter.filterType === 'Specific School Class') {
         response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
         const school = response.data;
 
         school.students.forEach(student => {
           student.exams.forEach(exam => {
-            if (statusCount[exam.writing] !== undefined) {
-              statusCount[exam.writing]++;
-            }
+              let existentPoll = false
+              polls.map(poll => {
+                  if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                      existentPoll = true
+                  }
+              })
+
+              if (!existentPoll) {
+                  polls.push({
+                      label: `${exam.poll_number + 'º Sondagem'}`,
+                      polls_values: {
+                          pre_syllabic: 0,
+                          syllabic: 0,
+                          alphabetical_syllabic: 0,
+                          alphabetical: 0,
+                      }
+                  })
+              }
+
+              polls.map(poll => {
+                  if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+
+                      if (exam.writing === 'pre_syllabic') {
+                          poll.polls_values.pre_syllabic += 1;
+                      } else if (exam.writing === 'syllabic') {
+                          poll.polls_values.syllabic += 1;
+                      } else if (exam.writing === 'alphabetical_syllabic') {
+                          poll.polls_values.alphabetical_syllabic += 1;
+                      } else if (exam.writing === 'alphabetical') {
+                          poll.polls_values.alphabetical += 1;
+                      }
+                  }
+              })
           });
         });
       }
     }
 
-    writingStatuses.value = Object.entries(statusCount);
+      polls.map(poll => {
+          graphicLabels.push(poll.label)
+          totalValuesPerLabel.pre_syllabic.push(poll.polls_values.pre_syllabic);
+          totalValuesPerLabel.syllabic.push(poll.polls_values.syllabic);
+          totalValuesPerLabel.alphabetical_syllabic.push(poll.polls_values.alphabetical_syllabic);
+          totalValuesPerLabel.alphabetical.push(poll.polls_values.alphabetical);
+      });
 
     const ctx = chartRef.value?.getContext('2d');
     if (!ctx) {
@@ -95,14 +226,53 @@ const fetchSchools = async () => {
     }
 
     const data = {
-      labels: writingStatuses.value.map(status => translationMap[status[0]]),
-      datasets: [{
-        label: 'Quantidade de escolas',
-        backgroundColor: ["#0D5413", "#76AA3B", "#FFCB00", "#FF5C00", "#008BD0", "#FF0000", "#9747FF"],
-        borderWidth: 0,
-        data: writingStatuses.value.map(status => status[1]),
-      }]
+      labels: graphicLabels,
+      datasets: [
+          {
+              label: 'Pré-silabico',
+              backgroundColor: ["#9747FF"],
+              borderWidth: 0,
+              data: totalValuesPerLabel.pre_syllabic
+          },
+          {
+              label: 'Silábico',
+              backgroundColor: ["#FF0000"],
+              borderWidth: 0,
+              data: totalValuesPerLabel.syllabic
+          },
+          {
+              label: 'Silábico Alfabético',
+              backgroundColor: ["#FF5C00"],
+              borderWidth: 0,
+              data: totalValuesPerLabel.alphabetical_syllabic
+          },
+          {
+              label: 'Alfabético',
+              backgroundColor: ["#FFCB00"],
+              borderWidth: 0,
+              data: totalValuesPerLabel.alphabetical
+          },
+      ]
     };
+
+      let colorsAndNames = [
+          {
+              name: 'Pré-silabico',
+              color :"#9747FF"
+          },
+          {
+              name: 'Silábico',
+              color :"#FF0000"
+          },
+          {
+              name: 'Silábico Alfabético',
+              color :"#FF5C00"
+          },
+          {
+              name: 'Alfabético',
+              color :"#FFCB00"
+          }
+      ]
 
     new Chart(ctx, {
       type: 'bar',
@@ -115,21 +285,13 @@ const fetchSchools = async () => {
             position: 'bottom',
             labels: {
               generateLabels: function (chart) {
-                return writingStatuses.value.map(status => ({
-                  text: translationMap[status[0]],
-                  fillStyle: chart.data.datasets[0].backgroundColor[writingStatuses.value.indexOf(status)],
+                return colorsAndNames.map(configData => ({
+                  text: configData.name,
+                  fillStyle: configData.color,
                 }));
               }
             }
           },
-          tooltip: {
-            callbacks: {
-              label: function (tooltipItem) {
-                const label = tooltipItem.label;
-                return `${label}: ${tooltipItem.raw}`;
-              }
-            }
-          }
         },
         scales: {
           y: {

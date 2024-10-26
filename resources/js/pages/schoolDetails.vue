@@ -43,8 +43,7 @@ const fetchAllSchools = async () => {
 
 const fetchSchoolsByCity = async (city) => {
   try {
-    console.log("AQUI")
-    const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
+      const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
 
     if (response.data && response.data.length > 0) {
       const data = response.data[0];
@@ -108,9 +107,7 @@ const fetchSpecificClassInSchool = async (classId) => {
   }
 
   try {
-    console.log(classId, 'recebo isso');
       const response = await api.get(`/api/classes/${classId.classId}/exams`);
-    console.log(response.data);
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data;
     } else {
@@ -408,9 +405,9 @@ onMounted(() => {
         </div>
       </div>
       <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
-      <TitleComponent title="Análise geral média turmas - Leitura" />
+      <TitleComponent title="Análise geral dividida por sondagem" />
       <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
-      <TitleComponent title="Análise geral média turmas - Escrita" />
+      <TitleComponent title="Análise geral média " />
       <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
     </div>
   </div>

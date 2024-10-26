@@ -1,7 +1,6 @@
 <script setup>
 import GrapichBarBimReading from '/resources/js/components/grapichBarBimReading.vue';
-import PieChart from '/resources/js/components/piechartReading.vue';
-import SubtitleGrapichReading from './subtitleGrapichReading.vue';
+import GrapichBarBimWriting from "./grapichBarBimWriting.vue";
 
 const props = defineProps({
     titleGrapichCard: {
@@ -15,7 +14,7 @@ const props = defineProps({
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
+                    <h1>Analise dividida por sondagem - Leitura</h1>
                 </div>
             </div>
             <div class="grapich">
@@ -23,16 +22,16 @@ const props = defineProps({
             </div>
         </div>
 
-<!--        <div class="card-grapich">-->
-<!--            <div class="card-grapich-content">-->
-<!--                <div class="card-title">-->
-<!--                    <h1>{{ titleGrapichCard }}</h1>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="grapich">-->
-<!--                <PieChart></PieChart>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="card-grapich">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>Analise dividida por sondagem - Escrita</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <GrapichBarBimWriting></GrapichBarBimWriting>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -45,7 +44,7 @@ const props = defineProps({
 
     & .card-grapich:first-child {
         margin: 3rem 0;
-        width: 52%;
+        width: 40%;
 
         display: flex;
         flex-direction: column;
@@ -81,7 +80,7 @@ const props = defineProps({
 
     & .card-grapich {
         margin: 3rem 0;
-        width: 30%;
+        width: 40%;
 
         display: flex;
         flex-direction: column;
@@ -115,15 +114,13 @@ const props = defineProps({
         }
     }
 
-        @media (max-width: 1300px) {
-            & .card-grapich:first-child {
-                width: 84%;
-            }
-            & .card-grapich {
+    @media (max-width: 1300px) {
+        & .card-grapich:first-child {
             width: 84%;
         }
-
-
+        & .card-grapich {
+            width: 84%;
+        }
     }
 }
 
