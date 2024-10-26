@@ -13,6 +13,7 @@ const route = useRoute();
 const formDataStudentPreview = ref([]);
 const schoolsWithAverages = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
+const studentData = ref([]);
 
 const getGradeValue = (grade) => {
   const grades = {
@@ -113,7 +114,43 @@ const fetchSpecificClassInSchool = async (classId) => {
     } else {
       formDataStudentPreview.value = [response.data];
     }
-    calculateAveragesCityAndSchool();
+      formDataStudentPreview.value.map(school => {
+
+          if (Array.isArray(school.students)) {
+              school.students.forEach(student => {
+                  if (Array.isArray(student.exams)) {
+                      student.exams.forEach(exam => {
+                          let hasStudant = false;
+                          studentData.value.forEach(studant => {
+                             if(studant.name === student.student_name){
+                                 studant.writing = exam.writing;
+                                 studant.reading = exam.reading;
+                                 hasStudant = true
+                             }
+                          });
+
+                          if (!hasStudant){
+                              studentData.value.push({
+                                  name: student.student_name,
+                                  reading: exam.reading,
+                                  writing: exam.writing
+                              });
+                          }
+                      });
+                  } else {
+                      console.error('student.exams is not an array:', student);
+                  }
+              });
+          } else {
+              console.error('school.students is not an array:', school.students);
+              return {
+                  name: school.class,
+                  averageReading: null,
+                  averageWriting: null
+              };
+          }
+      });
+
 
   } catch (error) {
     console.error('Error fetching exams for classId:', classId, error);
@@ -345,9 +382,7 @@ onMounted(() => {
         fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
 
     } else if (selectedFilter.filterType === 'Specific School Class') {
-
         fetchSpecificClassInSchool(selectedFilter);
-
     }
   } else {
     console.warn('selectedFilter is undefined or missing filterType');
@@ -392,13 +427,11 @@ onMounted(() => {
             </template>
 
             <template v-else>
-              <template v-for="school in schoolsWithAverages" :key="school.id">
-                <tr v-for="student in school" :key="student.student_name">
-                  <td>{{ student.student_name }}</td>
-                  <td>{{ translateGrade(student.averageReading) }}</td>
-                  <td>{{ translateGrade(student.averageWriting) }}</td>
+                <tr v-for="student in studentData" :key="student.name">
+                  <td>{{ student.name }}</td>
+                  <td>{{ translateGrade(student.reading) }}</td>
+                  <td>{{ translateGrade(student.writing) }}</td>
                 </tr>
-              </template>
             </template>
           </table>
 
