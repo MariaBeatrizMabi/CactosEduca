@@ -1,7 +1,6 @@
 <script setup>
-import GrapichBarBimWriting from '/resources/js/components/grapichBarBimWriting.vue';
-import PieChart from '/resources/js/components/piechartWriting.vue';
-import Subtitle from './subtitleGrapichWriting.vue';
+import PiechartReading from "./piechartReading.vue";
+import PiechartWriting from "./piechartWriting.vue";
     const props = defineProps({
         titleGrapichCard: {
             type: String
@@ -14,25 +13,25 @@ import Subtitle from './subtitleGrapichWriting.vue';
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
+                    <h1>Nivel Geral das Turmas - Leitura</h1>
                 </div>
             </div>
             <div class="grapich">
-                <GrapichBarBimWriting></GrapichBarBimWriting>
+                <PiechartReading></PiechartReading>
             </div>
         </div>
-        
+
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
+                    <h1>Nivel Geral das Turmas - Escrita</h1>
                 </div>
             </div>
             <div class="grapich">
-                <PieChart></PieChart>
+                <PiechartWriting></PiechartWriting>
             </div>
         </div>
-    </div>  
+    </div>
 </template>
 
 <style scoped>
@@ -44,7 +43,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
 
     & .card-grapich:first-child {
         margin: 3rem 0;
-        width: 52%;
+        width: 40%;
 
         display: flex;
         flex-direction: column;
@@ -61,7 +60,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -80,7 +79,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
 
     & .card-grapich {
         margin: 3rem 0;
-        width: 30%;
+        width: 40%;
 
         display: flex;
         flex-direction: column;
@@ -97,7 +96,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -122,7 +121,7 @@ import Subtitle from './subtitleGrapichWriting.vue';
             width: 84%;
         }
 
-       
+
     }
 }
 </style>

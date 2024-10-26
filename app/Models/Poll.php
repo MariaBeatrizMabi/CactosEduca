@@ -17,11 +17,16 @@ class Poll extends Model
         'school_id',
         'class_id',
         'active',
-        'year'
+        'year',
+        'poll_number'
     ];
 
     public function class(): BelongsTo
     {
         return $this->belongsTo(ClassModel::class, 'class_id');
+    }
+
+    public function exam(){
+        return $this->hasMany(Exam::class);
     }
 }

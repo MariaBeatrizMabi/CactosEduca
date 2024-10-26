@@ -80,9 +80,9 @@ function showSchools(cityName) {
             router.push({
                 name: 'SchoolDetailsByCityAndSchool',
                 params: {
-                    city: selectedSchool.city_id,  
-                    schoolName: selectedSchool.name, 
-                    schoolId: selectedSchool.id 
+                    city: selectedSchool.city_id,
+                    schoolName: selectedSchool.name,
+                    schoolId: selectedSchool.id
                 }
             }).catch(error => console.error('Navigation error:', error));
 
@@ -109,15 +109,15 @@ function showClassAllSchools() {
             filterType: 'All Cities',
             id: schoolIDStorage,
             city: cityId,
-            schoolNames: userData.name, 
+            schoolNames: userData.name,
         }));
 
         router.push({
             name: 'SchoolDetailsAll',
             params: {
                 city: cityId,
-                schoolName: userData.name, 
-                schoolId: userData.id  
+                schoolName: userData.name,
+                schoolId: userData.id
             }
         }).catch(error => console.error('Navigation error:', error));
     } else if (typeUser.value ===  'teacher') {
@@ -175,7 +175,7 @@ function navigateToSchool(cityName, schoolName) {
         if (selectedSchool && selectedCity.value) {
 
             const cityId = selectedCity.value.schools[0]?.city_id || null;
-            
+
             if (cityId) {
                 localStorage.setItem('selectedFilter', JSON.stringify({
                     filterType: 'Specific School',
@@ -249,7 +249,7 @@ onMounted(async () => {
     isLoading.value = true;
     try {
         await getUser();
-  
+
         if (typeUser.value === 'school') {
             const { data } = await api.get(`/api/management-schools/${idUser.value}/classes`);
 
@@ -301,7 +301,7 @@ onMounted(async () => {
 
         <div v-if="!schoolSelected" class="register-content">
             <template v-if="typeUser === 'admin'">
-                <h1>Você gostaria de visualizar os dados de leitura e escrita de qual escola?</h1>
+                <h1>Você gostaria de visualizar os dados de leitura e escrita de qual município?</h1>
                 <div class="searcheble">
                     <input class="seacheble-camp" placeholder="Digite o nome do município" :value="search"
                         @input="search = $event.target.value">
@@ -335,7 +335,7 @@ onMounted(async () => {
                 </div>
 
                 <ButtonComponent TextValue="Selecionar Todas" @click="showClassAllSchools" />
-                
+
                 <ButtonComponent v-for="(classItem, index) in citiesSchools" :key="index" :TextValue="classItem.name"
                     @click="() => {
                         showClassSchools(classItem);

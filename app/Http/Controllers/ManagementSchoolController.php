@@ -18,10 +18,10 @@ class ManagementSchoolController extends Controller
     public function listAvailableClassInSchools($schoolId)
     {
         $school = ManagementSchool::where('user_id', $schoolId)->first();
-        $userID = $school ? $school->id : null; 
-        
+        $userID = $school ? $school->id : null;
+
         $class = ClassModel::where('school_id', $school->id)->get();
-        
+
         if (!$class) {
             return response()->json(['message' => 'Escola não encontrada'], 404);
         }
@@ -32,10 +32,10 @@ class ManagementSchoolController extends Controller
     public function listAvailableClassForTeacherInSchools($id)
     {
         $teacherId = Teacher::where('user_id', $id)->first();
-        $userID = $teacherId ? $teacherId->id : null; 
+        $userID = $teacherId ? $teacherId->id : null;
         $class = ClassModel::where('teacher_id', $userID)->get();
-        
-        
+
+
         if (!$class) {
             return response()->json(['message' => 'Escola não encontrada'], 404);
         }
@@ -55,13 +55,14 @@ class ManagementSchoolController extends Controller
             $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
                 $location = $locations->firstWhere('id', $school->location_id);
                 $averageGrades = $this->calculateAverageGrades($school->exams);
-                
+
                 $exams = $school->exams->map(function ($exam) {
                     return [
                         'id' => $exam->id,
                         'reading' => $exam->reading,
                         'writing' => $exam->writing,
                         'action' => $exam->action,
+                        'poll_number' => $exam->poll->poll_number
                     ];
                 });
 
@@ -102,26 +103,26 @@ class ManagementSchoolController extends Controller
     public function getSchoolsByCityName($cityName)
     {
         $city = Cities::where('id', $cityName)->first();
-    
+
         if (!$city) {
             return response()->json(['message' => 'City not found'], 404);
         }
-    
+
         $cityId = $city->id;
-    
+
         $schools = ManagementSchool::with('exams', 'user')
             ->where('city_id', $cityId)
             ->get();
-    
+
         $locations = Location::all();
-    
+
         $groupedSchools = $schools->groupBy('city_id');
-    
+
         $response = Cities::all()->map(function ($city) use ($groupedSchools, $locations) {
             $citySchools = $groupedSchools->get($city->id, collect())->map(function ($school) use ($locations) {
                 $location = $locations->firstWhere('id', $school->location_id);
                 $averageGrades = $this->calculateAverageGrades($school->exams);
-    
+
                 $exams = $school->exams->map(function ($exam) {
                     return [
                         'id' => $exam->id,
@@ -130,7 +131,7 @@ class ManagementSchoolController extends Controller
                         'action' => $exam->action,
                     ];
                 });
-    
+
                 return [
                     'id' => $school->id,
                     'name' => $school->name,
@@ -141,7 +142,7 @@ class ManagementSchoolController extends Controller
                     'exams' => $exams,
                 ];
             });
-    
+
             return [
                 'city' => $city->name,
                 'schools' => $citySchools
@@ -152,21 +153,21 @@ class ManagementSchoolController extends Controller
 
         return view('schoolDetails', ['responseData' => $response->values()]);
     }
-    
+
 
     public function getSchoolDetailsByCity($city_id, $school_id): JsonResponse
     {
         $school = ManagementSchool::with(['user', 'classes.students.exams'])
             ->where('city_id', $city_id)
             ->find($school_id);
-    
+
         if (!$school) {
             return response()->json(['error' => 'Escola não encontrada.'], 404);
         }
-    
+
         $location = Location::find($school->location_id);
         $city = Cities::find($school->city_id);
-    
+
         $schoolData = [
             'id' => $school->id,
             'name' => $school->name,
@@ -195,7 +196,7 @@ class ManagementSchoolController extends Controller
                 ];
             }),
         ];
-    
+
         return response()->json($schoolData);
     }
 

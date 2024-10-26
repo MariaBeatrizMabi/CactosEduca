@@ -108,6 +108,7 @@ class SchoolDetails extends Controller
                         'reading' => $exam->reading,
                         'writing' => $exam->writing,
                         'action' => $exam->action,
+                        'poll_number' => $exam->poll->poll_number
                     ];
                 });
 
@@ -159,6 +160,7 @@ class SchoolDetails extends Controller
                 'reading' => $exam->reading,
                 'writing' => $exam->writing,
                 'action' => $exam->action,
+                'poll_number' => $exam->poll->poll_number
             ];
         });
 
