@@ -242,7 +242,6 @@ const fetchSchools = async () => {
                     });
                 });
             }
-
         }
 
         if (polls.length > 0) {
