@@ -193,15 +193,52 @@ const fetchSchools = async () => {
                     });
                 }
 
-            } else if (selectedFilter.filterType === 'Specific School Class') {
+            }
+            else if (selectedFilter.filterType === 'Specific School Class') {
                 response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
+
                 const school = response.data;
                 console.log('aqui: d')
                 school.students.forEach(student => {
                     student.exams.forEach(exam => {
-                        if (statusCount[exam.reading] !== undefined) {
-                            statusCount[exam.reading]++;
+                        let existentPoll = false
+                        polls.map(poll => {
+                            if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                                existentPoll = true
+                            }
+                        })
+
+                        if (!existentPoll) {
+                            polls.push({
+                                label: `${exam.poll_number + 'º Sondagem'}`,
+                                polls_values: {
+                                    not_reader: 0,
+                                    syllable_reader: 0,
+                                    word_reader: 0,
+                                    sentence_reader: 0,
+                                    no_fluent_text_reader: 0,
+                                    fluent_text_reader: 0,
+                                }
+                            })
                         }
+
+                        polls.map(poll => {
+                            if (poll.label === `${exam.poll_number + 'º Sondagem'}`) {
+                                if (exam.reading === 'not_reader') {
+                                    poll.polls_values.not_reader += 1;
+                                } else if (exam.reading === 'syllable_reader') {
+                                    poll.polls_values.syllable_reader += 1;
+                                } else if (exam.reading === 'word_reader') {
+                                    poll.polls_values.word_reader += 1;
+                                } else if (exam.reading === 'sentence_reader') {
+                                    poll.polls_values.sentence_reader += 1;
+                                } else if (exam.reading === 'no_fluent_text_reader') {
+                                    poll.polls_values.no_fluent_text_reader += 1;
+                                } else if (exam.reading === 'fluent_text_reader') {
+                                    poll.polls_values.fluent_text_reader += 1;
+                                }
+                            }
+                        })
                     });
                 });
             }

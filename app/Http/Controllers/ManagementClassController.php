@@ -22,7 +22,7 @@ class ManagementClassController extends Controller
     public function examClass($classId)
     {
         $class = ClassModel::with(['students.exams'])->findOrFail($classId);
-        
+
         $studentsWithExams = $class->students->map(function ($student) {
             return [
                 'student_name' => $student->name,
@@ -31,39 +31,40 @@ class ManagementClassController extends Controller
                         'reading' => $exam->reading,
                         'writing' => $exam->writing,
                         'action' => $exam->action,
+                        'poll_number' => $exam->poll->poll_number
                     ];
                 })
             ];
         });
-    
+
         return response()->json([
             'class' => $class->name,
-            'students' => $studentsWithExams  
+            'students' => $studentsWithExams
         ]);
     }
-    
-    
+
+
 
     public function index()
     {
         $user = Auth::user();
         $school = ManagementSchool::where('user_id', $user->id)->first();
         $teacher = Teacher::where('user_id', $user->id)->first();
-        
+
         if ($user && $user->id && $user->type === 'school') {
-            $schoolIds = [$school->id]; 
+            $schoolIds = [$school->id];
             $classes = ClassModel::with(['teacher', 'studentsInClass.studentsChart'])
                 ->whereIn('school_id', $schoolIds)
                 ->get();
         } else if ($user && $user->id && $user->type === 'teacher') {
-            $teacherIds = [$teacher->id]; 
+            $teacherIds = [$teacher->id];
             $classes = ClassModel::with(['teacher', 'studentsInClass.studentsChart'])
                 ->where('teacher_id', $teacherIds)
                 ->get();
         } else {
             $classes = collect();
         }
-        
+
         return response()->json($classes);
     }
 
