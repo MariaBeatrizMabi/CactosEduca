@@ -255,13 +255,13 @@ const fetchSchools = async () => {
             datasets: [
                 {
                     label: 'Não leitor',
-                    backgroundColor: ["#9747FF"],
+                    backgroundColor: ["#FF0000"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.not_reader
                 },
                 {
                     label: 'Leitor de silabas',
-                    backgroundColor: ["#FF0000"],
+                    backgroundColor: ["#FFCB00"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.syllable_reader
                 },
@@ -273,13 +273,13 @@ const fetchSchools = async () => {
                 },
                 {
                     label: 'Leitor de frases',
-                    backgroundColor: ["#FFCB00"],
+                    backgroundColor: ["#9747FF"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.sentence_reader
                 },
                 {
                     label: 'Leitor de Texto com fluencia',
-                    backgroundColor: ["#0AA7AA"],
+                    backgroundColor: ["#ADD8E6"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.fluent_text_reader
                 },
@@ -295,11 +295,11 @@ const fetchSchools = async () => {
         let colorsAndNames = [
             {
                 name: 'Não leitor',
-                color :"#9747FF"
+                color :"#FF0000"
             },
             {
                 name: 'Leitor de silabas',
-                color :"#FF0000"
+                color :"#FFCB00"
             },
             {
                 name: 'Leitor de palavras',
@@ -307,15 +307,15 @@ const fetchSchools = async () => {
             },
             {
                 name: 'Leitor de frases',
-                color :"#FFCB00"
+                color :"#9747FF"
             },
             {
                 name: 'Leitor de Texto com fluencia',
-                color :"#76AA3B"
+                color :"#ADD8E6"
             },
             {
                 name: 'Leitor de texto sem fluencia',
-                color :"#0AA7AA"
+                color :"#0D5413"
             }
         ]
 
@@ -344,6 +344,9 @@ const fetchSchools = async () => {
                         title: {
                             display: true,
                             text: 'Quantidade de alunos'
+                        },
+                        ticks: {
+                            stepSize: 1
                         }
                     },
                     x: {

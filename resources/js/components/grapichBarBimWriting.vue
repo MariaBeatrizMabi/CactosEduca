@@ -230,25 +230,25 @@ const fetchSchools = async () => {
       datasets: [
           {
               label: 'Pré-silabico',
-              backgroundColor: ["#9747FF"],
+              backgroundColor: ["#FF0000"],
               borderWidth: 0,
               data: totalValuesPerLabel.pre_syllabic
           },
           {
               label: 'Silábico',
-              backgroundColor: ["#FF0000"],
+              backgroundColor: ["#FFCB00"],
               borderWidth: 0,
               data: totalValuesPerLabel.syllabic
           },
           {
               label: 'Silábico Alfabético',
-              backgroundColor: ["#FF5C00"],
+              backgroundColor: ["#76AA3B"],
               borderWidth: 0,
               data: totalValuesPerLabel.alphabetical_syllabic
           },
           {
               label: 'Alfabético',
-              backgroundColor: ["#FFCB00"],
+              backgroundColor: ["#0D5413"],
               borderWidth: 0,
               data: totalValuesPerLabel.alphabetical
           },
@@ -258,19 +258,19 @@ const fetchSchools = async () => {
       let colorsAndNames = [
           {
               name: 'Pré-silabico',
-              color :"#9747FF"
-          },
-          {
-              name: 'Silábico',
               color :"#FF0000"
           },
           {
+              name: 'Silábico',
+              color :"#FFCB00"
+          },
+          {
               name: 'Silábico Alfabético',
-              color :"#FF5C00"
+              color :"#76AA3B"
           },
           {
               name: 'Alfabético',
-              color :"#FFCB00"
+              color :"#0D5413"
           }
       ]
 
@@ -299,7 +299,10 @@ const fetchSchools = async () => {
             title: {
               display: true,
               text: 'Quantidade de escolas'
-            }
+            },
+              ticks: {
+                  stepSize: 1
+              }
           },
           x: {
             ticks: {
