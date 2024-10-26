@@ -22,18 +22,18 @@ const props = defineProps({
                 <GrapichBarBimReading></GrapichBarBimReading>
             </div>
         </div>
-        
-        <div class="card-grapich">
-            <div class="card-grapich-content">
-                <div class="card-title">
-                    <h1>{{ titleGrapichCard }}</h1>
-                </div>
-            </div>
-            <div class="grapich">
-                <PieChart></PieChart>
-            </div>
-        </div>
-    </div>  
+
+<!--        <div class="card-grapich">-->
+<!--            <div class="card-grapich-content">-->
+<!--                <div class="card-title">-->
+<!--                    <h1>{{ titleGrapichCard }}</h1>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="grapich">-->
+<!--                <PieChart></PieChart>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
 </template>
 
 <style scoped>
@@ -62,7 +62,7 @@ const props = defineProps({
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -98,7 +98,7 @@ const props = defineProps({
                     text-align: center;
 
                     color: white;
-                    
+
                     font-weight: 400;
                     font-size: 20px;
                 }
@@ -123,7 +123,7 @@ const props = defineProps({
             width: 84%;
         }
 
-       
+
     }
 }
 
