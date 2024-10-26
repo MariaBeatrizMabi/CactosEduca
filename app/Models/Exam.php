@@ -28,4 +28,8 @@ class Exam extends Model
     {
         return $this->belongsTo(ClassModel::class, 'class_id');
     }
+
+    public function poll(){
+        return $this->belongsTo(Poll::class, 'poll_id', 'id');
+    }
 }
