@@ -93,9 +93,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{exam}', [ExamController::class, 'delete']);
     });
 
-    Route::get('/get-exam/{studentId}/{pollId}', [InterventionController::class, 'getExamId']);
+    Route::get('/interventions/exam/{studentId}/{pollId}', [InterventionController::class, 'getExamId']);
     Route::get('/interventions/{writing}/{studentId}/{pollIdD}', [InterventionController::class, 'getInterventions']);
-    Route::post('/student-interventions', [InterventionController::class, 'saveStudentInterventions']);
+    Route::post('/students/interventions', [InterventionController::class, 'saveStudentInterventions']);
 });
 
 Route::get('/{classModel}/monitoring-form', [ManagementClassController::class, 'monitoringForm']);

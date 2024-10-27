@@ -52,7 +52,7 @@ const checked = async function (event) {
     display: flex;
     align-items: center;
     padding: 10px 14px;
-    border: 1px solid var(--black-frap-color);
+    border: 1px solid var(--primary-color);
     border-radius: 15px;
     background-color: var(--grap-color);
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -100,7 +100,7 @@ const checked = async function (event) {
     margin-left: 14px;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--black-color);
+    color: var(--primary-color);
     transition: color 0.3s ease;
 }
 

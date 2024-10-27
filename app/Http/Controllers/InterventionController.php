@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Intervention\StudentInterventionRequest;
-use App\Services\InterventionService;
-use App\Services\InterventionFetchService;
+use App\Services\Intervention\InterventionService;
+use App\Services\Intervention\InterventionFetchService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log; 
 

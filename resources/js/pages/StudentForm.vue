@@ -232,18 +232,14 @@ const openInterventionModal = async (writing, pollId) => {
     pollIdD.value = pollId;
 
     try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/interventions/${writing}/${studentId}/${pollId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        const response = await api.get(`/api/interventions/${writing}/${studentId}/${pollId}`);
         
         interventions.value = response.data.interventions;
+        
         if (!selectedInterventionsPoll.value[pollId]) {
             selectedInterventionsPoll.value[pollId] = [];
         }
-        
+
         selectedInterventions.value = selectedInterventionsPoll.value[pollId];
         showInterventionModal.value = true;
     } catch (error) {
@@ -253,18 +249,14 @@ const openInterventionModal = async (writing, pollId) => {
 
 const getExamIdForStudent = async (pollIdD) => {
     try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/get-exam/${studentId}/${pollIdD}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        const response = await api.get(`/api/interventions/exam/${studentId}/${pollIdD}`);
         console.log(response.data.exam_id);
         return response.data.exam_id;
     } catch (error) {
-        console.error("getExamIdForStudent:", error);
+        console.error("Erro ao obter o ID do exame:", error);
         return null;
     }
+
 };
 
 const updateIntervention = (interventionId) => {
@@ -282,19 +274,14 @@ const updateIntervention = (interventionId) => {
 
 const submitIntervention = async () => {
     try {
-        const token = localStorage.getItem('token');
         const examId = await getExamIdForStudent(pollIdD.value);
-        
-        await axios.post('/api/student-interventions', {
+
+        await api.post('/api/students/interventions', {
             selectedInterventions: selectedInterventionsPoll.value[pollIdD.value],
             exam_id: examId,
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
         });
 
-        console.log("intervenções salvas");
+        console.log("Intervenções salvas!");
         showInterventionModal.value = false;
     } catch (error) {
         console.error(error);

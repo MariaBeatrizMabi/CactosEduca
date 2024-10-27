@@ -17,7 +17,7 @@ class StudentInterventionRequest extends FormRequest
     {
 
         return [
-            'selectedInterventions' => 'required|array',
+            'selectedInterventions' => 'array',
             'selectedInterventions.*' => 'exists:interventions,id',
             'exam_id' => 'required|exists:exams,id', 
         ];

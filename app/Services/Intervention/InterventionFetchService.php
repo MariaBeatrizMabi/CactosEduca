@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Intervention;
 
 use App\Models\Intervention;
 use App\Models\Exam;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Intervention;
 use Illuminate\Support\Facades\DB; 
 use App\Models\ExamsIntervention; 
 
