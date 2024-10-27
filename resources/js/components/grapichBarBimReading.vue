@@ -266,7 +266,7 @@ const fetchSchools = async () => {
                 },
                 {
                     label: 'Leitor de Palavras',
-                    backgroundColor: ["#FF5C00"],
+                    backgroundColor: ["#7B0000"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.word_reader
                 },
@@ -302,7 +302,7 @@ const fetchSchools = async () => {
             },
             {
                 name: 'Leitor de palavras',
-                color :"#FF5C00"
+                color :"#7B0000"
             },
             {
                 name: 'Leitor de frases',
