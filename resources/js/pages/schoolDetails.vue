@@ -204,25 +204,58 @@ const calculateAveragesAllCities = () => {
   }
 
   schoolsWithAverages.value = previewValue.map(school => {
-    let totalReading = 0;
-    let totalWriting = 0;
-    let examCount = 0;
+      let statusReadingCounter = {
+          'not_reader': 0,
+          'syllable_reader': 0,
+          'word_reader': 0,
+          'sentence_reader':0,
+          'no_fluent_text_reader': 0,
+          'fluent_text_reader': 0,
+      }
+
+      let statusWritingCounter = {
+          'pre_syllabic': 0,
+          'syllabic': 0,
+          'alphabetical_syllabic': 0,
+          'alphabetical': 0
+      }
 
     if (Array.isArray(school.exams)) {
       school.exams.forEach(exam => {
-        totalReading += getGradeValue(exam.reading);
-        totalWriting += getGradeValue(exam.writing);
-        examCount++;
+          statusReadingCounter[exam.reading] += 1;
+          statusWritingCounter[exam.writing] += 1;
       });
     }
 
-    const averageReading = examCount ? totalReading / examCount : null;
-    const averageWriting = examCount ? totalWriting / examCount : null;
+      let maxReadingStatus = {
+          name: null,
+          value: -1,
+      }
+
+      const readingStatuses = Object.entries(statusReadingCounter);
+      readingStatuses.forEach(status => {
+          if(maxReadingStatus.value < status[1]){
+              maxReadingStatus.name = status[0];
+              maxReadingStatus.value = status[1]
+          }
+      })
+
+      let maxWritingStatus = {
+          name: null,
+          value: -1,
+      }
+      const writingStatuses = Object.entries(statusWritingCounter);
+      writingStatuses.forEach(status => {
+          if(maxWritingStatus.value < status[1]) {
+              maxWritingStatus.name = status[0];
+              maxWritingStatus.value = status[1]
+          }
+      })
 
     return {
       ...school,
-      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      averageReading: maxReadingStatus.name,
+      averageWriting: maxWritingStatus.name
     };
   });
 };
@@ -234,17 +267,28 @@ const calculateAveragesCityAndSchool = () => {
   }
 
   schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
-    let totalReading = 0;
-    let totalWriting = 0;
-    let examCount = 0;
+      let statusReadingCounter = {
+          'not_reader': 0,
+          'syllable_reader': 0,
+          'word_reader': 0,
+          'sentence_reader':0,
+          'no_fluent_text_reader': 0,
+          'fluent_text_reader': 0,
+      }
+
+      let statusWritingCounter = {
+          'pre_syllabic': 0,
+          'syllabic': 0,
+          'alphabetical_syllabic': 0,
+          'alphabetical': 0
+      }
 
     if (Array.isArray(school.students)) {
     school.students.forEach(student => {
         if (Array.isArray(student.exams)) {
           student.exams.forEach(exam => {
-            totalReading += getGradeValue(exam.reading);
-            totalWriting += getGradeValue(exam.writing);
-            examCount++;
+              statusReadingCounter[exam.reading] += 1;
+              statusWritingCounter[exam.writing] += 1;
           });
         } else {
           console.error('student.exams is not an array:', student);
@@ -259,14 +303,36 @@ const calculateAveragesCityAndSchool = () => {
       };
     }
 
-    const averageReading = examCount ? totalReading / examCount : null;
-    const averageWriting = examCount ? totalWriting / examCount : null;
+      let maxReadingStatus = {
+          name: null,
+          value: -1,
+      }
+
+      const readingStatuses = Object.entries(statusReadingCounter);
+      readingStatuses.forEach(status => {
+          if(maxReadingStatus.value < status[1]){
+              maxReadingStatus.name = status[0];
+              maxReadingStatus.value = status[1]
+          }
+      })
+
+      let maxWritingStatus = {
+          name: null,
+          value: -1,
+      }
+      const writingStatuses = Object.entries(statusWritingCounter);
+      writingStatuses.forEach(status => {
+          if(maxWritingStatus.value < status[1]) {
+              maxWritingStatus.name = status[0];
+              maxWritingStatus.value = status[1]
+          }
+      })
 
       return school.students.map(student => {
       return {
         student_name: student.student_name,
-        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+        averageReading: maxReadingStatus.name,
+        averageWriting: maxWritingStatus.name
       };
     });
 
@@ -281,17 +347,26 @@ const calculateAveragesCityAndSchoolEspecify = () => {
   }
 
   schoolsWithAverages.value = formDataStudentPreview.value.map(school => {
-    let totalReading = 0;
-    let totalWriting = 0;
-    let examCount = 0;
+      let statusReadingCounter = {
+          'not_reader': 0,
+          'syllable_reader': 0,
+          'word_reader': 0,
+          'sentence_reader':0,
+          'no_fluent_text_reader': 0,
+          'fluent_text_reader': 0,
+      }
 
-    console.log('aaaaaaaaaaaaaaa', school);
+      let statusWritingCounter = {
+          'pre_syllabic': 0,
+          'syllabic': 0,
+          'alphabetical_syllabic': 0,
+          'alphabetical': 0
+      }
 
     if (Array.isArray(school.exams)) {
       school.exams.forEach(exam => {
-        totalReading += getGradeValue(exam.reading);
-        totalWriting += getGradeValue(exam.writing);
-        examCount++;
+          statusReadingCounter[exam.reading] += 1;
+          statusWritingCounter[exam.writing] += 1;
       });
     } else {
       console.error('school.exams is not an array:', school);
@@ -302,13 +377,35 @@ const calculateAveragesCityAndSchoolEspecify = () => {
       };
     }
 
-    const averageReading = examCount ? totalReading / examCount : null;
-    const averageWriting = examCount ? totalWriting / examCount : null;
+      let maxReadingStatus = {
+          name: null,
+          value: -1,
+      }
+
+      const readingStatuses = Object.entries(statusReadingCounter);
+      readingStatuses.forEach(status => {
+          if(maxReadingStatus.value < status[1]){
+              maxReadingStatus.name = status[0];
+              maxReadingStatus.value = status[1]
+          }
+      })
+
+      let maxWritingStatus = {
+          name: null,
+          value: -1,
+      }
+      const writingStatuses = Object.entries(statusWritingCounter);
+      writingStatuses.forEach(status => {
+          if(maxWritingStatus.value < status[1]) {
+              maxWritingStatus.name = status[0];
+              maxWritingStatus.value = status[1]
+          }
+      })
 
     return {
       name: school.name,
-      averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-      averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+      averageReading: maxReadingStatus.name,
+      averageWriting: maxWritingStatus.name
     };
   });
 };
@@ -326,23 +423,57 @@ const calculateAverages = () => {
     }
 
     return cityData.schools.map(school => {
-      let totalReading = 0;
-      let totalWriting = 0;
-      let examCount = 0;
+
+      let statusReadingCounter = {
+          'not_reader': 0,
+          'syllable_reader': 0,
+          'word_reader': 0,
+          'sentence_reader':0,
+          'no_fluent_text_reader': 0,
+          'fluent_text_reader': 0,
+      }
+
+      let statusWritingCounter = {
+          'pre_syllabic': 0,
+          'syllabic': 0,
+          'alphabetical_syllabic': 0,
+          'alphabetical': 0
+      }
 
       school.exams.forEach(exam => {
-        totalReading += getGradeValue(exam.reading);
-        totalWriting += getGradeValue(exam.writing);
-        examCount++;
+        statusReadingCounter[exam.reading] += 1;
+        statusWritingCounter[exam.writing] += 1;
       });
 
-      const averageReading = examCount ? totalReading / examCount : null;
-      const averageWriting = examCount ? totalWriting / examCount : null;
+      let maxReadingStatus = {
+          name: null,
+          value: -1,
+      }
+
+      const readingStatuses = Object.entries(statusReadingCounter);
+      readingStatuses.forEach(status => {
+          if(maxReadingStatus.value < status[1]){
+              maxReadingStatus.name = status[0];
+              maxReadingStatus.value = status[1]
+          }
+      })
+
+      let maxWritingStatus = {
+          name: null,
+          value: -1,
+      }
+      const writingStatuses = Object.entries(statusWritingCounter);
+      writingStatuses.forEach(status => {
+          if(maxWritingStatus.value < status[1]) {
+              maxWritingStatus.name = status[0];
+              maxWritingStatus.value = status[1]
+          }
+      })
 
       return {
         ...school,
-        averageReading: averageReading ? translateReadingGradeBack(averageReading) : null,
-        averageWriting: averageWriting ? translateWritingGradeBack(averageWriting) : null
+        averageReading: maxReadingStatus.name,
+        averageWriting: maxWritingStatus.name
       };
     });
   });
@@ -366,19 +497,15 @@ onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
 
     if (selectedFilter.filterType === 'All Cities') {
-
         fetchAllSchools();
 
     } else if (selectedFilter.filterType === 'All Schools in City') {
-
         fetchSchoolsByCity(selectedFilter.city);
 
     } else if (selectedFilter.filterType === 'Specific School') {
-
         fetchSpecificSchoolInCityData(selectedFilter.city, selectedFilter.school, selectedFilter.schoolId);
 
     } else if (selectedFilter.filterType === 'Specific School in City') {
-
         fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
 
     } else if (selectedFilter.filterType === 'Specific School Class') {

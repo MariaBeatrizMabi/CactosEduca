@@ -139,7 +139,6 @@ const fetchSchools = async () => {
             else if (selectedFilter.filterType === 'Specific School') {
                 response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
                 const school = response.data;
-                console.log('aqui: c')
                 if (school.exams) {
                     school.exams.forEach(exam => {
                         let existentPoll = false

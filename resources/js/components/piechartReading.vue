@@ -101,7 +101,7 @@ const fetchSchools = async () => {
             labels: readingStatuses.value.map(status => translationMap[status[0]]), // Labels traduzidas
             datasets: [{
                 label: 'Quantidade de alunos',
-                backgroundColor: ["#FF0000", "#FFCB00", "#FF5C00", "#9747FF", "#ADD8E6", "#0D5413"],
+                backgroundColor: ["#FF0000", "#FFCB00", "#0A0AA0", "#9747FF", "#ADD8E6", "#0D5413"],
                 data: readingStatuses.value.map(status => status[1]),
             }]
         };
