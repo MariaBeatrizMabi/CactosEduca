@@ -38,16 +38,6 @@ const checked = async function (event) {
 </template>
 
 <style scoped>
-.checkbox-list-container {
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-
-.checkbox-list-container::-webkit-scrollbar-track {
-    background-color: var(--grap-color);
-}
-
 .checkbox-container {
     display: flex;
     align-items: center;
