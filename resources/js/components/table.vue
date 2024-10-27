@@ -1185,11 +1185,11 @@ tr:nth-child(even) {
         border-radius: 100%;
         cursor: pointer;
         & svg > path {
-            fill:  rgb(103 46 229);
+            fill:  rgb(255,92,0);
         }
     }
     & .intervention:hover {
-        background-color: rgb(103 46 229);
+        background-color: rgb(255,92,0);
         & svg > path {
             fill: rgb(255, 255, 255);
         }

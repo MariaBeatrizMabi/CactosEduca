@@ -226,6 +226,17 @@ const pollIdD = ref(null);
 const selectedInterventionsPoll = ref({});
 const writingType = ref('');
 
+const saveSelectedInterventions = (pollId) => {
+    localStorage.setItem(`selectedInterventions_${pollId}`, JSON.stringify(selectedInterventionsPoll.value[pollId]));
+};
+
+const loadSelectedInterventions = (pollId) => {
+    const storedInterventions = localStorage.getItem(`selectedInterventions_${pollId}`);
+    if (storedInterventions) {
+        selectedInterventionsPoll.value[pollId] = JSON.parse(storedInterventions);
+        selectedInterventions.value = [...selectedInterventionsPoll.value[pollId]];
+    }
+};
 const openInterventionModal = async (writing, pollId) => {
     pollIdD.value = null;
     interventions.value = [];
@@ -243,6 +254,7 @@ const openInterventionModal = async (writing, pollId) => {
         }
 
         selectedInterventions.value = selectedInterventionsPoll.value[pollId];
+        loadSelectedInterventions(pollId);
         showInterventionModal.value = true;
     } catch (error) {
         console.error("Erro na intervenção:", error);
@@ -272,6 +284,7 @@ const updateIntervention = (interventionId) => {
     }
 
     selectedInterventions.value = [...pollInterventions];
+    saveSelectedInterventions(pollIdD.value);
 };
 
 const submitIntervention = async () => {
