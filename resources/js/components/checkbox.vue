@@ -55,8 +55,8 @@ const checked = async function (event) {
 }
 
 .custom-checkbox {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 2px solid var(--primary-color);
     border-radius: 4px;
     cursor: pointer;
@@ -67,6 +67,7 @@ const checked = async function (event) {
     align-items: center;
     justify-content: center;
     background-color: var(--grap-color);
+    flex-shrink: 0;
 }
 
 .custom-checkbox:checked {
