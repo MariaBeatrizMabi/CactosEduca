@@ -1177,6 +1177,23 @@ tr:nth-child(even) {
             fill: rgb(255, 255, 255);
         }
     }
+    & .intervention {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        width: 3.5rem;
+        border-radius: 100%;
+        cursor: pointer;
+        & svg > path {
+            fill:  rgb(255,92,0);
+        }
+    }
+    & .intervention:hover {
+        background-color: rgb(255,92,0);
+        & svg > path {
+            fill: rgb(255, 255, 255);
+        }
+    }
 }
 
 .combobox-item-content {

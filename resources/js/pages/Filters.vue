@@ -67,8 +67,6 @@ function showSchools(cityName) {
     else if (selectedCity.value && typeUser.value === 'admin') {
         selectedSchools.value = selectedCity.value.schools || [];
 
-        console.log("Selecione uma escola da cidade:", selectedSchools.value);
-
         const selectedSchool = selectedSchools.value.find(school => school.id === selectedSchoolId.value);
 
         if (selectedSchool) {
@@ -99,7 +97,6 @@ function showClassAllSchools() {
     const userData = JSON.parse(localStorage.getItem('userData'));
     const cityId = localStorage.getItem('cityId');
     const schoolIDStorage = localStorage.getItem('schoolId');
-    console.log(citiesSchools.value[0].id, 'sadlççaldkç')
     search.value = '';
     selectedCity.value = cityId;
     schoolSelected.value = true;
@@ -265,7 +262,6 @@ onMounted(async () => {
             localStorage.setItem('schoolId', schoolIDStorage);
             localStorage.setItem('cityId', cityId);
         } else if (typeUser.value === 'teacher') {
-            console.log('Teacher', idUser.value)
             const { data } = await api.get(`/api/management-schools/${idUser.value}/teacher`);
 
             const classes = Array.isArray(data) ? data : [data];
