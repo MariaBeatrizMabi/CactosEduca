@@ -223,9 +223,9 @@ const showInterventionModal = ref(false);
 const interventions = ref([]);
 const selectedInterventions = ref([]);
 const pollIdD = ref(null); 
+const selectedInterventionsPoll = ref({});
 
 const openInterventionModal = async (writing, pollId) => {
-
     pollIdD.value = null;
     interventions.value = [];
     showInterventionModal.value = false; 
@@ -238,13 +238,16 @@ const openInterventionModal = async (writing, pollId) => {
                 Authorization: `Bearer ${token}`
             }
         });
-        pollIdD.value = pollId;
-        console.log(pollIdD.value);
+        
         interventions.value = response.data.interventions;
-        console.log(interventions.value);
+        if (!selectedInterventionsPoll.value[pollId]) {
+            selectedInterventionsPoll.value[pollId] = [];
+        }
+        
+        selectedInterventions.value = selectedInterventionsPoll.value[pollId];
         showInterventionModal.value = true;
     } catch (error) {
-        console.error("erro na intervenção:", error);
+        console.error("Erro na intervenção:", error);
     }
 };
 
@@ -265,25 +268,25 @@ const getExamIdForStudent = async (pollIdD) => {
 };
 
 const updateIntervention = (interventionId) => {
-    const index = selectedInterventions.value.indexOf(interventionId)
+    const pollInterventions = selectedInterventionsPoll.value[pollIdD.value];
+    const index = pollInterventions.indexOf(interventionId);
+
     if (index === -1) {
-        selectedInterventions.value.push(interventionId);
+        pollInterventions.push(interventionId);
     } else {
-        selectedInterventions.value.splice(index, 1);
+        pollInterventions.splice(index, 1);
     }
+
+    selectedInterventions.value = [...pollInterventions];
 };
 
 const submitIntervention = async () => {
     try {
         const token = localStorage.getItem('token');
-        console.log(pollIdD.value)
         const examId = await getExamIdForStudent(pollIdD.value);
         
-        console.log("ID do desgraçado:", examId); 
-        console.log("selected Interventions:", selectedInterventions.value);
-
         await axios.post('/api/student-interventions', {
-            selectedInterventions: selectedInterventions.value,
+            selectedInterventions: selectedInterventionsPoll.value[pollIdD.value],
             exam_id: examId,
         }, {
             headers: {
@@ -291,7 +294,7 @@ const submitIntervention = async () => {
             }
         });
 
-        console.log("Intervenções salvas!");
+        console.log("intervenções salvas");
         showInterventionModal.value = false;
     } catch (error) {
         console.error(error);

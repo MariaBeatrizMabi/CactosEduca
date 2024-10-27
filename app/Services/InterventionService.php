@@ -23,6 +23,11 @@ class InterventionService
                 dd($e);
             }
         }
+
+        ExamsIntervention::where('exam_id', $examId)
+        ->whereNotIn('intervention_id', $selectedInterventions)
+        ->delete();
+
         return $savedData;
     }
     public function getExamIdStudent($studentId, $pollId)
