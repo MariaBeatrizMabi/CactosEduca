@@ -20,6 +20,7 @@ class PollController extends Controller
             'name' => $request->input('name'),
             'school_id' => $request->input('school_id'),
             'class_id' => $request->input('class_id'),
+            'poll_number' => $request->input('poll_number'),
             'active' => 1,
             'year' => Carbon::now()->year
         ]);

@@ -114,6 +114,7 @@ async function submitPollCreated(name) {
                 createdPoll = await axios.post(`/PollCreate`, {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
+                    poll_number: studentExams.value.length + 1,
                     school_id: schoolId,
                     year: classData.value.id
                 });
@@ -122,6 +123,7 @@ async function submitPollCreated(name) {
                     name: studentExams.value.length + 1 + '° Período de sondagem',
                     class_id: classData.value.id,
                     school_id: schoolId,
+                    poll_number: studentExams.value.length + 1,
                     year: classData.value.id
                 });
             }
