@@ -29,8 +29,14 @@ class Exam extends Model
     {
         return $this->belongsTo(ClassModel::class, 'class_id');
     }
+    
     public function intervention()
     {
         return $this->belongsToMany(Intervention::class, 'exams_intervention');
+    }
+
+    public function poll()
+    {
+        return $this->belongsTo(Poll::class, 'poll_id', 'id');
     }
 }
