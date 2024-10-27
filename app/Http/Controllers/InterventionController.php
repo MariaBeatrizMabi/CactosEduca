@@ -24,13 +24,15 @@ class InterventionController extends Controller
     {
         try {
             $validated = $request->validated();    
-            $this->interventionService->saveInterventionsExam(
+            $savedData = $this->interventionService->saveInterventionsExam(
                 $validated['exam_id'],
                 $validated['selectedInterventions']
             );  
     
-            return response()->json(['message' => 'SALVOOU!'], 200);
-        } catch (\Exception $e) {
+            return response()->json([
+                'data' => $savedData,
+            ]);
+            } catch (\Exception $e) {
             dd($e->getMessage());
         }
     }   

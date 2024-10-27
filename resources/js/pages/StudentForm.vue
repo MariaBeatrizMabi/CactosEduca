@@ -7,6 +7,7 @@ import { useRoute } from "vue-router";
 import { api } from '../services/api';
 import Breadcrumb from '../components/Breadcrumb'
 import Modal from "../components/modal.vue";
+import Checkbox from "../components/checkbox.vue";
 import SelectComponent from "../components/SelectComponent.vue";
 import { translate } from '../utils/translate';
 import { Dropdown } from "../components/Dropdown";
@@ -221,8 +222,15 @@ async function handleImportExams() {
 const showInterventionModal = ref(false);
 const interventions = ref([]);
 const selectedInterventions = ref([]);
+const pollIdD = ref(null); 
 
 const openInterventionModal = async (writing, pollId) => {
+
+    pollIdD.value = null;
+    interventions.value = [];
+    showInterventionModal.value = false; 
+    pollIdD.value = pollId;
+
     try {
         const token = localStorage.getItem('token');
         const response = await axios.get(`/api/interventions/${writing}/${studentId}/${pollId}`, {
@@ -230,6 +238,8 @@ const openInterventionModal = async (writing, pollId) => {
                 Authorization: `Bearer ${token}`
             }
         });
+        pollIdD.value = pollId;
+        console.log(pollIdD.value);
         interventions.value = response.data.interventions;
         console.log(interventions.value);
         showInterventionModal.value = true;
@@ -238,11 +248,10 @@ const openInterventionModal = async (writing, pollId) => {
     }
 };
 
-const getExamIdForStudent = async () => {
-
+const getExamIdForStudent = async (pollIdD) => {
     try {
         const token = localStorage.getItem('token');
-        const response = await api.get(`/api/get-exam/${studentId}/${pollId}`, {
+        const response = await axios.get(`/api/get-exam/${studentId}/${pollIdD}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -255,16 +264,25 @@ const getExamIdForStudent = async () => {
     }
 };
 
+const updateIntervention = (interventionId) => {
+    const index = selectedInterventions.value.indexOf(interventionId)
+    if (index === -1) {
+        selectedInterventions.value.push(interventionId);
+    } else {
+        selectedInterventions.value.splice(index, 1);
+    }
+};
+
 const submitIntervention = async () => {
     try {
         const token = localStorage.getItem('token');
-
-        const examId = await getExamIdForStudent(); 
-
+        console.log(pollIdD.value)
+        const examId = await getExamIdForStudent(pollIdD.value);
+        
         console.log("ID do desgraçado:", examId); 
         console.log("selected Interventions:", selectedInterventions.value);
 
-        await api.post('/api/student-interventions', {
+        await axios.post('/api/student-interventions', {
             selectedInterventions: selectedInterventions.value,
             exam_id: examId,
         }, {
@@ -274,11 +292,11 @@ const submitIntervention = async () => {
         });
 
         console.log("Intervenções salvas!");
+        showInterventionModal.value = false;
     } catch (error) {
         console.error(error);
-    } 
+    }
 };
-
 </script>
 
 <template>
@@ -748,17 +766,15 @@ const submitIntervention = async () => {
         Titlevalue="Ações de Intervenção"
     >
         <div class="modal-body-size">
-            <h2>Detalhes das Intervenções</h2>
+            <h2>Intervenções</h2>
             <div class="modal-content-details">
                 <div v-if="interventions.length">
-                    <h3>Intervenções Relacionadas</h3>
                     <div v-for="intervention in interventions" :key="intervention.id">
-                        <input
-                            type="checkbox"
-                            :value="intervention.id"
-                            v-model="selectedInterventions"
+                        <Checkbox
+                            :isChecked="selectedInterventions.includes(intervention.id)" 
+                            :label="`${intervention.code}: ${intervention.description}`"
+                            @change="() => updateIntervention(intervention.id)"
                         />
-                        <label> {{ intervention.code }} - {{ intervention.description }}</label>
                     </div>
                 </div>
             </div>

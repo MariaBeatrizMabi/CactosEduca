@@ -8,17 +8,22 @@ class InterventionService
 {
     public function saveInterventionsExam($examId, $selectedInterventions)
     {
+        $savedData = [];
 
         foreach ($selectedInterventions as $interventionId) {
             try {
-                ExamsIntervention::create([
+                $savedData[] = ExamsIntervention::firstOrCreate(
+                [
                     'exam_id' => $examId, 
                     'intervention_id' => $interventionId,
-                ]);
+                ]
+            );
+
             } catch (\Exception $e) {
                 dd($e);
             }
         }
+        return $savedData;
     }
     public function getExamIdStudent($studentId, $pollId)
     {   

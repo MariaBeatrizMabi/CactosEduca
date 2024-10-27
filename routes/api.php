@@ -94,7 +94,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/get-exam/{studentId}/{pollId}', [InterventionController::class, 'getExamId']);
-    Route::get('/interventions/{writing}/{studentId}/{pollId}', [InterventionController::class, 'getInterventions']);
+    Route::get('/interventions/{writing}/{studentId}/{pollIdD}', [InterventionController::class, 'getInterventions']);
     Route::post('/student-interventions', [InterventionController::class, 'saveStudentInterventions']);
 });
 
