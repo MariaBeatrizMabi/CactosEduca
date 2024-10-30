@@ -445,6 +445,7 @@ onMounted(async () => {
         display: flex;
         flex-direction: column !important;
         margin: 0;
+        gap: 15px;
 
         & .seacheble-camp {
             width: 100% !important;

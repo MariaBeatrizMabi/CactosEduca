@@ -224,7 +224,7 @@ async function handleImportExams() {
 const showInterventionModal = ref(false);
 const interventions = ref([]);
 const selectedInterventions = ref([]);
-const pollIdD = ref(null); 
+const pollIdD = ref(null);
 const selectedInterventionsPoll = ref({});
 const writingType = ref('');
 
@@ -242,15 +242,15 @@ const loadSelectedInterventions = (pollId) => {
 const openInterventionModal = async (writing, pollId) => {
     pollIdD.value = null;
     interventions.value = [];
-    showInterventionModal.value = false; 
+    showInterventionModal.value = false;
     pollIdD.value = pollId;
-    writingType.value = writing; 
+    writingType.value = writing;
 
     try {
         const response = await api.get(`/api/interventions/${writing}/${studentId}/${pollId}`);
-        
+
         interventions.value = response.data.interventions;
-        
+
         if (!selectedInterventionsPoll.value[pollId]) {
             selectedInterventionsPoll.value[pollId] = [];
         }
@@ -560,6 +560,8 @@ const submitIntervention = async () => {
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
                     <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <SelectComponent
@@ -576,6 +578,8 @@ const submitIntervention = async () => {
                     <option value="syllabic">Silábico</option>
                     <option value="alphabetical_syllabic">Silábico alfabético</option>
                     <option value="alphabetical">Alfabético</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <span class="textarea-wrapper">
@@ -641,6 +645,8 @@ const submitIntervention = async () => {
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
                     <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <SelectComponent
@@ -657,6 +663,8 @@ const submitIntervention = async () => {
                     <option value="syllabic">Silábico</option>
                     <option value="alphabetical_syllabic">Silábico alfabético</option>
                     <option value="alphabetical">Alfabético</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <span class="textarea-wrapper">
@@ -709,6 +717,8 @@ const submitIntervention = async () => {
                     <option value="sentence_reader">Leitor de frases</option>
                     <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
                     <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <SelectComponent
@@ -725,6 +735,8 @@ const submitIntervention = async () => {
                     <option value="syllabic">Silábico</option>
                     <option value="alphabetical_syllabic">Silábico alfabético</option>
                     <option value="alphabetical">Alfabético</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
                 </SelectComponent>
 
                 <span class="textarea-wrapper">
@@ -772,7 +784,9 @@ const submitIntervention = async () => {
             pre_syllabic: 'Pré-silábico',
             syllabic: 'Silábico',
             alphabetical_syllabic: 'Silábico Alfabético',
-            alphabetical: 'Alfabético'
+            alphabetical: 'Alfabético',
+            missed:'Faltou',
+            transferred: 'Transferido'
         }[writingType] || writingType}`"
         >
         <div class="modal-body-size">
@@ -781,7 +795,7 @@ const submitIntervention = async () => {
                     <div v-if="interventions.length">
                         <div v-for="intervention in interventions" :key="intervention.id">
                             <Checkbox
-                                :isChecked="selectedInterventions.includes(intervention.id)" 
+                                :isChecked="selectedInterventions.includes(intervention.id)"
                                 :label="`${intervention.code}: ${intervention.description}`"
                                 @change="() => updateIntervention(intervention.id)"
                             />
@@ -1061,7 +1075,7 @@ input[type="number"] {
 #custom-modal-check {
     grid-template-columns: 1fr;
     max-height: 400px;
-    overflow-y: auto; 
+    overflow-y: auto;
     overflow-x: hidden;
     padding: 20px;
 }
