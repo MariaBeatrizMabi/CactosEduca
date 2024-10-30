@@ -21,7 +21,10 @@ return new class extends Migration
                 'no_fluent_text_reader',
                 'missed',
                 'transferred'
-            ])->default('not_reader');
+            ])
+            ->change()
+            ->default('not_reader');
+
             $table->enum('writing', [
                 'pre_syllabic',
                 'syllabic',
@@ -29,7 +32,9 @@ return new class extends Migration
                 'alphabetical',
                 'missed',
                 'transferred'
-            ])->default('pre_syllabic');
+            ])
+            ->change()
+            ->default('pre_syllabic');
         });
     }
 
@@ -38,6 +43,27 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('exams', function (Blueprint $table) {
+            $table->enum('reading', [
+                'not_reader',
+                'syllable_reader',
+                'word_reader',
+                'sentence_reader',
+                'fluent_text_reader',
+                'no_fluent_text_reader',
+            ])
+                ->change()
+                ->default('not_reader');
+
+            $table->enum('writing', [
+                'pre_syllabic',
+                'syllabic',
+                'alphabetical_syllabic',
+                'alphabetical',
+            ])
+                ->change()
+                ->default('pre_syllabic');
+        });
+
     }
 };
