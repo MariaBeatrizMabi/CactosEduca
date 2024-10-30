@@ -1044,6 +1044,39 @@ onMounted(
     justify-content: start;
 }
 
+@media (max-width: 375px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 320px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 10px;
+    }
+}
+
 .showModalContent {
     display: flex;
     justify-content: end;
