@@ -898,7 +898,7 @@ onMounted(
 
 .modal-content-details {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
     margin: 2rem 0;
     width: 100%;
