@@ -6,6 +6,7 @@ use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
 use App\Models\ClassModel;
 use App\Models\Student;
+use App\Services\Student\GetAllInterventionsService;
 use App\Services\Student\StoreStudentService;
 use App\Services\Student\UpdateStudentService;
 use Illuminate\Http\JsonResponse;
@@ -51,5 +52,11 @@ class StudentController extends Controller
         return response()->json(
             $student->exams()->where('class_id', $class->id)->get()
         );
+    }
+
+    public function getAllStudentInterventions($student){
+        $getAllInterventionsService = new GetAllInterventionsService();
+        $interventions = $getAllInterventionsService->run($student);
+        return response()->json($interventions);
     }
 }
