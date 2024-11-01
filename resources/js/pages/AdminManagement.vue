@@ -5,7 +5,6 @@ import { api } from "../services/api";
 import MenuComponent from "../components/menu.vue";
 import TitleComponent from "../components/title.vue";
 import userWelcomeComponent from "../components/userWelcome.vue";
-import TableComponent from "../components/table.vue";
 import TableComponentComponent from "../components/tableComponent.vue";
 
 import ModalComponent from "../components/modal.vue";
@@ -29,9 +28,11 @@ import {
     importClasses,
     importTeachers
 } from '../services/import';
+import {useRoute} from "vue-router";
 
 const emit = defineEmits(["viewDetails", "updateAction", "deletedAction"]);
 
+const route = useRoute();
 const userType = ref("");
 const userID = ref("");
 const showModalCreation = ref(false);
@@ -201,20 +202,19 @@ async function getUserType() {
 }
 
 async function getSchool() {
-    const { data: school } = await api.get('/api/user/school');
+    const { data: school } = await api.get(`/api/management-schools/${route.params.schoolId}`);
     schoolId.value = school.id;
 }
 
 async function getTableTeacherData() {
     try {
-        const response = await axios("/TeachersSchool");
+        const response = await axios(`/teachersBySchool/${route.params.schoolId}`);
 
         formDataTeachersPreview.value = response.data.map((take) => ({
             id: take.id,
             name: take.name,
             acess_cod: take.user.acess_cod,
         }));
-
     } catch (error) {
         console.error(error);
     }
@@ -222,13 +222,14 @@ async function getTableTeacherData() {
 
 async function getTableClassData() {
     try {
-        const response = await axios.get("/ClassSchool");
+        const response = await axios.get(`/classesByschool/${route.params.schoolId}`);
 
         formDataClassPreview.value = response.data.map((take) => ({
             id: take.id,
             name: take.name,
             teacher_name: take.teacher ? take.teacher.name : "",
         }));
+
     } catch (error) {
         console.error(error);
     }
@@ -236,7 +237,7 @@ async function getTableClassData() {
 
 async function getTableStudentData() {
     try {
-        const response = await axios("/StudentsData");
+        const response = await axios(`/getAllStudentsFromSchool/${route.params.schoolId}`);
 
         formDataStudentPreview.value = response.data.map((take) => ({
             id: take.id,
@@ -571,12 +572,11 @@ onMounted(async () => {
     isLoading.value = true;
 
     try {
-        await getUserType();
-    await getSchool();
-    await getTableTeacherData();
-    await getTableClassData();
-    await getTableStudentData();
-    isLoading.value = false;
+        await getSchool();
+        await getTableTeacherData();
+        await getTableClassData();
+        await getTableStudentData();
+        isLoading.value = false;
 
     } catch (error) {
         setTimeout(() => {
@@ -1336,82 +1336,82 @@ async function handleImportStudents() {
                 </Breadcrumb.Content>
             </Breadcrumb.Root>
 
-            <template v-if="userType === 'admin'">
-                <TitleComponent title="Cadastro de escolas" />
-                <TableComponent TitleValue="" :isAdmin="true"/>
-            </template>
+            <TitleComponent title="Cadastro de Professores" />
+            <TableComponentComponent
+                TitleValue=""
+                :TableHeader="['Professor', 'Acesso']"
+                :TableContent="formDataTeachersPreview"
+                :TableActions="true"
+                :TableActionVisibility="true"
+                :TableActionUpdate="true"
+                :TableAddButton="true"
+                :ButtonTitle="'Adicionar Professor'"
+                :OpenAddModal="false"
+                @viewDetails="ShowSchoolTeachersData"
+                @updateAction="UpdateSchoolTeachersData"
+                @deletedAction="deletedModalTeachersShow"
+                @exportData="exportTeachersData(toRaw(formDataTeachersPreview.value))"
+                @exportSampleData="exportTeachersSampleData"
+                @importData="handleImportTeachers"
+            />
 
-            <template v-if="userType === 'school'">
-                <TitleComponent title="Cadastro de Professores" />
-                <TableComponentComponent
-                    TitleValue=""
-                    :TableHeader="['Professor', 'Acesso']"
-                    :TableContent="formDataTeachersPreview"
-                    :TableActions="true"
-                    :TableActionVisibility="true"
-                    :TableActionUpdate="true"
-                    :TableAddButton="true"
-                    :ButtonTitle="'Adicionar Professor'"
-                    :OpenAddModal="OpenModalTeachersCreation"
-                    @viewDetails="ShowSchoolTeachersData"
-                    @updateAction="UpdateSchoolTeachersData"
-                    @deletedAction="deletedModalTeachersShow"
-                    @exportData="exportTeachersData(toRaw(formDataTeachersPreview.value))"
-                    @exportSampleData="exportTeachersSampleData"
-                    @importData="handleImportTeachers"
-                />
-            </template>
+            <TitleComponent title="Cadastro de Turmas"/>
+            <TableComponentComponent
+                class="tableClass"
+                TitleValue=""
+                :TableHeader="['Turma', 'Professor responsável']"
+                :TableContent="formDataClassPreview"
+                :TableActions="true"
+                :TableActionVisibility="true"
+                :TableActionUpdate="true"
+                :TableAddButton="true"
+                :ButtonTitle="'Adicionar Turma'"
+                :OpenAddModal="OpenModalClassCreation"
+                @viewDetails="ShowSchoolClassData"
+                @updateAction="UpdateSchoolClassData"
+                @deletedAction="deletedModalClassShow"
+                @exportData="exportClassesData(toRaw(formDataClassPreview.value))"
+                @exportSampleData="exportClassesSampleData"
+                @importData="handleImportClasses"
+            />
 
-            <template v-if="['school', 'teacher'].includes(userType)">
-                <TitleComponent title="Cadastro de Turmas"/>
-                <TableComponentComponent
-                    class="tableClass"
-                    TitleValue=""
-                    :TableHeader="['Turma', 'Professor responsável']"
-                    :TableContent="formDataClassPreview"
-                    :TableActions="true"
-                    :TableActionVisibility="true"
-                    :TableActionUpdate="true"
-                    :TableAddButton="true"
-                    :ButtonTitle="'Adicionar Turma'"
-                    :OpenAddModal="OpenModalClassCreation"
-                    @viewDetails="ShowSchoolClassData"
-                    @updateAction="UpdateSchoolClassData"
-                    @deletedAction="deletedModalClassShow"
-                    @exportData="exportClassesData(toRaw(formDataClassPreview.value))"
-                    @exportSampleData="exportClassesSampleData"
-                    @importData="handleImportClasses"
-                />
-            </template>
-
-            <template v-if="['school', 'teacher'].includes(userType)">
-                <TitleComponent title="Cadastro de alunos" />
-                <TableComponentComponent
-                    TitleValue=""
-                    :TableHeader="['Nome do aluno', 'Matrícula']"
-                    :TableContent="formDataStudentPreview"
-                    :TableActions="true"
-                    :TableActionVisibility="true"
-                    :TableActionUpdate="false"
-                    :TableAddButton="true"
-                    :TableUpdateAction="false"
-                    :ButtonTitle="'Adicionar aluno'"
-                    :OpenAddModal="OpenModalStudentCreation"
-                    @viewDetails="ShowStudentData"
-                    @deletedAction="deletedModalStudentShow"
-                    @exportData="exportStudentsData(toRaw(formDataStudentExport.value))"
-                    @exportSampleData="exportStudentsSampleData"
-                    @importData="handleImportStudents"
-                ></TableComponentComponent>
-            </template>
+            <TitleComponent title="Cadastro de alunos" />
+            <TableComponentComponent
+                TitleValue=""
+                :TableHeader="['Nome do aluno', 'Matrícula']"
+                :TableContent="formDataStudentPreview"
+                :TableActions="true"
+                :TableActionVisibility="true"
+                :TableActionUpdate="false"
+                :TableAddButton="true"
+                :TableUpdateAction="false"
+                :ButtonTitle="'Adicionar aluno'"
+                :OpenAddModal="OpenModalStudentCreation"
+                @viewDetails="ShowStudentData"
+                @deletedAction="deletedModalStudentShow"
+                @exportData="exportStudentsData(toRaw(formDataStudentExport.value))"
+                @exportSampleData="exportStudentsSampleData"
+                @importData="handleImportStudents"
+            ></TableComponentComponent>
         </div>
     </div>
 </template>
 
 <style>
-.modal-background {
-    z-index: 9999;
-}
+
+.school-register {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+
+    & .register-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 5rem 0;
+        gap: 2rem;
+    }
+    }
 
 .modal-end > .school-add {
     width: 16rem;

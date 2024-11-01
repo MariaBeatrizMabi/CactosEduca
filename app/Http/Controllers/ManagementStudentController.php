@@ -54,6 +54,12 @@ class ManagementStudentController extends Controller
         return response()->json($students);
     }
 
+    public function getAllStudentsFromSchool($schoolId){
+        return Student::where('school_id', $schoolId)
+            ->with('classData')
+            ->get();
+    }
+
     public function indexChart()
     {
         $user = Auth::user();
