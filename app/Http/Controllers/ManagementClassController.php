@@ -68,6 +68,12 @@ class ManagementClassController extends Controller
         return response()->json($classes);
     }
 
+    public function getAllClassesFromSchool($schoolId){
+        return ClassModel::with(['teacher', 'studentsInClass.studentsChart'])
+            ->where('school_id', $schoolId)
+            ->get();
+    }
+
     public function create(Request $request)
     {
         try {

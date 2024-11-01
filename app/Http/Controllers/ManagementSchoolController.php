@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Log;
 
 class ManagementSchoolController extends Controller
 {
+
+    public function indexManagementAdminView(){
+        return view('AdminManagementView');
+    }
+
+
+    public function getSchoolById($schoolId){
+        return ManagementSchool::find($schoolId);
+    }
+
     public function listAvailableClassInSchools($schoolId)
     {
         $school = ManagementSchool::where('user_id', $schoolId)->first();
