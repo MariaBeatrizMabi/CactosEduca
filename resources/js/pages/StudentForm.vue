@@ -132,6 +132,9 @@ async function submitPollCreated(name) {
             }
 
             submitExamCreate(createdPoll.data.id);
+            await getUserType();
+            await getStudent();
+            showExamCreateModal.value = false;
 
         } else {
             console.error("Professor não encontrado ou não possui um user_id correspondente.");
@@ -157,6 +160,8 @@ async function submitExamCreate(createdPollId) {
         writing: '',
         action: null
     }
+
+
 }
 
 async function submitExamUpdate() {
@@ -544,7 +549,7 @@ const submitIntervention = async () => {
 
                             </tr>
                             <tr v-else>
-                                <td >Sem açõess cadastradas</td>
+                                <td >Sem ações cadastradas</td>
                             </tr>
                         </table>
 
