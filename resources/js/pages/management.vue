@@ -161,6 +161,23 @@ const OpenModalStudentCreation = () => {
     showModalStudentCreation.value = true;
 };
 
+const showUpdateStudentModal = async (studentId) => {
+    const { data } = await api.get(`/api/students/${studentId}`);
+
+    formDataStudentAdd.value = {
+        id: studentId,
+        name: data.name,
+        gender: data.gender,
+        enrollment_date: data.enrollment_date,
+        enrollment: data.enrollment,
+        date_of_birth: data.date_of_birth,
+        people_with_disabilities: data.people_with_disabilities,
+        school_id: data.school_id,
+    }
+
+    showModalStudentCreation.value = true;
+}
+
 function resetForm() {
     formDataTeacherAdd.value = {
         name: "",
@@ -277,11 +294,28 @@ async function submitStudentForm() {
     try {
         isLoading.value = true;
 
-        await api.post("/api/students", {
-            ...formDataStudentAdd.value,
-            people_with_disabilities: JSON.parse(formDataStudentAdd.value.people_with_disabilities),
-            school_id: schoolId.value,
-        });
+        if(!formDataStudentAdd.value.id){
+            await api.post("/api/students", {
+                ...formDataStudentAdd.value,
+                people_with_disabilities: JSON.parse(formDataStudentAdd.value.people_with_disabilities),
+                school_id: schoolId.value,
+            });
+        } else {
+            formDataStudentAdd.value.people_with_disabilities = formDataStudentAdd.value.people_with_disabilities === 'true'
+            await api.put(`/api/students/${formDataStudentAdd.value.id}`, {
+                ...formDataStudentAdd.value
+            });
+        }
+
+        formDataStudentAdd.value = {
+            name: "",
+            gender: "",
+            enrollment_date: "",
+            enrollment: "",
+            date_of_birth: "",
+            people_with_disabilities: '',
+            school_id: userID.value,
+        };
 
         getTableStudentData();
         showModalStudentCreation.value = false;
@@ -1392,12 +1426,13 @@ async function handleImportStudents() {
                     :TableContent="formDataStudentPreview"
                     :TableActions="true"
                     :TableActionVisibility="true"
-                    :TableActionUpdate="false"
+                    :TableActionUpdate="true"
                     :TableAddButton="true"
                     :TableUpdateAction="false"
                     :ButtonTitle="'Adicionar aluno'"
                     :OpenAddModal="OpenModalStudentCreation"
                     @viewDetails="ShowStudentData"
+                    @updateAction="showUpdateStudentModal"
                     @deletedAction="deletedModalStudentShow"
                     @exportData="exportStudentsData(toRaw(formDataStudentExport.value))"
                     @exportSampleData="exportStudentsSampleData"
