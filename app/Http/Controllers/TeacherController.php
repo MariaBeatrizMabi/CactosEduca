@@ -22,6 +22,12 @@ class TeacherController extends Controller
         );
     }
 
+    public function findteachersBySchool($schoolId){
+        return Teacher::with('user')
+            ->where('school_id', $schoolId)
+            ->get();
+    }
+
     public function show(Teacher $teacher)
     {
         return response()->json($teacher->load('user'));

@@ -15,22 +15,6 @@ const schoolsWithAverages = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
 const studentData = ref([]);
 
-const getGradeValue = (grade) => {
-  const grades = {
-    'not_reader': 1,
-    'syllable_reader': 2,
-    'word_reader': 3,
-    'sentence_reader': 4,
-    'no_fluent_text_reader': 5,
-    'fluent_text_reader': 6,
-    'pre_syllabic': 1,
-    'syllabic': 2,
-    'alphabetical_syllabic': 3,
-    'alphabetical': 4
-  };
-  return grades[grade] || 0;
-};
-
 const fetchAllSchools = async () => {
   try {
     const response = await axios.get('/ManagementSchool/all');
@@ -118,13 +102,20 @@ const fetchSpecificClassInSchool = async (classId) => {
 
           if (Array.isArray(school.students)) {
               school.students.forEach(student => {
-                  if (Array.isArray(student.exams)) {
+                  if (Array.isArray(student.exams) && student.exams.length > 0) {
                       student.exams.forEach(exam => {
                           let hasStudant = false;
                           studentData.value.forEach(studant => {
                              if(studant.name === student.student_name){
-                                 studant.writing = exam.writing;
-                                 studant.reading = exam.reading;
+
+                                 studant.writing = exam.writing != 'transferred' && exam.writing != 'transferred'
+                                     ? exam.writing
+                                     : studant.writing;
+
+                                 studant.reading = exam.reading != 'transferred' && exam.reading != 'transferred'
+                                     ? exam.reading
+                                     : studant.reading;
+
                                  hasStudant = true
                              }
                           });
@@ -132,12 +123,21 @@ const fetchSpecificClassInSchool = async (classId) => {
                           if (!hasStudant){
                               studentData.value.push({
                                   name: student.student_name,
-                                  reading: exam.reading,
-                                  writing: exam.writing
+                                  reading: exam.reading != 'transferred' && exam.reading != 'transferred'
+                                      ? exam.reading
+                                      : "Sem sondagens",
+                                  writing: exam.writing != 'transferred' && exam.writing != 'transferred'
+                                      ? exam.writing
+                                      : "Sem sondagens"
                               });
                           }
                       });
                   } else {
+                      studentData.value.push({
+                          name: student.student_name,
+                          reading: "Sem sondagens",
+                          writing: "Sem sondagens"
+                      });
                       console.error('student.exams is not an array:', student);
                   }
               });
@@ -159,23 +159,6 @@ const fetchSpecificClassInSchool = async (classId) => {
 
 const translateGrade = (grade) => {
   return gradeTranslations[grade] || grade;
-};
-
-const translateReadingGradeBack = (average) => {
-  if (average <= 1) return 'not_reader';
-  if (average <= 2) return 'syllable_reader';
-  if (average <= 3) return 'word_reader';
-  if (average <= 4) return 'sentence_reader';
-  if (average <= 5) return 'no_fluent_text_reader';
-  return 'fluent_text_reader';
-};
-
-const translateWritingGradeBack = (average) => {
-  if (average <= 1) return 'pre_syllabic';
-  if (average <= 2) return 'syllabic';
-  if (average <= 3) return 'alphabetical_syllabic';
-  if (average <= 4) return 'alphabetical';
-  return 'fluent_text_reader';
 };
 
 const gradeTranslations = {
@@ -659,4 +642,5 @@ onMounted(() => {
     }
   }
 }
+
 </style>

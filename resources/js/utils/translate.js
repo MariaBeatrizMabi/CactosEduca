@@ -8,7 +8,9 @@ const data = {
     word_reader: 'Leitor de palavras',
     sentence_reader: 'Leitor de frases',
     no_fluent_text_reader: 'Leitor de texto sem fluência',
-    fluent_text_reader: 'Leitor de texto com fluência'
+    fluent_text_reader: 'Leitor de texto com fluência',
+    missed:'Faltou',
+    transferred: 'Transferido'
 }
 
 export function translate(key = '') {

@@ -8,6 +8,7 @@ import SchoolDetails from '../../resources/js/pages/schoolDetails.vue';
 import StudentForm from '../../resources/js/pages/StudentForm.vue';
 import ClassDetails from '../../resources/js/pages/ClassDetails.vue';
 import StudentHistory from '../../resources/js/pages/StudentHistory.vue';
+import AdminManagement from "../js/pages/AdminManagement.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -53,6 +54,13 @@ const router = createRouter({
             path: '/schoolDetails/:city/all',
             name: 'SchoolDetailsAllByCity',
             component: SchoolDetails,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/management/admin/:schoolId',
+            name: 'managementAdmin',
+            component: AdminManagement,
             props: true,
             meta: { requiresAuth: true }
         },

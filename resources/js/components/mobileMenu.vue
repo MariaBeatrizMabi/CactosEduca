@@ -21,7 +21,7 @@
                 </li>
                 <li class="nav-link">
                     <a href="/Filters">
-                       Dashboard
+                        Gráficos de desempenho
                     </a>
                 </li>
                 <li class="nav-link">
@@ -73,7 +73,7 @@ ul {
         padding: 2rem;
         border-bottom: 2px solid var(--secondary-color);
     }
-}   
+}
 
 #menu.nav-active{
     height: calc(100vh - 60px);

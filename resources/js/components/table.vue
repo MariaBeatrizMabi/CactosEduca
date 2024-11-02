@@ -12,6 +12,8 @@ import Combobox from "./Combobox";
 import { Dropdown } from "./Dropdown";
 import { importSchools } from "../services/import";
 import { exportSchoolsData, exportSchoolsSampleData } from "../services/export";
+import Router from "../../router/index.js";
+import router from "../../router/index.js";
 
 const showModal = ref();
 const showModalUpdated = ref();
@@ -28,6 +30,11 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    isAdmin: {
+        type: Boolean,
+        required: false,
+        default: false
+    }
 });
 
 function resetForm() {
@@ -107,6 +114,12 @@ async function getTableData() {
 }
 
 async function ShowSchoolData(id) {
+
+    if(props.isAdmin){
+        router.push(`/management/admin/${id}`);
+        return;
+    }
+
     showModalData.value = true;
     try {
         const response = await axios.get(`/ManagementSchool/${id}`);
@@ -1042,6 +1055,39 @@ onMounted(
     flex-direction: column;
     padding: 0 0 5rem 0;
     justify-content: start;
+}
+
+@media (max-width: 375px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 320px) {
+    .tableContent {
+        width: 84%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 0 5rem 0;
+        justify-content: start;
+        font-size: 10px;
+    }
 }
 
 .showModalContent {
