@@ -127,7 +127,7 @@ const fetchSpecificClassInSchool = async (classId) => {
                                       ? exam.reading
                                       : "Sem sondagens",
                                   writing: exam.writing != 'transferred' && exam.writing != 'transferred'
-                                      ? exam.reading
+                                      ? exam.writing
                                       : "Sem sondagens"
                               });
                           }
