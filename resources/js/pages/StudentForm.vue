@@ -309,7 +309,7 @@ const submitIntervention = async () => {
 
         await api.post('/api/students/interventions', {
             selectedInterventions: selectedInterventionsPoll.value[pollIdD.value],
-            exam_id: examId,
+            exam_id: pollIdD.value,
         });
 
         await getStudent();
