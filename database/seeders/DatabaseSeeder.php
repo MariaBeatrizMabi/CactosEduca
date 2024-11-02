@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CitiesSeeder::class);
         $this->call(LocationSeeder::class);
+        $this->call(InterventionsSeeder::class);
+        $this->call(InterventionSeeder20241101::class);
 
         User::factory()->create([
             'user_name' => 'Admin',

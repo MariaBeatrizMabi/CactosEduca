@@ -544,7 +544,7 @@ const submitIntervention = async () => {
 
                             </tr>
                             <tr v-else>
-                                <td >Sem açõess cadastradas</td>
+                                <td >Sem ações cadastradas</td>
                             </tr>
                         </table>
 
