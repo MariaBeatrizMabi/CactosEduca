@@ -305,11 +305,9 @@ const updateIntervention = (interventionId) => {
 
 const submitIntervention = async () => {
     try {
-        const examId = await getExamIdForStudent(pollIdD.value);
-
         await api.post('/api/students/interventions', {
             selectedInterventions: selectedInterventionsPoll.value[pollIdD.value],
-            exam_id: examId,
+            exam_id: pollIdD.value,
         });
 
         await getStudent();
