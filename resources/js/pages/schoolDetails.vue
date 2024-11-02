@@ -8,6 +8,8 @@ import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
 import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
 import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
 import { api } from "../services/api"
+import html2pdf from 'html2pdf.js';
+import Button from "../components/button.vue";
 
 const route = useRoute();
 const formDataStudentPreview = ref([]);
@@ -498,15 +500,66 @@ onMounted(() => {
     console.warn('selectedFilter is undefined or missing filterType');
   }
 });
+
+const exportToPDF = () => {
+
+    // Elemento raiz
+    const element = document.getElementById('dashboard');
+
+    // Removidos da página
+    const pizzaElement = document.getElementById('pizza-graphic');
+    pizzaElement.classList.add('none-on-impress')
+
+    const pizzaElementTitle = document.getElementById('pizza-graphic-title');
+    pizzaElementTitle.classList.add('none-on-impress')
+
+    const userModal = document.getElementById('user-modal');
+    userModal.classList.add('none-on-impress')
+
+    const exportBtn = document.getElementById('export-btn');
+    exportBtn.classList.add('none-on-impress')
+
+    // Formatando modal de média
+    const averageModalTitle = document.getElementById('average-modal-title');
+    averageModalTitle.classList.add('average-modal')
+
+    const averageModalContent = document.getElementById('average-modal-content');
+    averageModalContent.classList.add('average-modal')
+
+
+    // Formatando modal do gráfico de barras
+    const barChatTitle = document.getElementById('bar-chart-title');
+    barChatTitle.classList.add('average-modal')
+
+    // const barChatContent = document.getElementById('bar-chart-content');
+    // barChatContent.classList.replace('cards', 'bar-chart-content')
+
+    html2pdf()
+        .from(element)
+        .set({
+            margin: 1,
+            filename: 'exported-file.pdf',
+            html2canvas: {
+                scale: 3, // Aumenta a escala para melhorar a qualidade
+                useCORS: true, // Para garantir que imagens externas sejam carregadas corretamente
+                scrollX: 0,
+                scrollY: 0,
+            },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        })
+        .toContainer()
+        .save();
+};
+
 </script>
 
 <template>
   <div class="dashboard">
     <MenuComponent />
-    <div class="dashboard-content">
-      <TitleComponent v-if="selectedFilter.filterType !== 'Specific School Class'" title="Análise Geral das escolas" />
-      <TitleComponent v-if="selectedFilter.filterType === 'Specific School Class'" title="Análise Geral das turmas" />
-      <div class="tableContent">
+    <div id="dashboard" class="dashboard-content">
+      <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class'" title="Análise Geral das escolas" />
+      <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class'" title="Análise Geral das turmas" />
+      <div id='average-modal-content' class="tableContent">
         <div class="table-container" style="overflow-x: auto;">
           <div class="titleTable">
             <h1>Média Geral</h1>
@@ -547,16 +600,117 @@ onMounted(() => {
 
         </div>
       </div>
-      <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
-      <TitleComponent title="Análise geral dividida por sondagem" />
-      <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
-      <TitleComponent title="Análise geral média " />
-      <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
+      <UserWelcomeComponent id='user-modal' class="welcome-component"></UserWelcomeComponent>
+      <TitleComponent id='bar-chart-title' title="Análise geral dividida por sondagem" />
+      <ChartBarBimReading id='bar-chart-content' titleGrapichCard="Nível turmas das escolas - Leitura" />
+      <TitleComponent id='pizza-graphic-title' title="Análise geral média " />
+      <ChartBarBimWriting id='pizza-graphic' titleGrapichCard="Nível geral das turmas - Escrita" />
+       <button id="export-btn" @click="exportToPDF">teste</button>
     </div>
   </div>
 </template>
 
 <style scoped>
+
+.average-modal{
+    display: flex;
+    justify-content: center;
+    width: 95% !important;
+    margin: 15px !important;
+}
+
+.bar-chart-content{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 3rem;
+
+    & .card-grapich:first-child {
+        margin: 3rem 0;
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: 1rem;
+        border: 3px solid var(--secondary-color);
+
+        background-color: var(--secondary-color);
+
+        & .card-grapich-content {
+            & .card-title {
+                & h1 {
+                    margin: 0.5rem;
+                    text-align: center;
+
+                    color: white;
+
+                    font-weight: 400;
+                    font-size: 20px;
+                }
+            }
+        }
+        & .grapich {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 1rem 1rem;
+            background-color: white;
+        }
+    }
+
+    & .card-grapich {
+        margin: 3rem 0;
+        width: 40%;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: 1rem;
+        border: 3px solid var(--secondary-color);
+
+        background-color: var(--secondary-color);
+
+        & .card-grapich-content {
+            & .card-title {
+                & h1 {
+                    margin: 0.5rem;
+                    text-align: center;
+
+                    color: white;
+
+                    font-weight: 400;
+                    font-size: 20px;
+                }
+            }
+        }
+        & .grapich {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 1rem 1rem;
+            background-color: white;
+        }
+    }
+
+    @media (max-width: 1300px) {
+        & .card-grapich:first-child {
+            width: 84%;
+        }
+        & .card-grapich {
+            width: 84%;
+        }
+    }
+}
+
+.none-on-impress{
+    display: none;
+}
+
 .dashboard {
   display: flex;
 
