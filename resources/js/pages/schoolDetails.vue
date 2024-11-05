@@ -14,6 +14,7 @@ import ExportBarGraphics from "../components/Export/ExportReadingBarGraphics.vue
 import ExportWritingBarGraphic from "../components/Export/ExportWritingBarGraphic.vue";
 import ExportReadingBarGraphics from "../components/Export/ExportReadingBarGraphics.vue";
 import ExportReadingPizzaGraphic from "../components/Export/ExportReadingPieGraphic.vue";
+import ExportWritingPieChart from "../components/Export/ExportWritingPieChart.vue";
 
 const route = useRoute();
 const formDataStudentPreview = ref([]);
@@ -539,6 +540,9 @@ const exportToPDF = () => {
     const barChartTitle = document.getElementById('bar-chart-title');
     barChartTitle.classList.add('average-modal')
 
+    const pieChartTitle = document.getElementById('pie-chart-title');
+    pieChartTitle.classList.add('average-modal')
+
     setTimeout(html2pdf()
         .from(element)
         .set({
@@ -566,9 +570,9 @@ const exportToPDF = () => {
         <TitleComponent id='bar-chart-title' title="Análise geral dividida por sondagem" />
         <ExportReadingBarGraphics id="bar-chart-component"></ExportReadingBarGraphics>
         <ExportWritingBarGraphic></ExportWritingBarGraphic>
-        <TitleComponent id='bar-chart-title' title="Análise geral média" />
+        <TitleComponent id='pie-chart-title' title="Análise geral média" />
         <ExportReadingPizzaGraphic></ExportReadingPizzaGraphic>
-        <ExportReadingPizzaGraphic></ExportReadingPizzaGraphic>
+        <ExportWritingPieChart></ExportWritingPieChart>
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class' && !isImpress" title="Análise Geral das escolas" />
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class' && !isImpress" title="Análise Geral das turmas" />
       <div id='average-modal-content' class="tableContent">

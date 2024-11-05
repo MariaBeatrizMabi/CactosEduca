@@ -376,7 +376,8 @@ onMounted(() => {
 <style scoped>
 
 .test {
-    width: 45%;
+    width: 650px;
+    height: 350px !important;
 }
 .cards{
     display: flex;

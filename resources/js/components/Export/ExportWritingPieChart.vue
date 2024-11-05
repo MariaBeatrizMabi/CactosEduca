@@ -148,7 +148,7 @@ onMounted(() => {
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>Analise dividida por sondagem - Leitura</h1>
+                    <h1>Análise média dividida por tipo - Escrita</h1>
                 </div>
             </div>
             <div class="grapich">
@@ -163,10 +163,12 @@ onMounted(() => {
 <style scoped>
 
 .test {
-    width: 55%;
-    height: 35vh !important;
+    margin-left: 90px;
+    width: 450px;
+    height: 360px !important;
 }
 .cards{
+
     display: flex;
     width: 100%;
     justify-content: center;
