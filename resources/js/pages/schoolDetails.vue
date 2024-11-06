@@ -646,7 +646,7 @@ const exportToPDF = async () => {
 .button-modal{
     display: flex;
     justify-content: right;
-    width: 85%;
+    width: 83%;
 }
 
 .average-modal{
