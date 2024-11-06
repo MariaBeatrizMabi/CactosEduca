@@ -9,6 +9,7 @@ import StudentForm from '../../resources/js/pages/StudentForm.vue';
 import ClassDetails from '../../resources/js/pages/ClassDetails.vue';
 import StudentHistory from '../../resources/js/pages/StudentHistory.vue';
 import AdminManagement from "../js/pages/AdminManagement.vue";
+import ExportScreen from "../js/components/Export/ExportScreen.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -47,6 +48,13 @@ const router = createRouter({
             path: '/schoolDetails/:city',
             name: 'SchoolDetailsByCity',
             component: Filters,
+            props: true,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/export/dashboard',
+            name: 'exportDashboards',
+            component: ExportScreen,
             props: true,
             meta: { requiresAuth: true }
         },

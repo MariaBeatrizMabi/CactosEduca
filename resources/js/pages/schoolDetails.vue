@@ -10,12 +10,14 @@ import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue'
 import { api } from "../services/api"
 import html2pdf from 'html2pdf.js';
 import Button from "../components/button.vue";
-import ExportBarGraphics from "../components/Export/ExportReadingBarGraphics.vue";
 import ExportWritingBarGraphic from "../components/Export/ExportWritingBarGraphic.vue";
 import ExportReadingBarGraphics from "../components/Export/ExportReadingBarGraphics.vue";
-import ExportReadingPizzaGraphic from "../components/Export/ExportReadingPieGraphic.vue";
 import ExportWritingPieChart from "../components/Export/ExportWritingPieChart.vue";
+import Title from "../components/title.vue";
+import ExportReadingPieGraphic from "../components/Export/ExportReadingPieGraphic.vue";
+import Loading from "../components/loading.vue";
 
+const isLoading = ref(false);
 const route = useRoute();
 const formDataStudentPreview = ref([]);
 const schoolsWithAverages = ref([]);
@@ -509,9 +511,10 @@ onMounted(() => {
   }
 });
 
-const exportToPDF = () => {
+const exportToPDF = async () => {
 
     isImpress.value = true;
+    isLoading.value = true;
 
     // Elemento raiz
     const element = document.getElementById('dashboard');
@@ -536,43 +539,51 @@ const exportToPDF = () => {
     const averageModalContent = document.getElementById('average-modal-content');
     averageModalContent.classList.add('average-modal')
 
-
     const barChartTitle = document.getElementById('bar-chart-title');
     barChartTitle.classList.add('average-modal')
 
-    const pieChartTitle = document.getElementById('pie-chart-title');
-    pieChartTitle.classList.add('average-modal')
-
-    setTimeout(html2pdf()
+    await html2pdf()
         .from(element)
         .set({
             margin: [5, 5, 5, 5],
             filename: 'exported-file.pdf',
             html2canvas: {
-                scale: 3, // Aumenta a escala para melhorar a qualidade
-                useCORS: true, // Para garantir que imagens externas sejam carregadas corretamente
+                scale: 3,
+                useCORS: true,
                 scrollX: 0,
                 scrollY: 0,
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         })
         .save()
-, 3000);
 
+    isImpress.value = false;
+    isLoading.value = false;
+    pizzaElement.classList.remove('none-on-impress')
+    pizzaElementTitle.classList.remove('none-on-impress')
+    userModal.classList.remove('none-on-impress')
+    exportBtn.classList.remove('none-on-impress')
+    averageModalTitle.classList.remove('average-modal')
+    averageModalContent.classList.remove('average-modal')
+    barChartTitle.classList.remove('average-modal')
 };
 
 </script>
 
 <template>
+    <Loading :isLoading="isLoading"></Loading>
   <div class="dashboard">
     <MenuComponent />
     <div id="dashboard" class="dashboard-content">
-        <TitleComponent id='bar-chart-title' title="Análise geral dividida por sondagem" />
-        <ExportReadingBarGraphics id="bar-chart-component"></ExportReadingBarGraphics>
-        <ExportWritingBarGraphic></ExportWritingBarGraphic>
-        <TitleComponent id='pie-chart-title' title="Análise geral média" />
-        <ExportReadingPizzaGraphic></ExportReadingPizzaGraphic>
-        <ExportWritingPieChart></ExportWritingPieChart>
+      <div v-show="isImpress">
+          <Title class="average-modal" id='bar-chart-title' title="Análise geral dividida por sondagem" />
+          <ExportReadingBarGraphics/>
+          <ExportWritingBarGraphic/>
+          <Title class="average-modal" id='pie-chart-title' title="Análise geral média" />
+          <ExportReadingPieGraphic/>
+          <ExportWritingPieChart/>
+      </div>
+
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class' && !isImpress" title="Análise Geral das escolas" />
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class' && !isImpress" title="Análise Geral das turmas" />
       <div id='average-modal-content' class="tableContent">

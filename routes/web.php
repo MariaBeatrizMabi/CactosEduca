@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportPdfController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
@@ -72,6 +73,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/StudentCreate', 'App\Http\Controllers\ManagementStudentController@create')->name('student.create');
     Route::delete('/StudentDelete/{id}', 'App\Http\Controllers\ManagementStudentController@delete')->name('student.delete');
     Route::get('/getAllStudentsFromSchool/{schoolId}', [ManagementStudentController::class, 'getAllStudentsFromSchool']);
+
+    Route::get('/export/dashboard', [ExportPdfController::class, 'exportDashboardPdfController']);
 
     Route::get('/management/admin/1', [ManagementSchoolController::class, 'indexManagementAdminView']);
 
