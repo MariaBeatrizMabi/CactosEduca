@@ -22,6 +22,8 @@ const fetchSchools = async () => {
     try {
         let response;
 
+        var totalExamsQuantity = 0;
+
         const statusCount = {
             not_reader: 0,
             syllable_reader: 0,
@@ -37,6 +39,7 @@ const fetchSchools = async () => {
                 response.data.forEach(city => {
 
                     city.schools.forEach(school => {
+                        totalExamsQuantity += school.exams.length;
                         school.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -51,6 +54,7 @@ const fetchSchools = async () => {
 
                 schools.forEach(school => {
                     if (school.exams) {
+                        totalExamsQuantity += school.exams.length;
                         school.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -66,8 +70,8 @@ const fetchSchools = async () => {
                 const school = response.data;
 
                 if (school.exams) {
+                    totalExamsQuantity += school.exams.length;
                     school.exams.forEach(exam => {
-                        ('city', school.exams);
                         if (statusCount[exam.reading] !== undefined) {
                             statusCount[exam.reading]++;
                         }
@@ -79,6 +83,7 @@ const fetchSchools = async () => {
 
                 if (school.students) {
                     school.students.forEach(student => {
+                        totalExamsQuantity += student.exams.length;
                         student.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -91,6 +96,10 @@ const fetchSchools = async () => {
 
         readingStatuses.value = Object.entries(statusCount);
 
+        readingStatuses.value.map(readingStatus => {
+            readingStatus[2] = (readingStatus[1] * 100 / totalExamsQuantity).toFixed(2)
+        })
+
         const ctx = chartRef.value?.getContext('2d');
         if (!ctx) {
             console.error('Contexto do canvas não encontrado.');
@@ -98,7 +107,7 @@ const fetchSchools = async () => {
         }
 
         const data = {
-            labels: readingStatuses.value.map(status => translationMap[status[0]]), // Labels traduzidas
+            labels: readingStatuses.value.map(status => translationMap[status[0]] + ' - ' + status[2] + '%'), // Labels traduzidas
             datasets: [{
                 label: 'Quantidade de alunos',
                 backgroundColor: ["#FF0000", "#FFCB00", "#7B0000", "#9747FF", "#ADD8E6", "#0D5413"],

@@ -5,8 +5,8 @@ import axios from 'axios';
 import MenuComponent from '../components/menu.vue';
 import TitleComponent from '/resources/js/components/title.vue';
 import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
-import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
-import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+import ChartBarReadingAndWritting from '/resources/js/components/chartBarReadingAndWritting.vue';
+import ChartPieReadingAndWritting from '/resources/js/components/chartPieReadingAndWritting.vue';
 import { api } from "../services/api"
 import html2pdf from 'html2pdf.js';
 import Button from "../components/button.vue";
@@ -629,9 +629,9 @@ const exportToPDF = async () => {
       </div>
       <UserWelcomeComponent v-if='!isImpress' id='user-modal' class="welcome-component"></UserWelcomeComponent>
       <TitleComponent v-if='!isImpress' id='bar-chart-title' title="Análise geral dividida por sondagem" />
-      <ChartBarBimReading v-if='!isImpress' id='bar-chart-content' titleGrapichCard="Nível turmas das escolas - Leitura" />
+      <ChartBarReadingAndWritting v-if='!isImpress' id='bar-chart-content' titleGrapichCard="Nível turmas das escolas - Leitura" />
       <TitleComponent v-if='!isImpress' id='pizza-graphic-title' title="Análise geral média " />
-      <ChartBarBimWriting v-if='!isImpress' id='pizza-graphic' titleGrapichCard="Nível geral das turmas - Escrita" />
+      <ChartPieReadingAndWritting v-if='!isImpress' id='pizza-graphic' titleGrapichCard="Nível geral das turmas - Escrita" />
       <div class="button-modal">
           <Button v-if='!isImpress' TextValue="Exportar Gráficos" id="export-btn" @click="exportToPDF"/>
       </div>

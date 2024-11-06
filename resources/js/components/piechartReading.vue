@@ -22,6 +22,8 @@ const fetchSchools = async () => {
     try {
         let response;
 
+        var totalExamsQuantity = 0;
+
         const statusCount = {
             not_reader: 0,
             syllable_reader: 0,
@@ -37,6 +39,7 @@ const fetchSchools = async () => {
                 response.data.forEach(city => {
 
                     city.schools.forEach(school => {
+                        totalExamsQuantity += school.exams.length;
                         school.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -44,12 +47,13 @@ const fetchSchools = async () => {
                         });
                     });
                 });
-            } else if (selectedFilter.filterType === 'All Schools in City') {
+            }
+            else if (selectedFilter.filterType === 'All Schools in City') {
                 response = await axios.get(`/ManagementSchool/${selectedFilter.city.schools[0].city_id}/all`);
 
                 const schools = response.data[0];
-
                 schools.forEach(school => {
+                    totalExamsQuantity += school.exams.length;
                     if (school.exams) {
                         school.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
@@ -59,12 +63,13 @@ const fetchSchools = async () => {
                     }
                 });
 
-            } else if (selectedFilter.filterType === 'Specific School') {
+            }
+            else if (selectedFilter.filterType === 'Specific School') {
 
                 response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
 
                 const school = response.data;
-
+                totalExamsQuantity += school.exams.length;
                 if (school.exams) {
                     school.exams.forEach(exam => {
                         ('city', school.exams);
@@ -73,12 +78,14 @@ const fetchSchools = async () => {
                         }
                     });
                 }
-            } else if (selectedFilter.filterType === 'Specific School Class') {
+            }
+            else if (selectedFilter.filterType === 'Specific School Class') {
                 response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
                 const school = response.data;
 
                 if (school.students) {
                     school.students.forEach(student => {
+                        totalExamsQuantity += student.exams.length;
                         student.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -91,6 +98,10 @@ const fetchSchools = async () => {
 
         readingStatuses.value = Object.entries(statusCount);
 
+        readingStatuses.value.map(readingStatus => {
+            readingStatus[2] = (readingStatus[1] * 100 / totalExamsQuantity).toFixed(2)
+        })
+
         const ctx = chartRef.value?.getContext('2d');
         if (!ctx) {
             console.error('Contexto do canvas não encontrado.');
@@ -98,7 +109,7 @@ const fetchSchools = async () => {
         }
 
         const data = {
-            labels: readingStatuses.value.map(status => translationMap[status[0]]), // Labels traduzidas
+            labels: readingStatuses.value.map(status => translationMap[status[0]] + ' - ' + status[2] + '%'), // Labels traduzidas
             datasets: [{
                 label: 'Quantidade de alunos',
                 backgroundColor: ["#FF0000", "#FFCB00", "#7B0000", "#9747FF", "#ADD8E6", "#0D5413"],
