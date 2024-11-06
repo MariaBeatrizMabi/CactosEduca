@@ -571,7 +571,7 @@ const exportToPDF = async () => {
 </script>
 
 <template>
-    <Loading :isLoading="isLoading"></Loading>
+  <Loading :isLoading="isLoading"></Loading>
   <div class="dashboard">
     <MenuComponent />
     <div id="dashboard" class="dashboard-content">
@@ -632,13 +632,22 @@ const exportToPDF = async () => {
       <ChartBarBimReading v-if='!isImpress' id='bar-chart-content' titleGrapichCard="Nível turmas das escolas - Leitura" />
       <TitleComponent v-if='!isImpress' id='pizza-graphic-title' title="Análise geral média " />
       <ChartBarBimWriting v-if='!isImpress' id='pizza-graphic' titleGrapichCard="Nível geral das turmas - Escrita" />
-       <button v-if='!isImpress' id="export-btn" @click="exportToPDF">teste</button>
+      <div class="button-modal">
+          <Button v-if='!isImpress' TextValue="Exportar Gráficos" id="export-btn" @click="exportToPDF"/>
+      </div>
+
 
     </div>
   </div>
 </template>
 
 <style scoped>
+
+.button-modal{
+    display: flex;
+    justify-content: right;
+    width: 85%;
+}
 
 .average-modal{
     display: flex;
