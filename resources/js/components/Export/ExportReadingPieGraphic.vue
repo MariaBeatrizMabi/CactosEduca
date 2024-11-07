@@ -6,7 +6,7 @@ import axios from "axios";
 const chartRef = ref(null);
 const readingStatuses = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
-import { api } from "../services/api"
+import { api } from "../../services/api"
 
 const translationMap = {
     null: 'não informado',
@@ -47,14 +47,14 @@ const fetchSchools = async () => {
                         });
                     });
                 });
-            }
-            else if (selectedFilter.filterType === 'All Schools in City') {
+            } else if (selectedFilter.filterType === 'All Schools in City') {
                 response = await axios.get(`/ManagementSchool/${selectedFilter.city.schools[0].city_id}/all`);
 
                 const schools = response.data[0];
+
                 schools.forEach(school => {
-                    totalExamsQuantity += school.exams.length;
                     if (school.exams) {
+                        totalExamsQuantity += school.exams.length;
                         school.exams.forEach(exam => {
                             if (statusCount[exam.reading] !== undefined) {
                                 statusCount[exam.reading]++;
@@ -63,23 +63,21 @@ const fetchSchools = async () => {
                     }
                 });
 
-            }
-            else if (selectedFilter.filterType === 'Specific School') {
+            } else if (selectedFilter.filterType === 'Specific School') {
 
                 response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
 
                 const school = response.data;
-                totalExamsQuantity += school.exams.length;
+
                 if (school.exams) {
+                    totalExamsQuantity += school.exams.length;
                     school.exams.forEach(exam => {
-                        ('city', school.exams);
                         if (statusCount[exam.reading] !== undefined) {
                             statusCount[exam.reading]++;
                         }
                     });
                 }
-            }
-            else if (selectedFilter.filterType === 'Specific School Class') {
+            } else if (selectedFilter.filterType === 'Specific School Class') {
                 response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
                 const school = response.data;
 
@@ -121,7 +119,7 @@ const fetchSchools = async () => {
             type: 'pie',
             data: data,
             options: {
-                responsive: true,
+                responsive: false,
                 plugins: {
                     legend: {
                         display: true,
@@ -150,7 +148,69 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <canvas ref="chartRef" id="myChart"></canvas>
+    <div class="cards">
+        <div class="card-grapich">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>Análise média dividida por tipo - Leitura</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <div>
+                    <canvas class="canvar-style" id="myChart" ref="chartRef"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
+<style scoped>
+
+.canvar-style {
+    margin-left: 90px;
+    width: 550px;
+    height: 370px !important;
+}
+.cards{
+
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    & .card-grapich {
+        margin: 1.5rem 0 !important;
+        width: 95%;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: 1rem;
+        border: 3px solid var(--secondary-color);
+
+        background-color: var(--secondary-color);
+
+        & .card-grapich-content {
+            & .card-title {
+                & h1 {
+                    margin: 0.5rem;
+                    text-align: center;
+
+                    color: white;
+
+                    font-weight: 400;
+                    font-size: 20px;
+                }
+            }
+        }
+        & .grapich {
+            width: 100%;
+            display: flex !important;
+            justify-content: center !important;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 1rem 1rem;
+            background-color: white;
+        }
+    }
+}
+</style>

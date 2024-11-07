@@ -5,15 +5,25 @@ import axios from 'axios';
 import MenuComponent from '../components/menu.vue';
 import TitleComponent from '/resources/js/components/title.vue';
 import UserWelcomeComponent from '/resources/js/components/userWelcome.vue';
-import ChartBarBimReading from '/resources/js/components/chartBarBimReading.vue';
-import ChartBarBimWriting from '/resources/js/components/chartBarBimWriting.vue';
+import ChartBarReadingAndWritting from '/resources/js/components/chartBarReadingAndWritting.vue';
+import ChartPieReadingAndWritting from '/resources/js/components/chartPieReadingAndWritting.vue';
 import { api } from "../services/api"
+import html2pdf from 'html2pdf.js';
+import Button from "../components/button.vue";
+import ExportWritingBarGraphic from "../components/Export/ExportWritingBarGraphic.vue";
+import ExportReadingBarGraphics from "../components/Export/ExportReadingBarGraphics.vue";
+import ExportWritingPieChart from "../components/Export/ExportWritingPieChart.vue";
+import Title from "../components/title.vue";
+import ExportReadingPieGraphic from "../components/Export/ExportReadingPieGraphic.vue";
+import Loading from "../components/loading.vue";
 
+const isLoading = ref(false);
 const route = useRoute();
 const formDataStudentPreview = ref([]);
 const schoolsWithAverages = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
 const studentData = ref([]);
+const isImpress = ref(false);
 
 const fetchAllSchools = async () => {
   try {
@@ -171,7 +181,9 @@ const gradeTranslations = {
   'pre_syllabic': 'Pré-Silábico',
   'syllabic': 'Silábico',
   'alphabetical_syllabic': 'Silabico Alfabetico',
-  'alphabetical': 'Alfabetico'
+  'alphabetical': 'Alfabetico',
+  'missed': 'Faltou',
+  'transfered': 'Transferido',
 };
 
 const calculateAveragesAllCities = () => {
@@ -498,15 +510,83 @@ onMounted(() => {
     console.warn('selectedFilter is undefined or missing filterType');
   }
 });
+
+const exportToPDF = async () => {
+
+    isImpress.value = true;
+    isLoading.value = true;
+
+    // Elemento raiz
+    const element = document.getElementById('dashboard');
+
+    // Removidos da página
+    const pizzaElement = document.getElementById('pizza-graphic');
+    pizzaElement.classList.add('none-on-impress')
+
+    const pizzaElementTitle = document.getElementById('pizza-graphic-title');
+    pizzaElementTitle.classList.add('none-on-impress')
+
+    const userModal = document.getElementById('user-modal');
+    userModal.classList.add('none-on-impress')
+
+    const exportBtn = document.getElementById('export-btn');
+    exportBtn.classList.add('none-on-impress')
+
+    // Formatando modal de média
+    const averageModalTitle = document.getElementById('average-modal-title');
+    averageModalTitle.classList.add('average-modal')
+
+    const averageModalContent = document.getElementById('average-modal-content');
+    averageModalContent.classList.add('average-modal')
+
+    const barChartTitle = document.getElementById('bar-chart-title');
+    barChartTitle.classList.add('average-modal')
+
+    await html2pdf()
+        .from(element)
+        .set({
+            margin: [5, 5, 5, 5],
+            filename: 'exported-file.pdf',
+            html2canvas: {
+                scale: 3,
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        })
+        .save()
+
+    isImpress.value = false;
+    isLoading.value = false;
+    pizzaElement.classList.remove('none-on-impress')
+    pizzaElementTitle.classList.remove('none-on-impress')
+    userModal.classList.remove('none-on-impress')
+    exportBtn.classList.remove('none-on-impress')
+    averageModalTitle.classList.remove('average-modal')
+    averageModalContent.classList.remove('average-modal')
+    barChartTitle.classList.remove('average-modal')
+};
+
 </script>
 
 <template>
+  <Loading :isLoading="isLoading"></Loading>
   <div class="dashboard">
     <MenuComponent />
-    <div class="dashboard-content">
-      <TitleComponent v-if="selectedFilter.filterType !== 'Specific School Class'" title="Análise Geral das escolas" />
-      <TitleComponent v-if="selectedFilter.filterType === 'Specific School Class'" title="Análise Geral das turmas" />
-      <div class="tableContent">
+    <div id="dashboard" class="dashboard-content">
+      <div v-show="isImpress">
+          <Title class="average-modal" id='bar-chart-title' title="Análise geral dividida por sondagem" />
+          <ExportReadingBarGraphics/>
+          <ExportWritingBarGraphic/>
+          <Title class="average-modal" id='pie-chart-title' title="Análise geral média" />
+          <ExportReadingPieGraphic/>
+          <ExportWritingPieChart/>
+      </div>
+
+      <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class' && !isImpress" title="Análise Geral das escolas" />
+      <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class' && !isImpress" title="Análise Geral das turmas" />
+      <div id='average-modal-content' class="tableContent">
         <div class="table-container" style="overflow-x: auto;">
           <div class="titleTable">
             <h1>Média Geral</h1>
@@ -547,16 +627,46 @@ onMounted(() => {
 
         </div>
       </div>
-      <UserWelcomeComponent class="welcome-component"></UserWelcomeComponent>
-      <TitleComponent title="Análise geral dividida por sondagem" />
-      <ChartBarBimReading titleGrapichCard="Nível turmas das escolas - Leitura" />
-      <TitleComponent title="Análise geral média " />
-      <ChartBarBimWriting titleGrapichCard="Nível geral das turmas - Escrita" />
+      <UserWelcomeComponent v-if='!isImpress' id='user-modal' class="welcome-component"></UserWelcomeComponent>
+      <TitleComponent v-if='!isImpress' id='bar-chart-title' title="Análise geral dividida por sondagem" />
+      <ChartBarReadingAndWritting v-if='!isImpress' id='bar-chart-content' titleGrapichCard="Nível turmas das escolas - Leitura" />
+      <TitleComponent v-if='!isImpress' id='pizza-graphic-title' title="Análise geral média " />
+      <ChartPieReadingAndWritting v-if='!isImpress' id='pizza-graphic' titleGrapichCard="Nível geral das turmas - Escrita" />
+      <div class="button-modal">
+          <Button v-if='!isImpress' TextValue="Exportar Gráficos" id="export-btn" @click="exportToPDF"/>
+      </div>
+
+
     </div>
   </div>
 </template>
 
 <style scoped>
+
+.button-modal{
+    display: flex;
+    justify-content: right;
+    width: 83%;
+}
+
+.average-modal{
+    display: flex;
+    justify-content: center;
+    width: 95% !important;
+    margin: 15px !important;
+}
+
+.bar-chart-content{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.none-on-impress{
+    display: none;
+}
+
 .dashboard {
   display: flex;
 

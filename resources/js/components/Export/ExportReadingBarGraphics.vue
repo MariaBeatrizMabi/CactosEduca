@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue';
 import Chart from 'chart.js/auto';
 import axios from "axios";
-import {api} from "../services/api"
+import { api } from "../../services/api"
 
 const chartRef = ref(null);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
@@ -311,7 +311,7 @@ const fetchSchools = async () => {
             type: 'bar',
             data: data,
             options: {
-                responsive: true,
+                responsive: false,
                 plugins: {
                     legend: {
                         display: true,
@@ -357,7 +357,67 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <canvas id="myChart" ref="chartRef"></canvas>
+    <div class="cards">
+        <div class="card-grapich">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>Analise dividida por sondagem - Leitura</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <div>
+                    <canvas class="test" id="myChart" ref="chartRef"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
+<style scoped>
+
+.test {
+    width: 650px;
+    height: 350px !important;
+}
+.cards{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    & .card-grapich {
+        margin: 2rem 0;
+        width: 95%;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: 1rem;
+        border: 3px solid var(--secondary-color);
+
+        background-color: var(--secondary-color);
+
+        & .card-grapich-content {
+            & .card-title {
+                & h1 {
+                    margin: 0.5rem;
+                    text-align: center;
+
+                    color: white;
+
+                    font-weight: 400;
+                    font-size: 20px;
+                }
+            }
+        }
+        & .grapich {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 1rem 1rem;
+            background-color: white;
+        }
+    }
+}
+</style>
