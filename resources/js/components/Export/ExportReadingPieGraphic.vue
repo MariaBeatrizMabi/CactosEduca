@@ -168,8 +168,8 @@ onMounted(() => {
 
 .canvar-style {
     margin-left: 90px;
-    width: 450px;
-    height: 360px !important;
+    width: 550px;
+    height: 370px !important;
 }
 .cards{
 
