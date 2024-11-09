@@ -211,6 +211,7 @@ const fetchSchools = async () => {
         });
 
         const ctx = chartRef.value?.getContext('2d');
+
         if (!ctx) {
             console.error('Contexto do canvas não encontrado.');
             return;
@@ -246,24 +247,8 @@ const fetchSchools = async () => {
             ]
         };
 
-        let colorsAndNames = [
-            {
-                name: 'Pré-silabico',
-                color :"#FF0000"
-            },
-            {
-                name: 'Silábico',
-                color :"#FFCB00"
-            },
-            {
-                name: 'Silábico Alfabético',
-                color :"#76AA3B"
-            },
-            {
-                name: 'Alfabético',
-                color :"#0D5413"
-            }
-        ]
+        Chart.defaults.color = '#000000'
+        Chart.defaults.font.weight = 'normal';
 
         new Chart(ctx, {
             type: 'bar',

@@ -274,32 +274,6 @@ const fetchSchools = async () => {
             ]
         };
 
-        let colorsAndNames = [
-            {
-                name: 'Não leitor',
-                color :"#FF0000"
-            },
-            {
-                name: 'Leitor de silabas',
-                color :"#FFCB00"
-            },
-            {
-                name: 'Leitor de palavras',
-                color :"#7B0000"
-            },
-            {
-                name: 'Leitor de frases',
-                color :"#9747FF"
-            },
-            {
-                name: 'Leitor de Texto com fluencia',
-                color :"#ADD8E6"
-            },
-            {
-                name: 'Leitor de texto sem fluencia',
-                color :"#0D5413"
-            }
-        ]
         Chart.defaults.color = '#000000'
         Chart.defaults.font.weight = 'normal';
 
