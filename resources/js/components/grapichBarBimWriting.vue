@@ -4,17 +4,8 @@ import Chart from 'chart.js/auto';
 import axios from 'axios';
 
 const chartRef = ref(null);
-const writingStatuses = ref([]);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
 import { api } from "../services/api"
-
-const translationMap = {
-  null: 'não informado',
-  'pre_syllabic': 'Pré-silábico',
-  'syllabic': 'Silábico',
-  'alphabetical_syllabic': 'Silábico alfabético',
-  'alphabetical': 'Alfabético'
-};
 
 const fetchSchools = async () => {
   try {
@@ -282,15 +273,7 @@ const fetchSchools = async () => {
         plugins: {
           legend: {
             display: true,
-            position: 'bottom',
-            labels: {
-              generateLabels: function (chart) {
-                return colorsAndNames.map(configData => ({
-                  text: configData.name,
-                  fillStyle: configData.color,
-                }));
-              }
-            }
+            position: 'bottom'
           },
         },
         scales: {

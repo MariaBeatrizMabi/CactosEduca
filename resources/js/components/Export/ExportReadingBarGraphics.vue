@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue';
 import Chart from 'chart.js/auto';
 import axios from "axios";
-import {api} from "../services/api"
+import { api } from "../../services/api"
 
 const chartRef = ref(null);
 const selectedFilter = JSON.parse(localStorage.getItem('selectedFilter'));
@@ -244,78 +244,49 @@ const fetchSchools = async () => {
                 {
                     label: 'Não leitor',
                     backgroundColor: ["#FF0000"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.not_reader
                 },
                 {
                     label: 'Leitor de silabas',
                     backgroundColor: ["#FFCB00"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.syllable_reader
                 },
                 {
                     label: 'Leitor de Palavras',
                     backgroundColor: ["#7B0000"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.word_reader
                 },
                 {
                     label: 'Leitor de frases',
                     backgroundColor: ["#9747FF"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.sentence_reader
                 },
                 {
                     label: 'Leitor de Texto com fluencia',
                     backgroundColor: ["#ADD8E6"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.fluent_text_reader
                 },
                 {
                     label: 'Leitor de texto sem fluencia',
                     backgroundColor: ["#0D5413"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.no_fluent_text_reader
                 },
             ]
         };
 
-        let colorsAndNames = [
-            {
-                name: 'Não leitor',
-                color :"#FF0000"
-            },
-            {
-                name: 'Leitor de silabas',
-                color :"#FFCB00"
-            },
-            {
-                name: 'Leitor de palavras',
-                color :"#7B0000"
-            },
-            {
-                name: 'Leitor de frases',
-                color :"#9747FF"
-            },
-            {
-                name: 'Leitor de Texto com fluencia',
-                color :"#ADD8E6"
-            },
-            {
-                name: 'Leitor de texto sem fluencia',
-                color :"#0D5413"
-            }
-        ]
+        Chart.defaults.color = '#000000'
+        Chart.defaults.font.weight = 'normal';
 
         new Chart(ctx, {
             type: 'bar',
             data: data,
             options: {
-                responsive: true,
+                responsive: false,
+                devicePixelRatio: 1,
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'bottom'
+                        position: 'bottom',
                     },
                 },
                 scales: {
@@ -349,7 +320,67 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
-        <canvas id="myChart" ref="chartRef"></canvas>
+    <div class="cards">
+        <div class="card-grapich">
+            <div class="card-grapich-content">
+                <div class="card-title">
+                    <h1>Analise dividida por sondagem - Leitura</h1>
+                </div>
+            </div>
+            <div class="grapich">
+                <div>
+                    <canvas class="test" id="myChart" ref="chartRef"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
+<style scoped>
+
+.test {
+    width: 650px;
+    height: 350px !important;
+}
+.cards{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    & .card-grapich {
+        margin: 2rem 0;
+        width: 95%;
+
+        display: flex;
+        flex-direction: column;
+
+        border-radius: 1rem;
+        border: 3px solid var(--secondary-color);
+
+        background-color: var(--secondary-color);
+
+        & .card-grapich-content {
+            & .card-title {
+                & h1 {
+                    margin: 0.5rem;
+                    text-align: center;
+
+                    color: white;
+
+                    font-weight: 400;
+                    font-size: 20px;
+                }
+            }
+        }
+        & .grapich {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 1rem 1rem;
+            background-color: white;
+        }
+    }
+}
+</style>

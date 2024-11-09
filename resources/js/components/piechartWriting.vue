@@ -20,6 +20,8 @@ const fetchSchools = async () => {
   try {
     let response;
 
+    var totalExamsQuantity = 0;
+
     const statusCount = {
       pre_syllabic: 0,
       syllabic: 0,
@@ -34,18 +36,21 @@ const fetchSchools = async () => {
 
           city.schools.forEach(school => {
             school.exams.forEach(exam => {
+              totalExamsQuantity += school.exams.length;
               if (statusCount[exam.writing] !== undefined) {
                 statusCount[exam.writing]++;
               }
             });
           });
         });
-      } else if (selectedFilter.filterType === 'All Schools in City') {
+      }
+      else if (selectedFilter.filterType === 'All Schools in City') {
         response = await axios.get(`/ManagementSchool/${selectedFilter.city.schools[0].city_id}/all`);
 
         const schools = response.data[0];
 
         schools.forEach(school => {
+          totalExamsQuantity += school.exams.length;
           if (school.exams) {
             school.exams.forEach(exam => {
               if (statusCount[exam.writing] !== undefined) {
@@ -55,13 +60,15 @@ const fetchSchools = async () => {
           }
         });
 
-      } else if (selectedFilter.filterType === 'Specific School') {
+      }
+      else if (selectedFilter.filterType === 'Specific School') {
 
         response = await axios.get(`/schoolDetails/json/${selectedFilter.city}/${selectedFilter.school}/${selectedFilter.schoolId}`);
 
         const school = response.data;
 
         if (school.exams) {
+          totalExamsQuantity += school.exams.length;
           school.exams.forEach(exam => {
             if (statusCount[exam.writing] !== undefined) {
               statusCount[exam.writing]++;
@@ -69,12 +76,14 @@ const fetchSchools = async () => {
           });
         }
 
-      } else if (selectedFilter.filterType === 'Specific School Class') {
+      }
+      else if (selectedFilter.filterType === 'Specific School Class') {
         response = await api.get(`/api/classes/${selectedFilter.classId}/exams`);
         const school = response.data;
 
         if (school.students) {
           school.students.forEach(student => {
+            totalExamsQuantity += student.exams.length;
             student.exams.forEach(exam => {
               if (statusCount[exam.writing] !== undefined) {
                 statusCount[exam.writing]++;
@@ -87,6 +96,10 @@ const fetchSchools = async () => {
 
     writingStatuses.value = Object.entries(statusCount);
 
+    writingStatuses.value.map(writingStatus => {
+        writingStatus[2] = (writingStatus[1] * 100 / totalExamsQuantity).toFixed(2)
+    })
+
     const ctx = chartRef.value?.getContext('2d');
     if (!ctx) {
       console.error('Contexto do canvas não encontrado.');
@@ -94,7 +107,7 @@ const fetchSchools = async () => {
     }
 
     const data = {
-      labels: writingStatuses.value.map(status => translationMap[status[0]]),
+      labels: writingStatuses.value.map(status => translationMap[status[0]] + ' - ' + status[2] + '%'),
       datasets: [{
         label: 'Quantidade de escolas',
         backgroundColor: ["#FF0000", "#FFCB00", "#76AA3B", "#0D5413"],
@@ -102,6 +115,9 @@ const fetchSchools = async () => {
         data: writingStatuses.value.map(status => status[1]),
       }]
     };
+
+    Chart.defaults.color = '#000000'
+    Chart.defaults.font.weight = 'normal';
 
     new Chart(ctx, {
       type: 'pie',
@@ -111,15 +127,7 @@ const fetchSchools = async () => {
         plugins: {
           legend: {
             display: true,
-            position: 'bottom',
-            labels: {
-              generateLabels: function (chart) {
-                return writingStatuses.value.map(status => ({
-                  text: translationMap[status[0]],
-                  fillStyle: chart.data.datasets[0].backgroundColor[writingStatuses.value.indexOf(status)],
-                }));
-              }
-            }
+            position: 'bottom'
           },
           tooltip: {
             callbacks: {
