@@ -101,6 +101,8 @@ const fetchSchools = async () => {
         })
 
         const ctx = chartRef.value?.getContext('2d');
+        Chart.defaults.color = '#000000'
+        Chart.defaults.font.weight = 'bold';
         if (!ctx) {
             console.error('Contexto do canvas não encontrado.');
             return;
@@ -111,6 +113,7 @@ const fetchSchools = async () => {
             datasets: [{
                 label: 'Quantidade de alunos',
                 backgroundColor: ["#FF0000", "#FFCB00", "#7B0000", "#9747FF", "#ADD8E6", "#0D5413"],
+                borderWidth: 0,
                 data: readingStatuses.value.map(status => status[1]),
             }]
         };
@@ -123,7 +126,7 @@ const fetchSchools = async () => {
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'bottom'
+                        position: 'right',
                     },
                     tooltip: {
                         callbacks: {
@@ -167,9 +170,9 @@ onMounted(() => {
 <style scoped>
 
 .canvar-style {
-    margin-left: 90px;
+    margin-left: 70px;
     width: 550px;
-    height: 370px !important;
+    height: 550px !important;
 }
 .cards{
 
@@ -206,6 +209,7 @@ onMounted(() => {
             width: 100%;
             display: flex !important;
             justify-content: center !important;
+            height: 400px !important;
             flex-direction: column;
             padding: 1rem;
             border-radius: 0 0 1rem 1rem;

@@ -116,6 +116,9 @@ const fetchSchools = async () => {
       }]
     };
 
+    Chart.defaults.color = '#000000'
+    Chart.defaults.font.weight = 'normal';
+
     new Chart(ctx, {
       type: 'pie',
       data: data,

@@ -315,15 +315,7 @@ const fetchSchools = async () => {
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'bottom',
-                        labels: {
-                            generateLabels: function (chart) {
-                                return colorsAndNames.map(configData => ({
-                                    text: configData['name'],
-                                    fillStyle: configData['color'],
-                                }));
-                            }
-                        }
+                        position: 'bottom'
                     },
                 },
                 scales: {

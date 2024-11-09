@@ -96,7 +96,8 @@ const fetchSchools = async () => {
         writingStatuses.value.map(writingStatus => {
             writingStatus[2] = (writingStatus[1] * 100 / totalExamsQuantity).toFixed(2)
         })
-
+        Chart.defaults.color = '#000000'
+        Chart.defaults.font.weight = 'bold';
         const ctx = chartRef.value?.getContext('2d');
         if (!ctx) {
             console.error('Contexto do canvas não encontrado.');
@@ -121,7 +122,7 @@ const fetchSchools = async () => {
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'bottom'
+                        position: 'right'
                     },
                     tooltip: {
                         callbacks: {
@@ -155,7 +156,7 @@ onMounted(() => {
             </div>
             <div class="grapich">
                 <div>
-                    <canvas class="test" id="myChart" ref="chartRef"></canvas>
+                    <canvas class="canvar-style" id="myChart" ref="chartRef"></canvas>
                 </div>
             </div>
         </div>
@@ -164,10 +165,10 @@ onMounted(() => {
 
 <style scoped>
 
-.test {
-    margin-left: 90px;
-    width: 550px;
-    height: 370px !important;
+.canvar-style {
+    margin-left: 70px;
+    width: 500px !important;
+    height: 500px !important;
 }
 .cards{
 
@@ -206,6 +207,7 @@ onMounted(() => {
             justify-content: center;
             flex-direction: column;
             padding: 1rem;
+            height: 400px !important;
             border-radius: 0 0 1rem 1rem;
             background-color: white;
         }

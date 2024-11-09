@@ -244,37 +244,31 @@ const fetchSchools = async () => {
                 {
                     label: 'Não leitor',
                     backgroundColor: ["#FF0000"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.not_reader
                 },
                 {
                     label: 'Leitor de silabas',
                     backgroundColor: ["#FFCB00"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.syllable_reader
                 },
                 {
                     label: 'Leitor de Palavras',
                     backgroundColor: ["#7B0000"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.word_reader
                 },
                 {
                     label: 'Leitor de frases',
                     backgroundColor: ["#9747FF"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.sentence_reader
                 },
                 {
                     label: 'Leitor de Texto com fluencia',
                     backgroundColor: ["#ADD8E6"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.fluent_text_reader
                 },
                 {
                     label: 'Leitor de texto sem fluencia',
                     backgroundColor: ["#0D5413"],
-                    borderWidth: 0,
                     data: totalValuesPerLabel.no_fluent_text_reader
                 },
             ]
@@ -306,6 +300,8 @@ const fetchSchools = async () => {
                 color :"#0D5413"
             }
         ]
+        Chart.defaults.color = '#000000'
+        Chart.defaults.font.weight = 'normal';
 
         new Chart(ctx, {
             type: 'bar',
@@ -316,14 +312,6 @@ const fetchSchools = async () => {
                     legend: {
                         display: true,
                         position: 'bottom',
-                        labels: {
-                            generateLabels: function (chart) {
-                                return colorsAndNames.map(configData => ({
-                                    text: configData['name'],
-                                    fillStyle: configData['color'],
-                                }));
-                            }
-                        }
                     },
                 },
                 scales: {
