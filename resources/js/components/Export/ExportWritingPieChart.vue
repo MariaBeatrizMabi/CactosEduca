@@ -118,6 +118,7 @@ const fetchSchools = async () => {
             type: 'pie',
             data: data,
             options: {
+                devicePixelRatio: 1,
                 responsive: false,
                 plugins: {
                     legend: {
