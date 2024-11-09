@@ -270,6 +270,7 @@ const fetchSchools = async () => {
             data: data,
             options: {
                 responsive: false,
+                devicePixelRatio: 1,
                 plugins: {
                     legend: {
                         display: true,
