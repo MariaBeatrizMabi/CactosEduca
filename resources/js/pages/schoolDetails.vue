@@ -18,6 +18,7 @@ import ExportReadingPieGraphic from "../components/Export/ExportReadingPieGraphi
 import Loading from "../components/loading.vue";
 
 const isLoading = ref(false);
+const className = ref('');
 const route = useRoute();
 const formDataStudentPreview = ref([]);
 const schoolsWithAverages = ref([]);
@@ -27,7 +28,15 @@ const isImpress = ref(false);
 
 const fetchAllSchools = async () => {
   try {
+
     const response = await axios.get('/ManagementSchool/all');
+    if(response.data.length === 1 && response.data[0].schools.length === 1){
+        className.value = `Escola ${response.data[0].schools[0].name}`
+    } else {
+        className.value = 'Todos os dados'
+    }
+
+
     formDataStudentPreview.value = Array.isArray(response.data) ? response.data : [];
     calculateAverages();
   } catch (error) {
@@ -39,6 +48,7 @@ const fetchAllSchools = async () => {
 const fetchSchoolsByCity = async (city) => {
   try {
       const response = await axios.get(`/ManagementSchool/${city.schools[0].city_id}/all`);
+      className.value = `Cidade ${city.city}`;
 
     if (response.data && response.data.length > 0) {
       const data = response.data[0];
@@ -82,6 +92,7 @@ const fetchSpecificSchoolInCityData = async (city, schoolNames, schoolId) => {
     return;
   }
   try {
+    className.value = `Escola ${schoolNames}`;
     const response = await axios.get(`/schoolDetails/json/${city}/${schoolNames}/${schoolId}`);
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data;
@@ -103,6 +114,7 @@ const fetchSpecificClassInSchool = async (classId) => {
 
   try {
       const response = await api.get(`/api/classes/${classId.classId}/exams`);
+      className.value = `Turma ${response.data.class}`
     if (Array.isArray(response.data)) {
       formDataStudentPreview.value = response.data;
     } else {
@@ -492,15 +504,19 @@ onMounted(() => {
   if (selectedFilter && selectedFilter.filterType) {
 
     if (selectedFilter.filterType === 'All Cities') {
+        console.log('aqui: a')
         fetchAllSchools();
 
     } else if (selectedFilter.filterType === 'All Schools in City') {
+        console.log('aqui: b')
         fetchSchoolsByCity(selectedFilter.city);
 
     } else if (selectedFilter.filterType === 'Specific School') {
+        console.log('aqui: c')
         fetchSpecificSchoolInCityData(selectedFilter.city, selectedFilter.school, selectedFilter.schoolId);
 
     } else if (selectedFilter.filterType === 'Specific School in City') {
+        console.log('aqui: d')
         fetchSpecificSchoolInCity(selectedFilter.city, selectedFilter.schoolNames, selectedFilter.id);
 
     } else if (selectedFilter.filterType === 'Specific School Class') {
@@ -584,6 +600,7 @@ const exportToPDF = async () => {
           <ExportWritingPieChart/>
       </div>
 
+      <TitleComponent id='average-modal-title' style="margin-bottom: 10px"  :title="className" />
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class' && !isImpress" title="Análise Geral das escolas" />
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class' && !isImpress" title="Análise Geral das turmas" />
       <div id='average-modal-content' class="tableContent">
