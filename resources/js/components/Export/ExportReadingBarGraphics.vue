@@ -348,7 +348,7 @@ onMounted(() => {
     justify-content: center;
 
     & .card-grapich {
-        margin: 2rem 0;
+        margin: 1rem 0;
         width: 95%;
 
         display: flex;
