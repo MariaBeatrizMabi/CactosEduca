@@ -592,6 +592,7 @@ const exportToPDF = async () => {
     <MenuComponent />
     <div id="dashboard" class="dashboard-content">
       <div v-show="isImpress">
+          <Title class="average-modal" id='bar-chart-title'  :title="className" />
           <Title class="average-modal" id='bar-chart-title' title="Análise geral dividida por sondagem" />
           <ExportReadingBarGraphics/>
           <ExportWritingBarGraphic/>
