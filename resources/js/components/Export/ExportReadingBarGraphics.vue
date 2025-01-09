@@ -324,7 +324,7 @@ onMounted(() => {
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>Analise dividida por sondagem - Leitura</h1>
+                    <h1>Análise dividida por sondagem - Leitura</h1>
                 </div>
             </div>
             <div class="grapich">
