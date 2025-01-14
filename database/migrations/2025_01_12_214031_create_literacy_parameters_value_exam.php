@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('literacy_parameters_value_exam', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('literacy_parameter_value')->constrained();
-            $table->foreignId('exams')->constrained();
+            $table->unsignedBigInteger('literacy_parameter_id');
+
+            $table->foreign('literacy_parameter_id')->references('id')->on('literacy_parameter_values');
+
+            $table->foreignId('exam_id')->constrained();
             $table->timestamps();
         });
     }

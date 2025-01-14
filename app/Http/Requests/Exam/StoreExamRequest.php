@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Exam;
 
+use App\Models\LiteracyParameterValue;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreExamRequest extends FormRequest
@@ -16,6 +17,20 @@ class StoreExamRequest extends FormRequest
             no_fluent_text_reader,missed,transferred'],
             'action' => ['nullable', 'string'],
             'poll_id' => ['required', 'exists:poll,id'],
+            'literacy_parameters_values' => ['required', 'array']
         ];
     }
+
+    protected function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            foreach ($this->literacy_parameters_values as $parametersValue){
+                $exists = LiteracyParameterValue::find($parametersValue);
+                if(!$exists){
+                    $validator->errors()->add('literacy_parameters_values', 'Parâmetro inexistente informado');
+                }
+            }
+        });
+    }
+
 }
