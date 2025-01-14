@@ -21,6 +21,7 @@ const route = useRoute();
 const schoolId = ref();
 const studentId = route.params.student;
 const studentInterventions = ref();
+const literacyParameters = ref();
 
 const studentData = ref({
     name: '',
@@ -84,6 +85,11 @@ const hasChangesToUpdate = computed(() =>
         .map(([key, value]) => value == formData.value[key])
         .some((value) => !value)
 )
+
+const getliteracyParameters = async () => {
+    const response = await api.get('/api/literacy_parameters')
+    literacyParameters.value = response.data.data;
+}
 
 async function updateStudent() {
     const peopleWithDisabilities = JSON.parse(formData.value?.people_with_disabilities);
@@ -216,6 +222,7 @@ const getStudent = async () => {
 onMounted(async () => {
     await getUserType();
     await getStudent();
+    await getliteracyParameters();
     // await handleImportExams();
 });
 
@@ -255,6 +262,7 @@ const loadSelectedInterventions = (pollId) => {
     }
 };
 const openInterventionModal = async (writing, pollId) => {
+
     pollIdD.value = null;
     interventions.value = [];
     showInterventionModal.value = false;
