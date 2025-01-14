@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\InterventionController;
+use App\Http\Controllers\LiteracyParametersController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
@@ -9,8 +11,6 @@ use App\Http\Controllers\ManagementStudentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\InterventionController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,6 +91,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ExamController::class, 'store']);
         Route::put('/{exam}', [ExamController::class, 'update']);
         Route::delete('/{exam}', [ExamController::class, 'delete']);
+    });
+
+    Route::prefix('/literacy_parameters')->group(function () {
+        Route::get('/', [LiteracyParametersController::class, 'index']);
     });
 
     Route::get('/interventions/exam/{studentId}/{pollId}', [InterventionController::class, 'getExamId']);
