@@ -16,6 +16,7 @@ import { importExams } from "../services/import";
 import axios from "axios";
 import Table from "../components/table.vue";
 import {DialogOverlay} from "radix-vue";
+import CreateExamModal from "../components/createExamModal.vue";
 
 const route = useRoute();
 const schoolId = ref();
@@ -614,7 +615,7 @@ const submitIntervention = async () => {
         </div>
     </div>
 
-    <Modal
+    <CreateExamModal
         v-if="showExamCreateModal"
         Titlevalue="Cadastro de Sondagens"
     >
@@ -700,7 +701,7 @@ const submitIntervention = async () => {
                 Adicionar sondagem
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
 
     <Modal
         v-if="showExamViewModal"
