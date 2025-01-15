@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('literacy_parameter_values', function (Blueprint $table) {
             $table->id();
             $table->text('value');
+            $table->text('name_to_show');
             $table->foreignId('literacy_parameter_id')->constrained();
             $table->timestamps();
         });

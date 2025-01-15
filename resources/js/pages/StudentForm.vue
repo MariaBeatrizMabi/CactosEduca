@@ -15,7 +15,6 @@ import { exportExamsData, exportExamsSampleData } from "../services/export";
 import { importExams } from "../services/import";
 import axios from "axios";
 import Table from "../components/table.vue";
-import {DialogOverlay} from "radix-vue";
 import CreateExamModal from "../components/createExamModal.vue";
 
 const route = useRoute();
@@ -23,6 +22,7 @@ const schoolId = ref();
 const studentId = route.params.student;
 const studentInterventions = ref();
 const literacyParameters = ref();
+const selectedLiteracyParameters = ref([]);
 
 const studentData = ref({
     name: '',
@@ -157,6 +157,7 @@ async function submitExamCreate(createdPollId) {
         student_id: route.params.student,
         class_id: classData.value.id,
         poll_id: createdPollId,
+        literacy_parameters_values: selectedLiteracyParameters.value
     });
 
     studentExams.value = await getStudentExams()
@@ -168,7 +169,14 @@ async function submitExamCreate(createdPollId) {
         action: null
     }
 
+    await getStudent();
 
+
+}
+
+const openExamCreateModal = () => {
+    selectedLiteracyParameters.value = [];
+    showExamCreateModal.value = true;
 }
 
 async function submitExamUpdate() {
@@ -298,6 +306,17 @@ const getExamIdForStudent = async (pollIdD) => {
 
 };
 
+const updateLiteracyValue = (literacyParameterValueId) => {
+    const position = selectedLiteracyParameters.value.indexOf(literacyParameterValueId);
+    if (position !== -1){
+        selectedLiteracyParameters.value.splice(position, 1)
+    } else {
+        selectedLiteracyParameters.value.push(literacyParameterValueId)
+    }
+
+    console.log(selectedLiteracyParameters.value)
+}
+
 const updateIntervention = (interventionId) => {
     const pollInterventions = selectedInterventionsPoll.value[pollIdD.value];
     const index = pollInterventions.indexOf(interventionId);
@@ -325,6 +344,18 @@ const submitIntervention = async () => {
         console.error(error);
     }
 };
+
+const literacyParameterTranslator = (parameter) => {
+    const parameters = {
+        write_name: 'Escreve o nome',
+        recognize_write_alphabet: 'Reconhece e escreve o alfabeto',
+        recognize_write_vocal_encounters: 'Reconhece e escreve encontros vocálicos',
+        recognize_write_syllable_family: 'Reconhece e escreve familias silábicas',
+        recognize_write_number: 'Reconhece e escreve numeros',
+    }
+
+    return parameters[parameter];
+}
 </script>
 
 <template>
@@ -470,7 +501,7 @@ const submitIntervention = async () => {
                         <div class="import-actions" v-if="studentExams?.length > index + 1 || studentExams?.length === 0">
                             <button
                                 class="create-test"
-                                @click="showExamCreateModal = true"
+                                @click="openExamCreateModal"
                             >
                                 Adicionar sondagem
                             </button>
@@ -573,7 +604,7 @@ const submitIntervention = async () => {
                     <div class="import-actions">
                         <button
                             class="create-test"
-                            @click="showExamCreateModal = true"
+                            @click="openExamCreateModal"
                         >
                             Adicionar sondagem
                         </button>
@@ -662,6 +693,18 @@ const submitIntervention = async () => {
                     <option value="missed">Faltou</option>
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
+
+                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+<!--                        <p>{{value.name_to_show}}</p>-->
+                        <Checkbox
+                            :isChecked="selectedLiteracyParameters.includes(value.id)"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
 
                 <span class="textarea-wrapper">
                     <h3>Ações de Intervenção</h3>
@@ -1192,6 +1235,13 @@ input[type="number"] {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 20px;
+}
+
+.form-label {
+    font-size: 14px;
+    margin-bottom: 3px;
+    font-weight: 600;
+    color: var(--black-color);
 }
 
 </style>

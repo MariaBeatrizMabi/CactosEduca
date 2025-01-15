@@ -11,6 +11,7 @@ class LiteracyParameterValue extends Model
 
     protected $fillable = [
         'value',
+        'name_to_show',
         'literacy_parameter_id'
     ];
 
