@@ -12,6 +12,10 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    disabled:{
+        type: Boolean,
+        required: false,
+    }
 });
 
 const randomId = Math.random();
@@ -32,6 +36,7 @@ const checked = async function (event) {
             class="custom-checkbox"
             type="checkbox"
             @change="checked"
+            :disabled="disabled"
         />
         <label :for="randomId" class="checkbox-label">{{ props.label }}</label>
     </div>

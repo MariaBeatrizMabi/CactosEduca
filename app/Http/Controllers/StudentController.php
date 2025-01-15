@@ -50,7 +50,10 @@ class StudentController extends Controller
     public function getExamsFromClass(Student $student, ClassModel $class): JsonResponse
     {
         return response()->json(
-            $student->exams()->where('class_id', $class->id)->get()
+            $student->exams()
+                ->with(['literacyParameterValues'])
+                ->where('class_id', $class->id)
+                ->get()
         );
     }
 

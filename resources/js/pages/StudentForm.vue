@@ -23,6 +23,7 @@ const studentId = route.params.student;
 const studentInterventions = ref();
 const literacyParameters = ref();
 const selectedLiteracyParameters = ref([]);
+const examLiteracyParameters = ref([])
 
 const studentData = ref({
     name: '',
@@ -232,12 +233,12 @@ onMounted(async () => {
     await getUserType();
     await getStudent();
     await getliteracyParameters();
-    // await handleImportExams();
 });
 
 function openShowExamModal(id) {
     showExamViewModal.value = true;
     activeExamId.value = id;
+    verifyIfLiteracyParameterIsChecked(activeExamData)
 }
 
 function openExamUpdateModal(id) {
@@ -355,6 +356,16 @@ const literacyParameterTranslator = (parameter) => {
     }
 
     return parameters[parameter];
+}
+
+const verifyIfLiteracyParameterIsChecked = (examParameters) => {
+
+    examParameters.value.literacy_parameter_values.forEach((parameter) => {
+        examLiteracyParameters.value.push(parameter.id)
+    })
+
+    console.log(examLiteracyParameters.value)
+
 }
 </script>
 
@@ -697,7 +708,6 @@ const literacyParameterTranslator = (parameter) => {
                 <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
-<!--                        <p>{{value.name_to_show}}</p>-->
                         <Checkbox
                             :isChecked="selectedLiteracyParameters.includes(value.id)"
                             :label="value.name_to_show"
@@ -746,7 +756,7 @@ const literacyParameterTranslator = (parameter) => {
         </div>
     </CreateExamModal>
 
-    <Modal
+    <CreateExamModal
         v-if="showExamViewModal"
         Titlevalue="Cadastro de Sondagens"
     >
@@ -799,6 +809,18 @@ const literacyParameterTranslator = (parameter) => {
                         rows="12"
                     ></textarea>
                 </span>
+
+                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :disabled="true"
+                            :isChecked="examLiteracyParameters.indexOf(value.id) !== -1"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-end">
@@ -816,7 +838,7 @@ const literacyParameterTranslator = (parameter) => {
                 Fechar
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
 
     <Modal
         v-if="showExamUpdateModal"
