@@ -8,6 +8,7 @@ use App\Models\Exam;
 use App\Services\Exam\AttachLiteracyParameterValueToExamService;
 use App\Services\Exam\StoreExamService;
 use App\Services\Exam\UpdateExamService;
+use App\Services\Exam\UpdateLiteracyParametersToExamService;
 
 class ExamController extends Controller
 {
@@ -26,11 +27,14 @@ class ExamController extends Controller
     public function update(
         UpdateExamRequest $updateExamRequest,
         UpdateExamService $updateExamService,
-        Exam $exam
+        Exam $exam,
+        UpdateLiteracyParametersToExamService $updateLiteracyParametersToExamService
     ): void
     {
         $data = $updateExamRequest->validated();
         $updateExamService->run($exam, $data);
+        $updateLiteracyParametersToExamService->run($exam, $data['literacy_parameters_values']);
+
     }
 
     public function delete(Exam $exam): void

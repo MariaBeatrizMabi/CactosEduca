@@ -181,6 +181,7 @@ const openExamCreateModal = () => {
 }
 
 async function submitExamUpdate() {
+    updateExamData.value.literacy_parameters_values = selectedLiteracyParameters.value
     await api.put(`/api/exams/${activeExamId.value}`, updateExamData.value);
 
     studentExams.value = await getStudentExams()
@@ -238,7 +239,7 @@ onMounted(async () => {
 function openShowExamModal(id) {
     showExamViewModal.value = true;
     activeExamId.value = id;
-    verifyIfLiteracyParameterIsChecked(activeExamData)
+    verifyIfLiteracyParameterIsChecked(activeExamData.value.literacy_parameter_values)
 }
 
 function openExamUpdateModal(id) {
@@ -246,6 +247,7 @@ function openExamUpdateModal(id) {
     activeExamId.value = id;
 
     updateExamData.value = {...activeExamData.value};
+    verifyIfLiteracyParameterIsChecked(updateExamData.value.literacy_parameter_values)
 }
 
 async function handleImportExams() {
@@ -314,8 +316,6 @@ const updateLiteracyValue = (literacyParameterValueId) => {
     } else {
         selectedLiteracyParameters.value.push(literacyParameterValueId)
     }
-
-    console.log(selectedLiteracyParameters.value)
 }
 
 const updateIntervention = (interventionId) => {
@@ -359,13 +359,13 @@ const literacyParameterTranslator = (parameter) => {
 }
 
 const verifyIfLiteracyParameterIsChecked = (examParameters) => {
+    examLiteracyParameters.value = [];
 
-    examParameters.value.literacy_parameter_values.forEach((parameter) => {
+    examParameters.forEach((parameter) => {
         examLiteracyParameters.value.push(parameter.id)
     })
 
-    console.log(examLiteracyParameters.value)
-
+    selectedLiteracyParameters.value = examLiteracyParameters.value
 }
 </script>
 
@@ -840,7 +840,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
         </div>
     </CreateExamModal>
 
-    <Modal
+    <CreateExamModal
         v-if="showExamUpdateModal"
         Titlevalue="Cadastro de Sondagens"
     >
@@ -893,6 +893,18 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                         rows="12"
                     ></textarea>
                 </span>
+
+                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :disabled="false"
+                            :isChecked="examLiteracyParameters.indexOf(value.id) !== -1"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-end">
@@ -923,7 +935,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                 Adicionar sondagem
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
     <Modal
         v-if="showInterventionModal"
         :Titlevalue="`Aluno ${{
