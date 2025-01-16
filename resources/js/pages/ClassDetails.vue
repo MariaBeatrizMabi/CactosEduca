@@ -31,7 +31,11 @@ const students = ref([]);
 const isLoading = ref(false);
 const openedCreateExamModal = ref(false);
 const studentIdToCreateExam = ref(null);
-const createExamData = ref({});
+const createExamData = ref({
+    reading: '',
+    writing: '',
+    action: null
+});
 const literacyParameters = ref({});
 const selectedLiteracyParameters = ref([]);
 
