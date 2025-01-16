@@ -12,6 +12,10 @@ import Breadcrumb from '../components/Breadcrumb'
 import { exportClassStudentsData, exportClassStudentsSampleData } from '../services/export';
 import { importClassStudents } from '../services/import';
 import LoadingComponent from "../components/loading.vue";
+import CreateExamModal from "../components/createExamModal.vue";
+import Checkbox from "../components/checkbox.vue";
+import SelectComponent from "../components/SelectComponent.vue";
+import axios from "axios";
 
 const route = useRoute();
 
@@ -25,6 +29,11 @@ const availableStudents = ref([]);
 const availableTeachers = ref([]);
 const students = ref([]);
 const isLoading = ref(false);
+const openedCreateExamModal = ref(false);
+const studentIdToCreateExam = ref(null);
+const createExamData = ref({});
+const literacyParameters = ref({});
+const selectedLiteracyParameters = ref([]);
 
 const selectedStudentToAdd = ref('');
 
@@ -84,6 +93,11 @@ async function fetchAvailableStudents() {
     return data
 }
 
+const getliteracyParameters = async () => {
+    const response = await api.get('/api/literacy_parameters')
+    literacyParameters.value = response.data.data;
+}
+
 onMounted(async () => {
     school.value = await fetchSchool()
     classData.value = await fetchClassData()
@@ -91,6 +105,7 @@ onMounted(async () => {
     availableTeachers.value = await fetchAvailableTeachers();
     availableStudents.value = await fetchAvailableStudents();
     students.value = await fetchStudents()
+    await getliteracyParameters();
 });
 
 function redirectToStudentScreen(id) {
@@ -155,6 +170,82 @@ async function handleImportData() {
     students.value = await fetchStudents();
     availableStudents.value = await fetchAvailableStudents();
 }
+
+const openCreateExamModal = (studentId) => {
+    studentIdToCreateExam.value = studentId
+    openedCreateExamModal.value = true
+}
+
+const updateLiteracyValue = (literacyParameterValueId) => {
+    const position = selectedLiteracyParameters.value.indexOf(literacyParameterValueId);
+    if (position !== -1){
+        selectedLiteracyParameters.value.splice(position, 1)
+    } else {
+        selectedLiteracyParameters.value.push(literacyParameterValueId)
+    }
+}
+
+const literacyParameterTranslator = (parameter) => {
+    const parameters = {
+        write_name: 'Escreve o nome',
+        recognize_write_alphabet: 'Reconhece e escreve o alfabeto',
+        recognize_write_vocal_encounters: 'Reconhece e escreve encontros vocálicos',
+        recognize_write_syllable_family: 'Reconhece e escreve familias silábicas',
+        recognize_write_number: 'Reconhece e escreve numeros',
+    }
+
+    return parameters[parameter];
+}
+
+async function getStudentExams(studentId) {
+    const { data } = await api.get(`/api/students/${studentId}/classes/${classData.value.id}/exams`);
+    return data?.reverse();
+}
+
+const submitExamCreated = async () => {
+    const studentExams = await getStudentExams(studentIdToCreateExam.value);
+    isLoading.value = true
+
+    try {
+
+        const createdPoll = await axios.post(`/PollCreate`, {
+            name: studentExams.length + 1 + '° Período de sondagem',
+            class_id: classData.value.id,
+            poll_number: studentExams.length + 1,
+            school_id: school.value.id,
+            year: classData.value.id
+        });
+
+        await api.post(`/api/exams`, {
+            ...createExamData.value,
+            student_id: studentIdToCreateExam.value,
+            class_id: classData.value.id,
+            poll_id: createdPoll.data.id,
+            literacy_parameters_values: selectedLiteracyParameters.value
+        });
+
+        createExamData.value = {
+            reading: '',
+            writing: '',
+            action: null
+        }
+
+    } catch (error) {
+        console.error("Erro ao criar a pesquisa:", error);
+    }
+    openedCreateExamModal.value = false;
+    isLoading.value = false;
+
+    // console.log(studentExams.length)
+    // console.log(classData.value)
+    // console.log(school.value.id)
+    // console.log(createExamData.value)
+    // console.log(selectedLiteracyParameters.value)
+    // console.log(studentIdToCreateExam.value)
+}
+
+
+
 </script>
 
 <template>
@@ -162,6 +253,103 @@ async function handleImportData() {
 <div class="content-wrapper">
     <MenuComponent />
     <UserWelcomeComponent />
+
+    <CreateExamModal v-if='openedCreateExamModal' Titlevalue="Cadastro de Sondagens">
+        <div class="modal-body-size">
+            <h2>Detalhes da sondagem</h2>
+            <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
+            <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
+
+            <div class="modal-content-details">
+                <SelectComponent
+                    labelTitle="Nível de leitura"
+                    placeholderValue="Nível de leitura"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="createExamData.reading"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="createExamData.reading = $event.target.value"
+                >
+                    <option value="not_reader">Não leitor</option>
+                    <option value="syllable_reader">Leitor de sílabas</option>
+                    <option value="word_reader">Leitor de palavras</option>
+                    <option value="sentence_reader">Leitor de frases</option>
+                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
+                </SelectComponent>
+
+                <SelectComponent
+                    labelTitle="Nível de escrita"
+                    placeholderValue="Nível de escrita"
+                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                    typeValue="select"
+                    :value="createExamData.writing"
+                    valueField="id"
+                    RightAction="display: none;"
+                    @input="createExamData.writing = $event.target.value"
+                >
+                    <option value="pre_syllabic">Pré silábico</option>
+                    <option value="syllabic">Silábico</option>
+                    <option value="alphabetical_syllabic">Silábico alfabético</option>
+                    <option value="alphabetical">Alfabético</option>
+                    <option value="missed">Faltou</option>
+                    <option value="transferred">Transferido</option>
+                </SelectComponent>
+
+                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :isChecked="selectedLiteracyParameters.includes(value.id)"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
+
+                <span class="textarea-wrapper">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        class="w-full"
+                        :value="createExamData.action"
+                        @input="createExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal" @click="openedCreateExamModal = false">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="red"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+                    ></path>
+                </svg>
+                Cancelar
+            </a>
+            <a class="school-add" @click="submitExamCreated">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="var(--secondary-color)"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
+                    />
+                </svg>
+                Adicionar sondagem
+            </a>
+        </div>
+    </CreateExamModal>
 
     <ModalComponent v-if="showAddStudentModal" Titlevalue="Adicionar aluno">
         <div class="modal-body-size">
@@ -322,7 +510,9 @@ async function handleImportData() {
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Aluno'"
             :OpenAddModal="openAddStudentModal"
+            :InsertExam="true"
             @viewDetails="redirectToStudentScreen"
+            @createExam="openCreateExamModal"
             @deletedAction="openRemoveStudentModal"
             @exportData="exportClassStudentsData(students.map(({ name }) => ({
                 studentName: name,
@@ -461,5 +651,92 @@ async function handleImportData() {
     background-color: #fff;
     right: 0;
     font-weight: 700;
+}
+
+.input {
+    width: 100%;
+    border: 0 solid var(--secondary-color);
+    border-bottom-width: 1px;
+    background-color: transparent;
+    outline: 0;
+    font-size: 13pt;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.textarea-wrapper {
+    grid-area: 2 / 1 / 3 / 3;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--primary-color);
+    border-radius: 1rem;
+    align-items: center;
+    cursor: text;
+    background-color: white;
+    padding: 5px 0;
+
+    & > h3 {
+        padding: 10px 0;
+    }
+}
+
+textarea {
+    width: 100%;
+    background-color: transparent;
+    padding: 1rem;
+    outline: none;
+    border: none;
+    resize: none;
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 750px) {
+    .import-actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        position: relative;
+    }
+}
+
+.student-form-actions-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.student-form-action-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    border-radius: 4rem;
+    background-color: transparent;
+    color: var(--secondary-color);
+    padding: 0.6rem 1.6rem;
+    background-color: #fff;
+    right: 0;
+    font-weight: 700;
+}
+
+@media screen and (min-width: 1200px) {
+    .student-form {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 </style>

@@ -1271,11 +1271,4 @@ input[type="number"] {
     padding: 20px;
 }
 
-.form-label {
-    font-size: 14px;
-    margin-bottom: 3px;
-    font-weight: 600;
-    color: var(--black-color);
-}
-
 </style>
