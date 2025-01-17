@@ -1095,11 +1095,15 @@ textarea {
     border: 2px solid var(--secondary-color);
     text-align: center;
     border-radius: 4rem;
-    background-color: transparent;
     color: var(--secondary-color);
     padding: 0.6rem 1.6rem;
     background-color: #fff;
     font-weight: 700;
+}
+
+.create-test:hover {
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
 }
 
 
