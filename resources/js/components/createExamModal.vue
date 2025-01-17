@@ -44,19 +44,35 @@
         justify-content: center;
         align-items: center;
 
-        .modal-content::-webkit-scrollbar{
-            display: none;
+        /* Estilizando a barra de rolagem */
+        .modal-content::-webkit-scrollbar {
+            width: 8px; /* Largura da barra */
+            height: 8px;            }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background-color: #888; /* Cor da barra */
+            border-radius: 4px; /* Arredondando a barra */
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background-color: #555; /* Cor ao passar o mouse */
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Cor do fundo da barra */
         }
 
         & .modal-content{
-            max-height: 96vh; /* Limita a altura do modal */
-            overflow-y: auto; /* Permite o scroll vertical */
+            scrollbar-width: thin;
+            max-height: 96vh;
+            overflow-y: auto;
             padding: 20px;
             display: flex;
             flex-direction: column;
             background-color: white;
             width: 70%;
-            border-radius: 5rem 5rem;
+            border-radius: 0 0;
+            /* border-radius: 5rem 5rem; */
 
             & .modal-title {
                 width: 100%;

@@ -24,6 +24,7 @@ const studentInterventions = ref();
 const literacyParameters = ref();
 const selectedLiteracyParameters = ref([]);
 const examLiteracyParameters = ref([])
+const hasErros = ref(false);
 
 const studentData = ref({
     name: '',
@@ -112,44 +113,62 @@ const pollData = ref({
     year: null,
 });
 
-async function submitPollCreated(name) {
-    try {
-        const response = await axios.get(`/Teachers`);
-        const teacher = response.data.find(teacher => teacher.user_id === userID.value);
+const validateData = () => {
+    hasErros.value = false
 
-        if (teacher) {
-            const schoolId = teacher.school_id;
-            let createdPoll = null;
-
-            if (userType === 'teacher') {
-                createdPoll = await axios.post(`/PollCreate`, {
-                    name: studentExams.value.length + 1 + '° Período de sondagem',
-                    class_id: classData.value.id,
-                    poll_number: studentExams.value.length + 1,
-                    school_id: schoolId,
-                    year: classData.value.id
-                });
-            } else {
-                createdPoll = await axios.post(`/PollCreate`, {
-                    name: studentExams.value.length + 1 + '° Período de sondagem',
-                    class_id: classData.value.id,
-                    school_id: schoolId,
-                    poll_number: studentExams.value.length + 1,
-                    year: classData.value.id
-                });
-            }
-
-            submitExamCreate(createdPoll.data.id);
-            await getUserType();
-            await getStudent();
-            showExamCreateModal.value = false;
-
-        } else {
-            console.error("Professor não encontrado ou não possui um user_id correspondente.");
-        }
-    } catch (error) {
-        console.error("Erro ao criar a pesquisa:", error);
+    if(!createExamData.value.reading || createExamData.value.reading === ''){
+        hasErros.value = true
     }
+
+    if(!createExamData.value.writing || createExamData.value.writing === ''){
+        hasErros.value = true
+    }
+}
+
+async function submitPollCreated(name) {
+    validateData()
+
+    if(!hasErros.value){
+        try {
+            const response = await axios.get(`/Teachers`);
+            const teacher = response.data.find(teacher => teacher.user_id === userID.value);
+
+            if (teacher) {
+                const schoolId = teacher.school_id;
+                let createdPoll = null;
+
+                if (userType === 'teacher') {
+                    createdPoll = await axios.post(`/PollCreate`, {
+                        name: studentExams.value.length + 1 + '° Período de sondagem',
+                        class_id: classData.value.id,
+                        poll_number: studentExams.value.length + 1,
+                        school_id: schoolId,
+                        year: classData.value.id
+                    });
+                } else {
+                    createdPoll = await axios.post(`/PollCreate`, {
+                        name: studentExams.value.length + 1 + '° Período de sondagem',
+                        class_id: classData.value.id,
+                        school_id: schoolId,
+                        poll_number: studentExams.value.length + 1,
+                        year: classData.value.id
+                    });
+                }
+
+                submitExamCreate(createdPoll.data.id);
+                await getUserType();
+                await getStudent();
+                showExamCreateModal.value = false;
+
+            } else {
+                console.error("Professor não encontrado ou não possui um user_id correspondente.");
+            }
+        } catch (error) {
+            console.error("Erro ao criar a pesquisa:", error);
+        }
+    }
+
+
 }
 
 async function submitExamCreate(createdPollId) {
@@ -666,6 +685,9 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             <h2>Detalhes da sondagem</h2>
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
             <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
+            <div class="error" role="alert">
+                <span class="font-medium">Danger alert!</span> Change a few things up and try submitting again.
+            </div>
 
             <div class="modal-content-details">
                 <SelectComponent
@@ -705,7 +727,6 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     <option value="missed">Faltou</option>
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
-
                 <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
