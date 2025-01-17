@@ -562,6 +562,7 @@ const submitExamCreated = async () => {
 }
 
 .class-form {
+    overflow-x: hidden;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 1fr;

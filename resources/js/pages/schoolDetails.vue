@@ -605,7 +605,7 @@ const exportToPDF = async () => {
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType !== 'Specific School Class' && !isImpress" title="Análise Geral das escolas" />
       <TitleComponent id='average-modal-title' v-if="selectedFilter.filterType === 'Specific School Class' && !isImpress" title="Análise Geral das turmas" />
       <div id='average-modal-content' class="tableContent">
-        <div class="table-container" style="overflow-x: auto;">
+        <div class="table-container">
           <div class="titleTable">
             <h1>Média Geral</h1>
           </div>
