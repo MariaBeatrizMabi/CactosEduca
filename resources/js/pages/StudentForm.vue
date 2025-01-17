@@ -184,6 +184,7 @@ async function submitExamUpdate() {
     updateExamData.value.literacy_parameters_values = selectedLiteracyParameters.value
     await api.put(`/api/exams/${activeExamId.value}`, updateExamData.value);
 
+    selectedLiteracyParameters.value = [];
     studentExams.value = await getStudentExams()
     showExamUpdateModal.value = false
 }
