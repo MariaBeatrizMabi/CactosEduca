@@ -698,6 +698,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     <CreateExamModal
         v-if="showExamCreateModal"
         Titlevalue="Cadastro de Sondagens"
+        @close-modal="showExamCreateModal = false"
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
@@ -804,6 +805,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     </CreateExamModal>
 
     <CreateExamModal
+        @close-modal="showExamViewModal = false"
         v-if="showExamViewModal"
         Titlevalue="Cadastro de Sondagens"
     >
@@ -890,6 +892,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     <CreateExamModal
         v-if="showExamUpdateModal"
         Titlevalue="Cadastro de Sondagens"
+        @close-modal="showExamUpdateModal=false"
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>

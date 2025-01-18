@@ -284,7 +284,12 @@ const submitExamCreated = async () => {
     <MenuComponent />
     <UserWelcomeComponent />
 
-    <CreateExamModal v-if='openedCreateExamModal' Titlevalue="Cadastro de Sondagens">
+    <CreateExamModal
+         v-if='openedCreateExamModal'
+         Titlevalue="Cadastro de Sondagens"
+         @close-modal="openedCreateExamModal = false"
+    >
+
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
