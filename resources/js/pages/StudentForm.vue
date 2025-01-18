@@ -688,8 +688,6 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                             </Dropdown.Portal>
                         </Dropdown.Root>
                     </div>
-
-
                 </div>
             </template>
         </div>
@@ -706,7 +704,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
 
             <div class="modal-content-div">
-                <div class="modal-content-div-error-div">
+                <div class="modal-content-div-error-div mobile">
                     <SelectComponent
                         labelTitle="Nível de leitura"
                         placeholderValue="Nível de leitura"
@@ -731,7 +729,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     </div>
                 </div>
 
-                <div class="modal-content-div-error-div">
+                <div class="modal-content-div-error-div mobile">
                     <SelectComponent
                         labelTitle="Nível de escrita"
                         placeholderValue="Nível de escrita"
@@ -753,7 +751,17 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                         <span class="error-span font-medium">O campo nível de escrita é obrigatório</span>
                     </div>
                 </div>
-                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+
+                <span class="textarea-wrapper mobile">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        :value="createExamData.action"
+                        @input="createExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
+
+                <div v-for="(literacyParameter, index) in literacyParameters" :key="index" class="mobile">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
                         <Checkbox
@@ -763,18 +771,9 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                         />
                     </div>
                 </div>
-
-                <span class="textarea-wrapper">
-                    <h3>Ações de Intervenção</h3>
-                    <textarea
-                        :value="createExamData.action"
-                        @input="createExamData.action = $event.target.value"
-                        rows="12"
-                    ></textarea>
-                </span>
             </div>
         </div>
-        <div class="modal-end">
+        <div class="modal-end mobile">
             <a class="close-modal" @click="showExamCreateModal = false">
                 <svg
                     width="20"
@@ -813,6 +812,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             <h2>Detalhes da sondagem</h2>
             <div class="modal-content-div">
                 <SelectComponent
+                    class="mobile"
                     disabled
                     labelTitle="Nível de leitura"
                     placeholderValue="Nível de leitura"
@@ -833,6 +833,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                 </SelectComponent>
 
                 <SelectComponent
+                    class="mobile"
                     disabled
                     labelTitle="Nível de escrita"
                     placeholderValue="Nível de escrita"
@@ -850,7 +851,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
 
-                <span class="textarea-wrapper">
+                <span class="textarea-wrapper mobile">
                     <h3>Ações de Intervenção</h3>
                     <textarea
                         disabled
@@ -859,7 +860,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     ></textarea>
                 </span>
 
-                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                <div class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
                         <Checkbox
@@ -898,6 +899,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             <h2>Detalhes da sondagem</h2>
             <div class="modal-content-div">
                 <SelectComponent
+                    class="mobile"
                     labelTitle="Nível de leitura"
                     placeholderValue="Nível de leitura"
                     icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -918,6 +920,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                 </SelectComponent>
 
                 <SelectComponent
+                    class="mobile"
                     labelTitle="Nível de escrita"
                     placeholderValue="Nível de escrita"
                     icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -935,7 +938,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
 
-                <span class="textarea-wrapper">
+                <span class="textarea-wrapper mobile">
                     <h3>Ações de Intervenção</h3>
                     <textarea
                         :value="updateExamData.action"
@@ -944,7 +947,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                     ></textarea>
                 </span>
 
-                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                <div class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
                         <Checkbox
@@ -1029,6 +1032,9 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
 </template>
 
 <style scoped>
+.mobile {
+    margin-bottom: 0;
+}
 
 .alert {
     position: relative;
@@ -1063,11 +1069,13 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     width: 100%;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 950px) {
     .modal-content-div {
-        grid-template-columns: repeat(1, 1fr);
-        gap: 1rem;
-        margin: 1rem 0;
+        display: block;
+    }
+
+    .mobile{
+        margin-bottom: 20px;
     }
 }
 
@@ -1139,12 +1147,6 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     & > h3 {
         padding: 10px 0;
     }
-}
-
-.teacher-comments-content {
-    display: flex;
-    flex-direction: column;
-    width: 84%;
 }
 
 textarea {

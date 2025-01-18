@@ -16,8 +16,8 @@
 
 <template>
     <div class="modal-background">
-        <div class="modal-content" @click="emits('closeModal');">
-            <div class="exit-button">
+        <div class="modal-content">
+            <div class="exit-button" @click="emits('closeModal');">
                 <svg  style="margin-right: 4px"
                       fill="var(--secondary-color)"
                       height="25"

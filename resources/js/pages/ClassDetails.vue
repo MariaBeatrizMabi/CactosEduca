@@ -295,7 +295,7 @@ const submitExamCreated = async () => {
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
             <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
 
-            <div class="modal-content-details">
+            <div class="modal-content-div mobile">
                 <div class="modal-content-div-error-div">
                     <SelectComponent
                         labelTitle="Nível de leitura"
@@ -321,7 +321,7 @@ const submitExamCreated = async () => {
                     </div>
                 </div>
 
-                <div class="modal-content-div-error-div">
+                <div class="modal-content-div-error-div mobile">
                     <SelectComponent
                         labelTitle="Nível de escrita"
                         placeholderValue="Nível de escrita"
@@ -344,7 +344,17 @@ const submitExamCreated = async () => {
                     </div>
                 </div>
 
-                <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                <span class="textarea-wrapper mobile">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        class="w-full"
+                        :value="createExamData.action"
+                        @input="createExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
+
+                <div class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
                         <Checkbox
@@ -354,16 +364,6 @@ const submitExamCreated = async () => {
                         />
                     </div>
                 </div>
-
-                <span class="textarea-wrapper">
-                    <h3>Ações de Intervenção</h3>
-                    <textarea
-                        class="w-full"
-                        :value="createExamData.action"
-                        @input="createExamData.action = $event.target.value"
-                        rows="12"
-                    ></textarea>
-                </span>
             </div>
         </div>
         <div class="modal-end">
@@ -398,7 +398,7 @@ const submitExamCreated = async () => {
 
     <ModalComponent v-if="showAddStudentModal" Titlevalue="Adicionar aluno">
         <div class="modal-body-size">
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <div class="input-component">
                     <label>Aluno</label>
                     <div class="input-formating">
@@ -576,6 +576,20 @@ const submitExamCreated = async () => {
 
 <style scoped>
 
+.mobile {
+    margin-bottom: 0;
+}
+
+@media (max-width: 950px) {
+    .modal-content-div {
+        display: block !important;
+    }
+
+    .mobile{
+        margin-bottom: 20px;
+    }
+}
+
 .alert {
     position: relative;
     padding: 5px 20px;
@@ -592,6 +606,14 @@ const submitExamCreated = async () => {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     gap: 1rem;
+    width: 100%;
+}
+
+.modal-content-div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin: 2rem 0;
     width: 100%;
 }
 
