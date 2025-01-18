@@ -774,7 +774,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             </div>
         </div>
         <div class="modal-end mobile">
-            <a class="close-modal" @click="showExamCreateModal = false">
+            <a class="close-modal btn" @click="showExamCreateModal = false">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -787,7 +787,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitPollCreated">
+            <a class="school-add btn" @click="submitPollCreated">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -961,7 +961,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             </div>
         </div>
         <div class="modal-end">
-            <a class="close-modal" @click="showExamUpdateModal = false">
+            <a class="close-modal btn" @click="showExamUpdateModal = false">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -974,7 +974,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitExamUpdate">
+            <a class="school-add btn" @click="submitExamUpdate">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -1032,6 +1032,11 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
 </template>
 
 <style scoped>
+
+.btn {
+    width: 15rem !important;
+}
+
 .mobile {
     margin-bottom: 0;
 }
@@ -1077,6 +1082,37 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     .mobile{
         margin-bottom: 20px;
     }
+
+    .modal-end {
+        justify-content: center;
+        justify-items: center;
+    }
+
+    .school-add{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+    .close-modal{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+
+}
+
+@media (max-width: 700px) {
+    .school-add{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+
 }
 
 .school-register {

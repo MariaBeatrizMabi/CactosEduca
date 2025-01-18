@@ -367,7 +367,7 @@ const submitExamCreated = async () => {
             </div>
         </div>
         <div class="modal-end">
-            <a class="close-modal" @click="openedCreateExamModal = false">
+            <a class="close-modal btn" @click="openedCreateExamModal = false">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -380,7 +380,7 @@ const submitExamCreated = async () => {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitExamCreated">
+            <a class="school-add btn" @click="submitExamCreated">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -576,8 +576,26 @@ const submitExamCreated = async () => {
 
 <style scoped>
 
+.btn {
+    width: 15rem !important;
+}
+
 .mobile {
     margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .school-add{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+
 }
 
 @media (max-width: 950px) {
@@ -587,6 +605,16 @@ const submitExamCreated = async () => {
 
     .mobile{
         margin-bottom: 20px;
+    }
+
+    .school-add{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
     }
 }
 
