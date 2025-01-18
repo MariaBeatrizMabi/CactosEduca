@@ -24,7 +24,10 @@ const studentInterventions = ref();
 const literacyParameters = ref();
 const selectedLiteracyParameters = ref([]);
 const examLiteracyParameters = ref([])
-const hasErros = ref(false);
+const hasErrors = ref({
+    reading: false,
+    writing: false
+});
 
 const studentData = ref({
     name: '',
@@ -114,21 +117,21 @@ const pollData = ref({
 });
 
 const validateData = () => {
-    hasErros.value = false
+    clearErrors()
 
     if(!createExamData.value.reading || createExamData.value.reading === ''){
-        hasErros.value = true
+        hasErrors.value.reading = true
     }
 
     if(!createExamData.value.writing || createExamData.value.writing === ''){
-        hasErros.value = true
+        hasErrors.value.writing = true
     }
 }
 
 async function submitPollCreated(name) {
     validateData()
 
-    if(!hasErros.value){
+    if(!(hasErrors.value.writing || hasErrors.value.reading )){
         try {
             const response = await axios.get(`/Teachers`);
             const teacher = response.data.find(teacher => teacher.user_id === userID.value);
@@ -194,7 +197,22 @@ async function submitExamCreate(createdPollId) {
 
 }
 
+const clearErrors = () => {
+    hasErrors.value = {
+        reading: false,
+        writing: false
+    }
+}
+
 const openExamCreateModal = () => {
+    createExamData.value = {
+        reading: '',
+        writing: '',
+        action: null
+    }
+
+    clearErrors();
+
     selectedLiteracyParameters.value = [];
     showExamCreateModal.value = true;
 }
@@ -685,48 +703,55 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
             <h2>Detalhes da sondagem</h2>
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
             <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
-            <div class="error" role="alert">
-                <span class="font-medium">Danger alert!</span> Change a few things up and try submitting again.
-            </div>
 
-            <div class="modal-content-details">
-                <SelectComponent
-                    labelTitle="Nível de leitura"
-                    placeholderValue="Nível de leitura"
-                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                    typeValue="select"
-                    :value="createExamData.reading"
-                    valueField="id"
-                    RightAction="display: none;"
-                    @input="createExamData.reading = $event.target.value"
-                >
-                    <option value="not_reader">Não leitor</option>
-                    <option value="syllable_reader">Leitor de sílabas</option>
-                    <option value="word_reader">Leitor de palavras</option>
-                    <option value="sentence_reader">Leitor de frases</option>
-                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
-                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
-                    <option value="missed">Faltou</option>
-                    <option value="transferred">Transferido</option>
-                </SelectComponent>
+            <div class="modal-content-div">
+                <div class="modal-content-div-error-div">
+                    <SelectComponent
+                        labelTitle="Nível de leitura"
+                        placeholderValue="Nível de leitura"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.reading"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.reading = $event.target.value"
+                    >
+                        <option value="not_reader">Não leitor</option>
+                        <option value="syllable_reader">Leitor de sílabas</option>
+                        <option value="word_reader">Leitor de palavras</option>
+                        <option value="sentence_reader">Leitor de frases</option>
+                        <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                        <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.reading">
+                        <span class="error-span font-medium">O campo nível de leitura é obrigatório</span>
+                    </div>
+                </div>
 
-                <SelectComponent
-                    labelTitle="Nível de escrita"
-                    placeholderValue="Nível de escrita"
-                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                    typeValue="select"
-                    :value="createExamData.writing"
-                    valueField="id"
-                    RightAction="display: none;"
-                    @input="createExamData.writing = $event.target.value"
-                >
-                    <option value="pre_syllabic">Pré silábico</option>
-                    <option value="syllabic">Silábico</option>
-                    <option value="alphabetical_syllabic">Silábico alfabético</option>
-                    <option value="alphabetical">Alfabético</option>
-                    <option value="missed">Faltou</option>
-                    <option value="transferred">Transferido</option>
-                </SelectComponent>
+                <div class="modal-content-div-error-div">
+                    <SelectComponent
+                        labelTitle="Nível de escrita"
+                        placeholderValue="Nível de escrita"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.writing"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.writing = $event.target.value"
+                    >
+                        <option value="pre_syllabic">Pré silábico</option>
+                        <option value="syllabic">Silábico</option>
+                        <option value="alphabetical_syllabic">Silábico alfabético</option>
+                        <option value="alphabetical">Alfabético</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.writing">
+                        <span class="error-span font-medium">O campo nível de escrita é obrigatório</span>
+                    </div>
+                </div>
                 <div class="col-1" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
@@ -784,7 +809,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <SelectComponent
                     disabled
                     labelTitle="Nível de leitura"
@@ -868,7 +893,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <SelectComponent
                     labelTitle="Nível de leitura"
                     placeholderValue="Nível de leitura"
@@ -971,7 +996,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
         >
         <div class="modal-body-size">
             <h2 style="text-align: center;">Intervenções sugeridas ao professor(a)</h2>
-                <div id="custom-modal-check" class="modal-content-details">
+                <div id="custom-modal-check" class="modal-content-div">
                     <div v-if="interventions.length">
                         <div v-for="intervention in interventions" :key="intervention.id">
                             <Checkbox
@@ -1001,6 +1026,48 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
 </template>
 
 <style scoped>
+
+.alert {
+    position: relative;
+    padding: 5px 20px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content-div-error-div {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+.error-span {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.modal-content-div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+@media (max-width: 700px) {
+    .modal-content-div {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+}
+
 .school-register {
     display: flex;
     height: 100vh;
@@ -1292,7 +1359,6 @@ input[type="number"] {
 #custom-modal-check {
     grid-template-columns: 1fr;
     max-height: 400px;
-    overflow-y: auto;
     overflow-x: hidden;
     padding: 20px;
 }

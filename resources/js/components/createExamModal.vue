@@ -72,7 +72,6 @@
             background-color: white;
             width: 70%;
             border-radius: 0 0;
-            /* border-radius: 5rem 5rem; */
 
             & .modal-title {
                 width: 100%;
