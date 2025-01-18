@@ -15,6 +15,9 @@
 <template>
     <div class="modal-background">
         <div class="modal-content">
+            <div class="exit-button">
+                <h1>X</h1>
+            </div>
             <div class="modal-title">
                 <h1>{{ props.Titlevalue }}</h1>
                 <hr>
@@ -27,6 +30,11 @@
 </template>
 
 <style>
+    .exit-button {
+        display: flex;
+        width: 100%;
+        justify-content: left;
+    }
     .modal-background {
         left: 0 !important;
         top: 0 !important;
@@ -44,22 +52,21 @@
         justify-content: center;
         align-items: center;
 
-        /* Estilizando a barra de rolagem */
         .modal-content::-webkit-scrollbar {
-            width: 8px; /* Largura da barra */
+            width: 8px;
             height: 8px;            }
 
         .modal-content::-webkit-scrollbar-thumb {
-            background-color: #888; /* Cor da barra */
-            border-radius: 4px; /* Arredondando a barra */
+            background-color: #888;
+            border-radius: 4px;
         }
 
         .modal-content::-webkit-scrollbar-thumb:hover {
-            background-color: #555; /* Cor ao passar o mouse */
+            background-color: #555;
         }
 
         .modal-content::-webkit-scrollbar-track {
-            background: #f1f1f1; /* Cor do fundo da barra */
+            background: #f1f1f1;
         }
 
         & .modal-content{
