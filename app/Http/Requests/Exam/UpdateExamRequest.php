@@ -13,7 +13,7 @@ class UpdateExamRequest extends FormRequest
             'reading' => ['required', 'in:not_reader,syllable_reader,word_reader,sentence_reader,fluent_text_reader,
             no_fluent_text_reader,missed,transferred'],
             'action' => ['nullable', 'string'],
-            'literacy_parameters_values' => ['required', 'array']
+            'literacy_parameters_values' => ['nullable', 'array']
         ];
     }
 }

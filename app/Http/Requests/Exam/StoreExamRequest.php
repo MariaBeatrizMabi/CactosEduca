@@ -17,7 +17,7 @@ class StoreExamRequest extends FormRequest
             no_fluent_text_reader,missed,transferred'],
             'action' => ['nullable', 'string'],
             'poll_id' => ['required', 'exists:poll,id'],
-            'literacy_parameters_values' => ['required', 'array']
+            'literacy_parameters_values' => ['nullable', 'array']
         ];
     }
 
