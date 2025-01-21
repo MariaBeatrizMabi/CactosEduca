@@ -405,6 +405,18 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
 
     selectedLiteracyParameters.value = examLiteracyParameters.value
 }
+
+const showTooltip = (elementId) => {
+    const element = document.getElementById(elementId)
+    element.classList.add('d-flex')
+    element.classList.remove('d-none')
+}
+
+const hideTooltip = (elementId) => {
+    const element = document.getElementById(elementId)
+    element.classList.remove('d-flex')
+    element.classList.add('d-none')
+}
 </script>
 
 <template>
@@ -585,6 +597,7 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                                 </Dropdown.Portal>
                             </Dropdown.Root>
                         </div>
+                        Marcos
                         <h2>{{ studentExams.length - index }}° Período de sondagem</h2>
                         <table class="test-table">
                             <tr>
@@ -597,23 +610,55 @@ const verifyIfLiteracyParameterIsChecked = (examParameters) => {
                                 <td>{{ translate(row.writing) }}</td>
                                 <td>
                                     <div class="actions">
-                                        <div class="show" @click="() => openShowExamModal(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-show-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-show-exam`)"
+                                            class="show"
+                                            @click="() => openShowExamModal(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                                                 <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
                                             </svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-show-exam`">
+                                                Visualizar detalhes da sondagem
+                                            </div>
                                         </div>
-                                        <div class="edit" @click="() => openExamUpdateModal(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-update-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-update-exam`)"
+                                            class="edit"
+                                            @click="() => openExamUpdateModal(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                 <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/>
                                             </svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-update-exam`">
+                                                Atualizar sondagem
+                                            </div>
                                         </div>
-                                        <div class="intervention" @click="() => openInterventionModal(row.writing, row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-create-intervention`)"
+                                            @mouseleave="hideTooltip(`${row.id}-create-intervention`)"
+                                            class="intervention"
+                                            @click="() => openInterventionModal(row.writing, row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M160 96a96 96 0 1 1 192 0A96 96 0 1 1 160 96zm80 152l0 264-48.4-24.2c-20.9-10.4-43.5-17-66.8-19.3l-96-9.6C12.5 457.2 0 443.5 0 427L0 224c0-17.7 14.3-32 32-32l30.3 0c63.6 0 125.6 19.6 177.7 56zm32 264l0-264c52.1-36.4 114.1-56 177.7-56l30.3 0c17.7 0 32 14.3 32 32l0 203c0 16.4-12.5 30.2-28.8 31.8l-96 9.6c-23.2 2.3-45.9 8.9-66.8 19.3L272 512z"/></svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-create-intervention`">
+                                                Intervenções sugeridas
+                                            </div>
                                         </div>
-                                        <div class="deleted" @click="() => submitExamDelete(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-delete-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-delete-exam`)"
+                                            class="deleted"
+                                            @click="() => submitExamDelete(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                 <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
                                             </svg>
+                                            <div class="tooltip-delete d-none" :id="`${row.id}-delete-exam`">
+                                                Deletar sondagem
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -1374,7 +1419,6 @@ textarea {
     border: 2px solid var(--secondary-color);
     text-align: center;
     border-radius: 4rem;
-    background-color: transparent;
     color: var(--secondary-color);
     padding: 0.6rem 1.6rem;
     background-color: #fff;
@@ -1402,6 +1446,40 @@ input[type="number"] {
     max-height: 400px;
     overflow-x: hidden;
     padding: 20px;
+}
+
+.tooltip {
+    position: absolute;
+    margin-top: -50px;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+.tooltip-delete {
+    position: absolute;
+    margin-top: -120px;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+.d-none {
+    display: none;
+}
+
+.d-flex{
+    display: flex;
 }
 
 </style>
