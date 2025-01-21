@@ -354,7 +354,7 @@ const submitExamCreated = async () => {
                     ></textarea>
                 </span>
 
-                <div class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                <div v-if="classData.type === 'preschool'" class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
                     <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
                     <div v-for="(value, index) in literacyParameter.values" :key="index">
                         <Checkbox
