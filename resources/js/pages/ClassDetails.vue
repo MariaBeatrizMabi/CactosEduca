@@ -85,7 +85,6 @@ const hasChangesToUpdate = computed(() =>
 
 async function fetchSchool() {
     const { data: loginUserData } = await api.get('/loginUser');
-
     if (loginUserData.type === 'teacher') {
         const { data: teacher } = await api.get(`/api/users/${loginUserData.id}/teacher`);
         const { data } = await api.get(`/api/management-schools/${teacher.teacher.school_id}`);
@@ -103,9 +102,14 @@ async function fetchClassData() {
 }
 
 async function fetchAvailableTeachers() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/teachers`);
+    try{
+        const { data } = await api.get(`/api/management-schools/${school.value.id}/teachers`);
+        return data;
+    } catch (e) {
+        return null
+    }
 
-    return data;
+
 }
 
 async function fetchStudents() {
@@ -114,8 +118,13 @@ async function fetchStudents() {
 }
 
 async function fetchAvailableStudents() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`);
-    return data
+    try{
+        const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`);
+        return data
+    } catch (e) {
+        const { data } = await api.get(`/api/management-schools/${classData.value.school_id}/classes/${classData.value.id}/students`);
+        return data
+    }
 }
 
 const getliteracyParameters = async () => {
