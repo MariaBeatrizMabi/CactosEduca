@@ -93,7 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{exam}', [ExamController::class, 'delete']);
     });
 
-    Route::prefix('/literacy_parameters')->group(function () {
+    Route::prefix('/literacy-parameters')->group(function () {
         Route::get('/', [LiteracyParametersController::class, 'index']);
     });
 
@@ -101,6 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/student/all-interventions/{studentId}', [StudentController::class, 'getAllStudentInterventions']);
     Route::get('/interventions/{writing}/{studentId}/{pollIdD}', [InterventionController::class, 'getInterventions']);
     Route::post('/students/interventions', [InterventionController::class, 'saveStudentInterventions']);
+
 });
 
 Route::get('/{classModel}/monitoring-form', [ManagementClassController::class, 'monitoringForm']);

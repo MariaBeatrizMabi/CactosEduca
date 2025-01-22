@@ -128,7 +128,7 @@ async function fetchAvailableStudents() {
 }
 
 const getliteracyParameters = async () => {
-    const response = await api.get('/api/literacy_parameters')
+    const response = await api.get('/api/literac-parameters')
     literacyParameters.value = response.data.data;
 }
 
@@ -283,7 +283,9 @@ const submitExamCreated = async () => {
 
 }
 
-
+const exportClassDocument = () => {
+    console.log('a')
+}
 
 </script>
 
@@ -576,6 +578,10 @@ const submitExamCreated = async () => {
             @importData="handleImportData"
         />
 
+        <button class="export-document-class" @click="exportClassDocument">
+            Exportar documento da turma
+        </button>
+
         <button class="close-class" @click="showCloseClass = true">
             Fechar turma
         </button>
@@ -666,6 +672,18 @@ const submitExamCreated = async () => {
     width: 84%;
     padding: 1rem;
     background-color: #F00;
+    text-align: center;
+    border-radius: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.export-document-class {
+    all: unset;
+    cursor: pointer;
+    width: 84%;
+    padding: 1rem;
+    background-color: var(--secondary-color);
     text-align: center;
     border-radius: 0.8rem;
     font-weight: bold;

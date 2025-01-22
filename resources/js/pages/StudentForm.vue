@@ -93,7 +93,7 @@ const hasChangesToUpdate = computed(() =>
 )
 
 const getliteracyParameters = async () => {
-    const response = await api.get('/api/literacy_parameters')
+    const response = await api.get('/api/literacy-parameters')
     literacyParameters.value = response.data.data;
 }
 
