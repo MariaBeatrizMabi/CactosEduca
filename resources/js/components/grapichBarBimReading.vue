@@ -248,13 +248,13 @@ const fetchSchools = async () => {
                     data: totalValuesPerLabel.not_reader
                 },
                 {
-                    label: 'Leitor de silabas',
+                    label: 'Leitor de sílabas',
                     backgroundColor: ["#FFCB00"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.syllable_reader
                 },
                 {
-                    label: 'Leitor de Palavras',
+                    label: 'Leitor de palavras',
                     backgroundColor: ["#7B0000"],
                     borderWidth: 0,
                     data: totalValuesPerLabel.word_reader
@@ -286,7 +286,7 @@ const fetchSchools = async () => {
                 color :"#FF0000"
             },
             {
-                name: 'Leitor de silabas',
+                name: 'Leitor de sílabas',
                 color :"#FFCB00"
             },
             {

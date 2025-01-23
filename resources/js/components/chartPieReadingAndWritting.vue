@@ -13,7 +13,7 @@ import PiechartWriting from "./piechartWriting.vue";
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>Nivel Geral das Turmas - Leitura</h1>
+                    <h1>Nível Geral das Turmas - Leitura</h1>
                 </div>
             </div>
             <div class="grapich">
@@ -24,7 +24,7 @@ import PiechartWriting from "./piechartWriting.vue";
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>Nivel Geral das Turmas - Escrita</h1>
+                    <h1>Nível Geral das Turmas - Escrita</h1>
                 </div>
             </div>
             <div class="grapich">

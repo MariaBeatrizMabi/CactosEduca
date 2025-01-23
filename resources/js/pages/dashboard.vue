@@ -213,7 +213,7 @@ onMounted(async () => {
 
             <div class="fullWidth" v-if="userType.type === 'admin'">
                 <TitleComponent title="Escolas Cadastradas"/>
-                <CardgrapichComponent titleGrapichCard="Cadastrados Por Múnicipio" ></CardgrapichComponent>
+                <CardgrapichComponent titleGrapichCard="Cadastrados Por Municipio" ></CardgrapichComponent>
             </div>
 
             <div class="fullWidth" v-if="userType.type === 'school'">

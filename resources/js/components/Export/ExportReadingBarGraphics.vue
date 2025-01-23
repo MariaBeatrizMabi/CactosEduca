@@ -247,12 +247,12 @@ const fetchSchools = async () => {
                     data: totalValuesPerLabel.not_reader
                 },
                 {
-                    label: 'Leitor de silabas',
+                    label: 'Leitor de sílabas',
                     backgroundColor: ["#FFCB00"],
                     data: totalValuesPerLabel.syllable_reader
                 },
                 {
-                    label: 'Leitor de Palavras',
+                    label: 'Leitor de palavras',
                     backgroundColor: ["#7B0000"],
                     data: totalValuesPerLabel.word_reader
                 },
@@ -324,7 +324,7 @@ onMounted(() => {
         <div class="card-grapich">
             <div class="card-grapich-content">
                 <div class="card-title">
-                    <h1>Analise dividida por sondagem - Leitura</h1>
+                    <h1>Análise dividida por sondagem - Leitura</h1>
                 </div>
             </div>
             <div class="grapich">
