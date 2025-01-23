@@ -14,7 +14,7 @@ export const exportSchoolsSampleData = () => jsonToXlsx({
     name: 'Planilha Modelo - Escolas',
     data: [{
         'Nome': '',
-        'Múnicipio': '',
+        'Municipio': '',
         'Localidade': '',
         'Código de acesso': '',
         'Senha de Acesso': ''
