@@ -143,15 +143,15 @@
     <div class="header-container">
         <div class="header-text">
             <h1>Relatório de Turmas</h1>
-            <p><strong>Escola:</strong> Maria José Medeiros</p>
+            <p><strong>Escola:</strong> {{$data['school']}}</p>
         </div>
         <div class="header-details">
             <h2>INFORMAÇÕES DA TURMA</h2>
-            <p><strong>Turma:</strong> Matemática Avançada</p>
-            <p><strong>Professor Responsável:</strong> João da Silva</p>
-            <p><strong>Total de Alunos:</strong> 25</p>
-            <p><strong>Turno:</strong> Noturno</p>
-            <p><strong>Tipo da Turma:</strong> Infantil</p>
+            <p><strong>Turma:</strong> {{$data['class']}}</p>
+            <p><strong>Professor Responsável:</strong> {{$data['teacher']}}</p>
+            <p><strong>Total de Alunos:</strong> {{$data['studentsQuantity']}}</p>
+            <p><strong>Turno:</strong> {{$data['shift']}}</p>
+            <p><strong>Tipo da Turma:</strong> {{$data['type']}}</p>
         </div>
     </div>
 </header>
@@ -162,7 +162,6 @@
     <table>
         <thead>
         <tr class="first-table">
-            <th>N°</th>
             <th>NOME DO (A) ALUNO (A)</th>
             <th>COM APOIO</th>
             <th>SEM APOIO</th>
@@ -170,27 +169,14 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>1</td>
-            <td>Ana Oliveira</td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Bruno Costa</td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Carla Mendes</td>
-            <td></td>
-            <td></td>
-            <td>X</td>
-        </tr>
+        @foreach($data['exams'] as $exam)
+            <tr>
+                <td>{{$exam->student->name}}</td>
+                <td>{{in_array(1, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(2, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(3, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            </tr>
+        @endforeach
         </tbody>
     </table>
 </section>
@@ -200,7 +186,6 @@
     <table>
         <thead>
         <tr>
-            <th>N°</th>
             <th>NOME DO (A) ALUNO (A)</th>
             <th>Reconhece todas as letras trabalhadas no bimestre</th>
             <th>Reconhece parcialmente as letras trabalhadas no bimestre</th>
@@ -211,36 +196,17 @@
         </tr>
         </thead>
         <tbody>
+        @foreach($data['exams'] as $exam)
         <tr>
-            <td>1</td>
-            <td>Ana Oliveira</td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{$exam->student->name}}</td>
+            <td>{{in_array(4, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            <td>{{in_array(5, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            <td>{{in_array(6, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            <td>{{in_array(7, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            <td>{{in_array(8, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            <td>{{in_array(9, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
         </tr>
-        <tr>
-            <td>2</td>
-            <td>Bruno Costa</td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Carla Mendes</td>
-            <td></td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        @endforeach
         </tbody>
     </table>
 </section>
@@ -250,7 +216,6 @@
     <table>
         <thead>
         <tr>
-            <th>N°</th>
             <th>NOME DO (A) ALUNO (A)</th>
             <th>Reconhece todos os Encontros Vocálicos trabalhados no bimestre</th>
             <th>Reconhece parcialmente os Encontros Vocálicos trabalhados no bimestre</th>
@@ -261,36 +226,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>1</td>
-            <td>Ana Oliveira</td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Bruno Costa</td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Carla Mendes</td>
-            <td></td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        @foreach($data['exams'] as $exam)
+            <tr>
+                <td>{{$exam->student->name}}</td>
+                <td>{{in_array(10, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(11, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(12, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(13, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(14, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(15, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            </tr>
+        @endforeach
         </tbody>
     </table>
 </section>
@@ -300,7 +246,6 @@
     <table>
         <thead>
         <tr>
-            <th>N°</th>
             <th>NOME DO (A) ALUNO (A)</th>
             <th>Reconhece as famílias silábicas trabalhadas no bimestre</th>
             <th>Reconhece parcialmente as famílias silábicas trabalhadas no bimestre</th>
@@ -311,36 +256,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>1</td>
-            <td>Ana Oliveira</td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Bruno Costa</td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Carla Mendes</td>
-            <td></td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        @foreach($data['exams'] as $exam)
+            <tr>
+                <td>{{$exam->student->name}}</td>
+                <td>{{in_array(16, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(17, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(18, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(19, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(20, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(21, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            </tr>
+        @endforeach
         </tbody>
     </table>
 </section>
@@ -350,7 +276,6 @@
     <table>
         <thead>
         <tr>
-            <th>N°</th>
             <th>NOME DO (A) ALUNO (A)</th>
             <th>Reconhece os números trabalhadas no bimestre</th>
             <th>Reconhece parcialmente os números trabalhadas no bimestre</th>
@@ -361,36 +286,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>1</td>
-            <td>Ana Oliveira</td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Bruno Costa</td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Carla Mendes</td>
-            <td></td>
-            <td></td>
-            <td>X</td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        @foreach($data['exams'] as $exam)
+            <tr>
+                <td>{{$exam->student->name}}</td>
+                <td>{{in_array(22, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(23, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(24, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(25, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(26, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+                <td>{{in_array(27, $exam->literacy_parameters_ids) ? 'X' : ''}}</td>
+            </tr>
+        @endforeach
         </tbody>
     </table>
 </section>

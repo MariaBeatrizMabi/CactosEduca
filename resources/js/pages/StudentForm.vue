@@ -597,7 +597,6 @@ const hideTooltip = (elementId) => {
                                 </Dropdown.Portal>
                             </Dropdown.Root>
                         </div>
-                        Marcos
                         <h2>{{ studentExams.length - index }}° Período de sondagem</h2>
                         <table class="test-table">
                             <tr>
@@ -669,7 +668,7 @@ const hideTooltip = (elementId) => {
                             <tr>
                                 <th>Ações de intervenção aplicadas</th>
                             </tr>
-                            <tr v-if="studentInterventions[studentExams.length - index].length > 0" v-for="(intervention, interventionIndex) in studentInterventions[studentExams.length - index]">
+                            <tr v-if="studentInterventions[studentExams.length - index] && studentInterventions[studentExams.length - index].length > 0" v-for="(intervention, interventionIndex) in studentInterventions[studentExams.length - index]">
 
                                 <td class="intervention-table-middle" v-if="studentInterventions[studentExams.length - index].length > interventionIndex + 1">
                                     {{intervention.code}} - {{intervention.description}}

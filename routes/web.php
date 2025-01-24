@@ -100,6 +100,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/classesFilter/{class}', StudentController::class);
 
     Route::prefix('/literacy-parameters')->group(function () {
-        Route::get('/export-document', [LiteracyParametersController::class, 'exportDocument']);
+        Route::get('/export-document/{class}/{bimester}', [LiteracyParametersController::class, 'exportDocument']);
+//        /literacy-parameters/export-document/1/1
     });
 });
