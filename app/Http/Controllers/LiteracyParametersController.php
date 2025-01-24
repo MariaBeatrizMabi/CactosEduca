@@ -22,10 +22,8 @@ class LiteracyParametersController extends Controller
         GetLiteracyParametersExportDataService $getLiteracyParametersExportDataService
     ){
         $data = $getLiteracyParametersExportDataService->run($class, $bimester);
-//        dd($data);
         $pdf = Pdf::loadView('pdf.literacy-parameters-export', compact('data'));
         $className = strtolower(str_replace(' ', '_', $class->name));
         return $pdf->download('dados_da_turma_' . $className . '.pdf');
-//        return view('pdf.literacy-parameters-export', compact('data'));
     }
 }
