@@ -18,6 +18,7 @@ import SelectComponent from "../components/SelectComponent.vue";
 import axios from "axios";
 
 const route = useRoute();
+const actualHost = ref('');
 
 const showAddStudentModal = ref(false);
 const showRemoveStudentModal = ref(false);
@@ -133,6 +134,8 @@ const getliteracyParameters = async () => {
 }
 
 onMounted(async () => {
+    actualHost.value = `${window.location.protocol}//${window.location.host}`
+
     school.value = await fetchSchool()
     classData.value = await fetchClassData()
     formData.value = classData.value
@@ -283,8 +286,9 @@ const submitExamCreated = async () => {
 
 }
 
-const exportClassDocument = () => {
-    console.log('a')
+const exportClassDocument = async () => {
+
+    const response = await api.get('http://localhost:8000/literacy-parameters/export-document/1/2');
 }
 
 </script>
@@ -577,10 +581,9 @@ const exportClassDocument = () => {
             @exportSampleData="exportClassStudentsSampleData"
             @importData="handleImportData"
         />
-
-        <button class="export-document-class" @click="exportClassDocument">
-            Exportar documento da turma
-        </button>
+        <a class="export-document-class" :href="`${actualHost}/literacy-parameters/export-document/1/2`" download="">
+                Exportar documento da turma
+        </a>
 
         <button class="close-class" @click="showCloseClass = true">
             Fechar turma
