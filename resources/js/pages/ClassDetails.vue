@@ -22,6 +22,8 @@ const actualHost = ref('');
 
 const showAddStudentModal = ref(false);
 const showRemoveStudentModal = ref(false);
+const openedExportDocumentModal = ref(false);
+const selectedBimonthly = ref('');
 
 const studentIdToRemove = ref(null);
 
@@ -286,9 +288,9 @@ const submitExamCreated = async () => {
 
 }
 
-const exportClassDocument = async () => {
-
-    const response = await api.get('http://localhost:8000/literacy-parameters/export-document/1/2');
+const openExportDocumentModal = () => {
+    openedExportDocumentModal.value = true
+    selectedBimonthly.value = ''
 }
 
 </script>
@@ -445,6 +447,47 @@ const exportClassDocument = async () => {
         </div>
     </ModalComponent>
 
+    <ModalComponent v-if="openedExportDocumentModal" Titlevalue="Exportar documento de alfabetização">
+        <div class="modal-body-size">
+            <div class="modal-content-div">
+                <div class="input-component">
+                    <label>Bimestre desejado</label>
+                    <div class="input-formating">
+                        <svg width="9" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"/>
+                        </svg>
+                        <hr>
+                        <select v-model="selectedBimonthly">
+                            <option value="" disabled selected>Selecione um bimestre</option>
+                            <option value=1>1° Bimestre</option>
+                            <option value=2>2° Bimestre</option>
+                            <option value=3>3° Bimestre</option>
+                            <option value=4>4° Bimestre</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a style="margin-right: 5rem;" class="close-modal" @click="openedExportDocumentModal = false">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                </svg>
+                Fechar
+            </a>
+            <a class="school-add"
+               :class="{ disabled: selectedBimonthly === '' }"
+               :href="`${actualHost}/literacy-parameters/export-document/${classData.id}/${selectedBimonthly}`"
+               download=""
+            >
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                </svg>
+                Exportar documento
+            </a>
+        </div>
+    </ModalComponent>
+
     <ModalComponentDeleted v-if="showRemoveStudentModal" Titlevalue="Apagar professor">
         <h1 class="deleted-title">
             Você realmente deseja remover o aluno(a) <strong>{{ students.find(({ id }) => id === studentIdToRemove)?.name }}</strong> dessa turma? Esta é uma ação permanente que não poderá ser desfeita
@@ -578,13 +621,11 @@ const exportClassDocument = async () => {
                 studentName: name,
                 className: classData.name
             })))"
+            :ExportLiteracyDocument="classData.type === 'preschool'"
+            @exportLiteracyDocument="openExportDocumentModal"
             @exportSampleData="exportClassStudentsSampleData"
             @importData="handleImportData"
         />
-        <a class="export-document-class" :href="`${actualHost}/literacy-parameters/export-document/1/2`" download="">
-                Exportar documento da turma
-        </a>
-
         <button class="close-class" @click="showCloseClass = true">
             Fechar turma
         </button>
@@ -593,6 +634,13 @@ const exportClassDocument = async () => {
 </template>
 
 <style scoped>
+
+.disabled {
+    pointer-events: none; /* Desabilita interações no link */
+    color: gray;
+    text-decoration: none;
+    cursor: not-allowed;
+}
 
 .btn {
     width: 15rem !important;
