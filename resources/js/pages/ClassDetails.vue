@@ -131,7 +131,7 @@ async function fetchAvailableStudents() {
 }
 
 const getliteracyParameters = async () => {
-    const response = await api.get('/api/literac-parameters')
+    const response = await api.get('/api/literacy-parameters')
     literacyParameters.value = response.data.data;
 }
 
