@@ -43,7 +43,7 @@ class GetLiteracyParametersExportDataService
 
     private function classTypeTranslator($type){
         $translator = [
-            'preschool' => 'Infantil',
+            'preschool' => 'Educação Infantil',
             'elementary_school' => 'Ensino fundamental 1',
             'middle_school' => 'Ensino fundamental 2'
         ];

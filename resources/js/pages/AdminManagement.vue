@@ -949,7 +949,7 @@ async function handleImportStudents() {
                         RightAction="display: none;"
                         @input="formDataClassAdd.type = $event.target.value"
                     >
-                        <option value="preschool">Infantil</option>
+                        <option value="preschool">Educação Infantil</option>
                         <option value="elementary_school">Fundamental 1</option>
                         <option value="middle_school">Fundamental 2</option>
                     </NewSelectComponent>
@@ -1049,7 +1049,7 @@ async function handleImportStudents() {
                         RightAction="display: none;"
                         @input="formDataClassUpdated.type = $event.target.value"
                     >
-                        <option value="preschool">Infantil</option>
+                        <option value="preschool">Educação Infantil</option>
                         <option value="elementary_school">Fundamental 1</option>
                         <option value="middle_school">Fundamental 2</option>
                     </NewSelectComponent>
