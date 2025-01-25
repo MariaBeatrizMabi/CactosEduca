@@ -151,7 +151,7 @@
             <p><strong>Professor Responsável:</strong> {{$data['teacher']}}</p>
             <p><strong>Total de Alunos:</strong> {{$data['studentsQuantity']}}</p>
             <p><strong>Turno:</strong> {{$data['shift']}}</p>
-            <p><strong>Tipo da Turma:</strong> {{$data['type']}}</p>
+            <p><strong>Nível de ensino:</strong> {{$data['type']}}</p>
         </div>
     </div>
 </header>
