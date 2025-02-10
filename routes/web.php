@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportPdfController;
+use App\Http\Controllers\LiteracyParametersController;
 use App\Http\Controllers\ManagementClassController;
 use App\Http\Controllers\ManagementSchoolController;
 use App\Http\Controllers\ManagementStudentController;
@@ -97,4 +98,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/student/{student}/classes/{class}', StudentController::class);
     Route::get('/class/{class}', StudentController::class);
     Route::get('/classesFilter/{class}', StudentController::class);
+
+    Route::prefix('/literacy-parameters')->group(function () {
+        Route::get('/export-document/{class}/{bimester}', [LiteracyParametersController::class, 'exportDocument']);
+//        /literacy-parameters/export-document/1/1
+    });
 });

@@ -143,7 +143,7 @@ a {
 
 .school-register{
     display: flex;
-    height: 100vh;
+    height: 90vh;
     width: 100%;
 
     & .register-content {
@@ -152,7 +152,8 @@ a {
         flex-direction: column;
         align-items: center;
         margin: 5rem 0;
-        height: 100vh;
+        height: 90vh;
+        overflow-x: hidden;
     }
 }
 

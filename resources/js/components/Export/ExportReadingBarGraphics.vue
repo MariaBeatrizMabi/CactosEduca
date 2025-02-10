@@ -262,12 +262,12 @@ const fetchSchools = async () => {
                     data: totalValuesPerLabel.sentence_reader
                 },
                 {
-                    label: 'Leitor de Texto com fluencia',
+                    label: 'Leitor de Texto com fluência',
                     backgroundColor: ["#ADD8E6"],
                     data: totalValuesPerLabel.fluent_text_reader
                 },
                 {
-                    label: 'Leitor de texto sem fluencia',
+                    label: 'Leitor de texto sem fluência',
                     backgroundColor: ["#0D5413"],
                     data: totalValuesPerLabel.no_fluent_text_reader
                 },

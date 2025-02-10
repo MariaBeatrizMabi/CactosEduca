@@ -81,6 +81,7 @@ class ManagementClassController extends Controller
                 'name' => $request->input('name'),
                 'year' => $request->input('year'),
                 'shift' => $request->input('shift'),
+                'type' => $request->input('type'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);
@@ -106,6 +107,7 @@ class ManagementClassController extends Controller
                 'name' => $request->input('name'),
                 'year' => $request->input('year'),
                 'shift' => $request->input('shift'),
+                'type' => $request->input('type'),
                 'school_id' => $request->input('school_id'),
                 'teacher_id' => $request->input('teacher_id'),
             ]);

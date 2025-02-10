@@ -12,11 +12,18 @@ import Breadcrumb from '../components/Breadcrumb'
 import { exportClassStudentsData, exportClassStudentsSampleData } from '../services/export';
 import { importClassStudents } from '../services/import';
 import LoadingComponent from "../components/loading.vue";
+import CreateExamModal from "../components/createExamModal.vue";
+import Checkbox from "../components/checkbox.vue";
+import SelectComponent from "../components/SelectComponent.vue";
+import axios from "axios";
 
 const route = useRoute();
+const actualHost = ref('');
 
 const showAddStudentModal = ref(false);
 const showRemoveStudentModal = ref(false);
+const openedExportDocumentModal = ref(false);
+const selectedExam = ref('');
 
 const studentIdToRemove = ref(null);
 
@@ -25,7 +32,20 @@ const availableStudents = ref([]);
 const availableTeachers = ref([]);
 const students = ref([]);
 const isLoading = ref(false);
+const openedCreateExamModal = ref(false);
+const studentIdToCreateExam = ref(null);
+const createExamData = ref({
+    reading: '',
+    writing: '',
+    action: null
+});
 
+const hasErrors = ref({
+    reading: false,
+    writing: false
+})
+const literacyParameters = ref({});
+const selectedLiteracyParameters = ref([]);
 const selectedStudentToAdd = ref('');
 
 const classData = ref({
@@ -34,6 +54,23 @@ const classData = ref({
     shift: '',
     teacher_id: null
 });
+const clearErrors = () => {
+    hasErrors.value = {
+        reading: false,
+        writing: false
+    }
+}
+const validateData = () => {
+    clearErrors()
+
+    if(!createExamData.value.reading || createExamData.value.reading === ''){
+        hasErrors.value.reading = true
+    }
+
+    if(!createExamData.value.writing || createExamData.value.writing === ''){
+        hasErrors.value.writing = true
+    }
+}
 
 const formData = ref({
     name: '',
@@ -51,7 +88,6 @@ const hasChangesToUpdate = computed(() =>
 
 async function fetchSchool() {
     const { data: loginUserData } = await api.get('/loginUser');
-
     if (loginUserData.type === 'teacher') {
         const { data: teacher } = await api.get(`/api/users/${loginUserData.id}/teacher`);
         const { data } = await api.get(`/api/management-schools/${teacher.teacher.school_id}`);
@@ -69,9 +105,14 @@ async function fetchClassData() {
 }
 
 async function fetchAvailableTeachers() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/teachers`);
+    try{
+        const { data } = await api.get(`/api/management-schools/${school.value.id}/teachers`);
+        return data;
+    } catch (e) {
+        return null
+    }
 
-    return data;
+
 }
 
 async function fetchStudents() {
@@ -80,17 +121,30 @@ async function fetchStudents() {
 }
 
 async function fetchAvailableStudents() {
-    const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`);
-    return data
+    try{
+        const { data } = await api.get(`/api/management-schools/${school.value.id}/classes/${classData.value.id}/students`);
+        return data
+    } catch (e) {
+        const { data } = await api.get(`/api/management-schools/${classData.value.school_id}/classes/${classData.value.id}/students`);
+        return data
+    }
+}
+
+const getliteracyParameters = async () => {
+    const response = await api.get('/api/literacy-parameters')
+    literacyParameters.value = response.data.data;
 }
 
 onMounted(async () => {
+    actualHost.value = `${window.location.protocol}//${window.location.host}`
+
     school.value = await fetchSchool()
     classData.value = await fetchClassData()
     formData.value = classData.value
     availableTeachers.value = await fetchAvailableTeachers();
     availableStudents.value = await fetchAvailableStudents();
     students.value = await fetchStudents()
+    await getliteracyParameters();
 });
 
 function redirectToStudentScreen(id) {
@@ -155,6 +209,90 @@ async function handleImportData() {
     students.value = await fetchStudents();
     availableStudents.value = await fetchAvailableStudents();
 }
+
+const openCreateExamModal = (studentId) => {
+    createExamData.value = {
+        reading: '',
+        writing: '',
+        action: null
+    };
+
+    clearErrors();
+    studentIdToCreateExam.value = studentId
+    openedCreateExamModal.value = true
+}
+
+const updateLiteracyValue = (literacyParameterValueId) => {
+    const position = selectedLiteracyParameters.value.indexOf(literacyParameterValueId);
+    if (position !== -1){
+        selectedLiteracyParameters.value.splice(position, 1)
+    } else {
+        selectedLiteracyParameters.value.push(literacyParameterValueId)
+    }
+}
+
+const literacyParameterTranslator = (parameter) => {
+    const parameters = {
+        write_name: 'Escreve o nome',
+        recognize_write_alphabet: 'Reconhece e escreve o alfabeto',
+        recognize_write_vocal_encounters: 'Reconhece e escreve encontros vocálicos',
+        recognize_write_syllable_family: 'Reconhece e escreve familias silábicas',
+        recognize_write_number: 'Reconhece e escreve numeros',
+    }
+
+    return parameters[parameter];
+}
+
+async function getStudentExams(studentId) {
+    const { data } = await api.get(`/api/students/${studentId}/classes/${classData.value.id}/exams`);
+    return data?.reverse();
+}
+
+const submitExamCreated = async () => {
+    validateData();
+
+    if(!(hasErrors.value.reading || hasErrors.value.writing)){
+        const studentExams = await getStudentExams(studentIdToCreateExam.value);
+        isLoading.value = true
+
+        try {
+
+            const createdPoll = await axios.post(`/PollCreate`, {
+                name: studentExams.length + 1 + '° Período de sondagem',
+                class_id: classData.value.id,
+                poll_number: studentExams.length + 1,
+                school_id: school.value.id,
+                year: classData.value.id
+            });
+
+            await api.post(`/api/exams`, {
+                ...createExamData.value,
+                student_id: studentIdToCreateExam.value,
+                class_id: classData.value.id,
+                poll_id: createdPoll.data.id,
+                literacy_parameters_values: selectedLiteracyParameters.value
+            });
+
+            createExamData.value = {
+                reading: '',
+                writing: '',
+                action: null
+            }
+
+        } catch (error) {
+            console.error("Erro ao criar a pesquisa:", error);
+        }
+        openedCreateExamModal.value = false;
+        isLoading.value = false;
+    }
+
+}
+
+const openExportDocumentModal = () => {
+    openedExportDocumentModal.value = true
+    selectedExam.value = ''
+}
+
 </script>
 
 <template>
@@ -163,9 +301,121 @@ async function handleImportData() {
     <MenuComponent />
     <UserWelcomeComponent />
 
+    <CreateExamModal
+         v-if='openedCreateExamModal'
+         Titlevalue="Cadastro de Sondagens"
+         @close-modal="openedCreateExamModal = false"
+    >
+
+        <div class="modal-body-size">
+            <h2>Detalhes da sondagem</h2>
+            <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
+            <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
+
+            <div class="modal-content-div mobile">
+                <div class="modal-content-div-error-div">
+                    <SelectComponent
+                        labelTitle="Nível de leitura"
+                        placeholderValue="Nível de leitura"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.reading"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.reading = $event.target.value"
+                    >
+                        <option value="not_reader">Não leitor</option>
+                        <option value="syllable_reader">Leitor de sílabas</option>
+                        <option value="word_reader">Leitor de palavras</option>
+                        <option value="sentence_reader">Leitor de frases</option>
+                        <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                        <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.reading">
+                        <span class="error-span font-medium">O campo nível de leitura é obrigatório</span>
+                    </div>
+                </div>
+
+                <div class="modal-content-div-error-div mobile">
+                    <SelectComponent
+                        labelTitle="Nível de escrita"
+                        placeholderValue="Nível de escrita"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.writing"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.writing = $event.target.value"
+                    >
+                        <option value="pre_syllabic">Pré silábico</option>
+                        <option value="syllabic">Silábico</option>
+                        <option value="alphabetical_syllabic">Silábico alfabético</option>
+                        <option value="alphabetical">Alfabético</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.writing">
+                        <span class="error-span font-medium">O campo nível de leitura é obrigatório</span>
+                    </div>
+                </div>
+
+                <span class="textarea-wrapper mobile">
+                    <h3>Ações de Intervenção</h3>
+                    <textarea
+                        class="w-full"
+                        :value="createExamData.action"
+                        @input="createExamData.action = $event.target.value"
+                        rows="12"
+                    ></textarea>
+                </span>
+
+                <div v-if="classData.type === 'preschool'" class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :isChecked="selectedLiteracyParameters.includes(value.id)"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a class="close-modal btn" @click="openedCreateExamModal = false">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="red"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"
+                    ></path>
+                </svg>
+                Cancelar
+            </a>
+            <a class="school-add btn" @click="submitExamCreated">
+                <svg
+                    width="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="var(--secondary-color)"
+                        d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"
+                    />
+                </svg>
+                Adicionar sondagem
+            </a>
+        </div>
+    </CreateExamModal>
+
     <ModalComponent v-if="showAddStudentModal" Titlevalue="Adicionar aluno">
         <div class="modal-body-size">
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <div class="input-component">
                     <label>Aluno</label>
                     <div class="input-formating">
@@ -193,6 +443,47 @@ async function handleImportData() {
                     <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
                 </svg>
                 Adicionar aluno
+            </a>
+        </div>
+    </ModalComponent>
+
+    <ModalComponent v-if="openedExportDocumentModal" Titlevalue="Exportar documento de alfabetização">
+        <div class="modal-body-size">
+            <div class="modal-content-div">
+                <div class="input-component">
+                    <label>Sondagem</label>
+                    <div class="input-formating">
+                        <svg width="9" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                            <path d="M337.8 5.4C327-1.8 313-1.8 302.2 5.4L166.3 96H48C21.5 96 0 117.5 0 144V464c0 26.5 21.5 48 48 48H256V416c0-35.3 28.7-64 64-64s64 28.7 64 64v96H592c26.5 0 48-21.5 48-48V144c0-26.5-21.5-48-48-48H473.7L337.8 5.4zM96 192h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V208c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V208zM96 320h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H96c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm400 16c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H512c-8.8 0-16-7.2-16-16V336zM232 176a88 88 0 1 1 176 0 88 88 0 1 1 -176 0zm88-48c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16s-7.2-16-16-16H336V144c0-8.8-7.2-16-16-16z"/>
+                        </svg>
+                        <hr>
+                        <select v-model="selectedExam">
+                            <option value="" disabled selected>Selecione uma sondagem</option>
+                            <option value=1>1° Sondagem</option>
+                            <option value=2>2° Sondagem</option>
+                            <option value=3>3° Sondagem</option>
+                            <option value=4>4° Sondagem</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-end">
+            <a style="margin-right: 5rem;" class="close-modal" @click="openedExportDocumentModal = false">
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="red" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+                </svg>
+                Fechar
+            </a>
+            <a class="school-add"
+               :class="{ disabled: selectedExam === '' }"
+               :href="`${actualHost}/literacy-parameters/export-document/${classData.id}/${selectedExam}`"
+               download=""
+            >
+                <svg width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="var(--secondary-color)" d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344V280H168c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V168c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H280v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                </svg>
+                Exportar documento
             </a>
         </div>
     </ModalComponent>
@@ -322,16 +613,19 @@ async function handleImportData() {
             :TableAddButton="true"
             :ButtonTitle="'Adicionar Aluno'"
             :OpenAddModal="openAddStudentModal"
+            :InsertExam="true"
             @viewDetails="redirectToStudentScreen"
+            @createExam="openCreateExamModal"
             @deletedAction="openRemoveStudentModal"
             @exportData="exportClassStudentsData(students.map(({ name }) => ({
                 studentName: name,
                 className: classData.name
             })))"
+            :ExportLiteracyDocument="classData.type === 'preschool'"
+            @exportLiteracyDocument="openExportDocumentModal"
             @exportSampleData="exportClassStudentsSampleData"
             @importData="handleImportData"
         />
-
         <button class="close-class" @click="showCloseClass = true">
             Fechar turma
         </button>
@@ -340,6 +634,89 @@ async function handleImportData() {
 </template>
 
 <style scoped>
+
+.disabled {
+    pointer-events: none; /* Desabilita interações no link */
+    color: gray;
+    text-decoration: none;
+    cursor: not-allowed;
+}
+
+.btn {
+    width: 15rem !important;
+}
+
+.mobile {
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .school-add{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+
+}
+
+@media (max-width: 950px) {
+    .modal-content-div {
+        display: block !important;
+    }
+
+    .mobile{
+        margin-bottom: 20px;
+    }
+
+    .school-add{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+}
+
+.alert {
+    position: relative;
+    padding: 5px 20px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content-div-error-div {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+.modal-content-div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+.error-span {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
 .close-class {
     all: unset;
     cursor: pointer;
@@ -352,7 +729,20 @@ async function handleImportData() {
     color: #fff;
 }
 
+.export-document-class {
+    all: unset;
+    cursor: pointer;
+    width: 84%;
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    text-align: center;
+    border-radius: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+}
+
 .content-wrapper {
+    overflow-x: hidden;
     display: flex;
     width: 100vw;
     height: 100vh;
@@ -368,6 +758,7 @@ async function handleImportData() {
 }
 
 .class-form {
+    overflow-x: hidden;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 1fr;
@@ -461,5 +852,91 @@ async function handleImportData() {
     background-color: #fff;
     right: 0;
     font-weight: 700;
+}
+
+.input {
+    width: 100%;
+    border: 0 solid var(--secondary-color);
+    border-bottom-width: 1px;
+    background-color: transparent;
+    outline: 0;
+    font-size: 13pt;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.textarea-wrapper {
+    grid-area: 2 / 1 / 3 / 3;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--primary-color);
+    border-radius: 1rem;
+    align-items: center;
+    cursor: text;
+    background-color: white;
+    padding: 5px 0;
+
+    & > h3 {
+        padding: 10px 0;
+    }
+}
+
+textarea {
+    width: 100%;
+    background-color: transparent;
+    padding: 1rem;
+    outline: none;
+    border: none;
+    resize: none;
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 750px) {
+    .import-actions {
+        display: flex;
+        flex-direction: row;
+        justify-content: right;
+        position: relative;
+    }
+}
+
+.student-form-actions-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.student-form-action-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    border: 2px solid var(--secondary-color);
+    text-align: center;
+    border-radius: 4rem;
+    color: var(--secondary-color);
+    padding: 0.6rem 1.6rem;
+    background-color: #fff;
+    right: 0;
+    font-weight: 700;
+}
+
+@media screen and (min-width: 1200px) {
+    .student-form {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 </style>
