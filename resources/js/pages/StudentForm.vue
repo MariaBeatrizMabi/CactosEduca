@@ -15,12 +15,19 @@ import { exportExamsData, exportExamsSampleData } from "../services/export";
 import { importExams } from "../services/import";
 import axios from "axios";
 import Table from "../components/table.vue";
-import {DialogOverlay} from "radix-vue";
+import CreateExamModal from "../components/createExamModal.vue";
 
 const route = useRoute();
 const schoolId = ref();
 const studentId = route.params.student;
 const studentInterventions = ref();
+const literacyParameters = ref();
+const selectedLiteracyParameters = ref([]);
+const examLiteracyParameters = ref([])
+const hasErrors = ref({
+    reading: false,
+    writing: false
+});
 
 const studentData = ref({
     name: '',
@@ -85,6 +92,11 @@ const hasChangesToUpdate = computed(() =>
         .some((value) => !value)
 )
 
+const getliteracyParameters = async () => {
+    const response = await api.get('/api/literacy-parameters')
+    literacyParameters.value = response.data.data;
+}
+
 async function updateStudent() {
     const peopleWithDisabilities = JSON.parse(formData.value?.people_with_disabilities);
 
@@ -104,44 +116,62 @@ const pollData = ref({
     year: null,
 });
 
-async function submitPollCreated(name) {
-    try {
-        const response = await axios.get(`/Teachers`);
-        const teacher = response.data.find(teacher => teacher.user_id === userID.value);
+const validateData = () => {
+    clearErrors()
 
-        if (teacher) {
-            const schoolId = teacher.school_id;
-            let createdPoll = null;
-
-            if (userType === 'teacher') {
-                createdPoll = await axios.post(`/PollCreate`, {
-                    name: studentExams.value.length + 1 + '° Período de sondagem',
-                    class_id: classData.value.id,
-                    poll_number: studentExams.value.length + 1,
-                    school_id: schoolId,
-                    year: classData.value.id
-                });
-            } else {
-                createdPoll = await axios.post(`/PollCreate`, {
-                    name: studentExams.value.length + 1 + '° Período de sondagem',
-                    class_id: classData.value.id,
-                    school_id: schoolId,
-                    poll_number: studentExams.value.length + 1,
-                    year: classData.value.id
-                });
-            }
-
-            submitExamCreate(createdPoll.data.id);
-            await getUserType();
-            await getStudent();
-            showExamCreateModal.value = false;
-
-        } else {
-            console.error("Professor não encontrado ou não possui um user_id correspondente.");
-        }
-    } catch (error) {
-        console.error("Erro ao criar a pesquisa:", error);
+    if(!createExamData.value.reading || createExamData.value.reading === ''){
+        hasErrors.value.reading = true
     }
+
+    if(!createExamData.value.writing || createExamData.value.writing === ''){
+        hasErrors.value.writing = true
+    }
+}
+
+async function submitPollCreated(name) {
+    validateData()
+
+    if(!(hasErrors.value.writing || hasErrors.value.reading )){
+        try {
+            const response = await axios.get(`/Teachers`);
+            const teacher = response.data.find(teacher => teacher.user_id === userID.value);
+
+            if (teacher) {
+                const schoolId = teacher.school_id;
+                let createdPoll = null;
+
+                if (userType === 'teacher') {
+                    createdPoll = await axios.post(`/PollCreate`, {
+                        name: studentExams.value.length + 1 + '° Período de sondagem',
+                        class_id: classData.value.id,
+                        poll_number: studentExams.value.length + 1,
+                        school_id: schoolId,
+                        year: classData.value.id
+                    });
+                } else {
+                    createdPoll = await axios.post(`/PollCreate`, {
+                        name: studentExams.value.length + 1 + '° Período de sondagem',
+                        class_id: classData.value.id,
+                        school_id: schoolId,
+                        poll_number: studentExams.value.length + 1,
+                        year: classData.value.id
+                    });
+                }
+
+                submitExamCreate(createdPoll.data.id);
+                await getUserType();
+                await getStudent();
+                showExamCreateModal.value = false;
+
+            } else {
+                console.error("Professor não encontrado ou não possui um user_id correspondente.");
+            }
+        } catch (error) {
+            console.error("Erro ao criar a pesquisa:", error);
+        }
+    }
+
+
 }
 
 async function submitExamCreate(createdPollId) {
@@ -150,6 +180,7 @@ async function submitExamCreate(createdPollId) {
         student_id: route.params.student,
         class_id: classData.value.id,
         poll_id: createdPollId,
+        literacy_parameters_values: selectedLiteracyParameters.value
     });
 
     studentExams.value = await getStudentExams()
@@ -161,12 +192,36 @@ async function submitExamCreate(createdPollId) {
         action: null
     }
 
+    await getStudent();
+
 
 }
 
+const clearErrors = () => {
+    hasErrors.value = {
+        reading: false,
+        writing: false
+    }
+}
+
+const openExamCreateModal = () => {
+    createExamData.value = {
+        reading: '',
+        writing: '',
+        action: null
+    }
+
+    clearErrors();
+
+    selectedLiteracyParameters.value = [];
+    showExamCreateModal.value = true;
+}
+
 async function submitExamUpdate() {
+    updateExamData.value.literacy_parameters_values = selectedLiteracyParameters.value
     await api.put(`/api/exams/${activeExamId.value}`, updateExamData.value);
 
+    selectedLiteracyParameters.value = [];
     studentExams.value = await getStudentExams()
     showExamUpdateModal.value = false
 }
@@ -216,12 +271,13 @@ const getStudent = async () => {
 onMounted(async () => {
     await getUserType();
     await getStudent();
-    // await handleImportExams();
+    await getliteracyParameters();
 });
 
 function openShowExamModal(id) {
     showExamViewModal.value = true;
     activeExamId.value = id;
+    verifyIfLiteracyParameterIsChecked(activeExamData.value.literacy_parameter_values)
 }
 
 function openExamUpdateModal(id) {
@@ -229,6 +285,7 @@ function openExamUpdateModal(id) {
     activeExamId.value = id;
 
     updateExamData.value = {...activeExamData.value};
+    verifyIfLiteracyParameterIsChecked(updateExamData.value.literacy_parameter_values)
 }
 
 async function handleImportExams() {
@@ -255,6 +312,7 @@ const loadSelectedInterventions = (pollId) => {
     }
 };
 const openInterventionModal = async (writing, pollId) => {
+
     pollIdD.value = null;
     interventions.value = [];
     showInterventionModal.value = false;
@@ -289,6 +347,15 @@ const getExamIdForStudent = async (pollIdD) => {
 
 };
 
+const updateLiteracyValue = (literacyParameterValueId) => {
+    const position = selectedLiteracyParameters.value.indexOf(literacyParameterValueId);
+    if (position !== -1){
+        selectedLiteracyParameters.value.splice(position, 1)
+    } else {
+        selectedLiteracyParameters.value.push(literacyParameterValueId)
+    }
+}
+
 const updateIntervention = (interventionId) => {
     const pollInterventions = selectedInterventionsPoll.value[pollIdD.value];
     const index = pollInterventions.indexOf(interventionId);
@@ -316,6 +383,40 @@ const submitIntervention = async () => {
         console.error(error);
     }
 };
+
+const literacyParameterTranslator = (parameter) => {
+    const parameters = {
+        write_name: 'Escreve o nome',
+        recognize_write_alphabet: 'Reconhece e escreve o alfabeto',
+        recognize_write_vocal_encounters: 'Reconhece e escreve encontros vocálicos',
+        recognize_write_syllable_family: 'Reconhece e escreve familias silábicas',
+        recognize_write_number: 'Reconhece e escreve numeros',
+    }
+
+    return parameters[parameter];
+}
+
+const verifyIfLiteracyParameterIsChecked = (examParameters) => {
+    examLiteracyParameters.value = [];
+
+    examParameters.forEach((parameter) => {
+        examLiteracyParameters.value.push(parameter.id)
+    })
+
+    selectedLiteracyParameters.value = examLiteracyParameters.value
+}
+
+const showTooltip = (elementId) => {
+    const element = document.getElementById(elementId)
+    element.classList.add('d-flex')
+    element.classList.remove('d-none')
+}
+
+const hideTooltip = (elementId) => {
+    const element = document.getElementById(elementId)
+    element.classList.remove('d-flex')
+    element.classList.add('d-none')
+}
 </script>
 
 <template>
@@ -461,7 +562,7 @@ const submitIntervention = async () => {
                         <div class="import-actions" v-if="studentExams?.length > index + 1 || studentExams?.length === 0">
                             <button
                                 class="create-test"
-                                @click="showExamCreateModal = true"
+                                @click="openExamCreateModal"
                             >
                                 Adicionar sondagem
                             </button>
@@ -508,23 +609,55 @@ const submitIntervention = async () => {
                                 <td>{{ translate(row.writing) }}</td>
                                 <td>
                                     <div class="actions">
-                                        <div class="show" @click="() => openShowExamModal(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-show-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-show-exam`)"
+                                            class="show"
+                                            @click="() => openShowExamModal(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
                                                 <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/>
                                             </svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-show-exam`">
+                                                Visualizar detalhes da sondagem
+                                            </div>
                                         </div>
-                                        <div class="edit" @click="() => openExamUpdateModal(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-update-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-update-exam`)"
+                                            class="edit"
+                                            @click="() => openExamUpdateModal(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                 <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/>
                                             </svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-update-exam`">
+                                                Atualizar sondagem
+                                            </div>
                                         </div>
-                                        <div class="intervention" @click="() => openInterventionModal(row.writing, row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-create-intervention`)"
+                                            @mouseleave="hideTooltip(`${row.id}-create-intervention`)"
+                                            class="intervention"
+                                            @click="() => openInterventionModal(row.writing, row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M160 96a96 96 0 1 1 192 0A96 96 0 1 1 160 96zm80 152l0 264-48.4-24.2c-20.9-10.4-43.5-17-66.8-19.3l-96-9.6C12.5 457.2 0 443.5 0 427L0 224c0-17.7 14.3-32 32-32l30.3 0c63.6 0 125.6 19.6 177.7 56zm32 264l0-264c52.1-36.4 114.1-56 177.7-56l30.3 0c17.7 0 32 14.3 32 32l0 203c0 16.4-12.5 30.2-28.8 31.8l-96 9.6c-23.2 2.3-45.9 8.9-66.8 19.3L272 512z"/></svg>
+                                            <div class="tooltip d-none" :id="`${row.id}-create-intervention`">
+                                                Intervenções sugeridas
+                                            </div>
                                         </div>
-                                        <div class="deleted" @click="() => submitExamDelete(row.id)">
+                                        <div
+                                            @mouseover="showTooltip(`${row.id}-delete-exam`)"
+                                            @mouseleave="hideTooltip(`${row.id}-delete-exam`)"
+                                            class="deleted"
+                                            @click="() => submitExamDelete(row.id)"
+                                        >
                                             <svg width="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                                 <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
                                             </svg>
+                                            <div class="tooltip-delete d-none" :id="`${row.id}-delete-exam`">
+                                                Deletar sondagem
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -535,7 +668,7 @@ const submitIntervention = async () => {
                             <tr>
                                 <th>Ações de intervenção aplicadas</th>
                             </tr>
-                            <tr v-if="studentInterventions[studentExams.length - index].length > 0" v-for="(intervention, interventionIndex) in studentInterventions[studentExams.length - index]">
+                            <tr v-if="studentInterventions[studentExams.length - index] && studentInterventions[studentExams.length - index].length > 0" v-for="(intervention, interventionIndex) in studentInterventions[studentExams.length - index]">
 
                                 <td class="intervention-table-middle" v-if="studentInterventions[studentExams.length - index].length > interventionIndex + 1">
                                     {{intervention.code}} - {{intervention.description}}
@@ -564,7 +697,7 @@ const submitIntervention = async () => {
                     <div class="import-actions">
                         <button
                             class="create-test"
-                            @click="showExamCreateModal = true"
+                            @click="openExamCreateModal"
                         >
                             Adicionar sondagem
                         </button>
@@ -599,62 +732,71 @@ const submitIntervention = async () => {
                             </Dropdown.Portal>
                         </Dropdown.Root>
                     </div>
-
-
                 </div>
             </template>
         </div>
     </div>
 
-    <Modal
+    <CreateExamModal
         v-if="showExamCreateModal"
         Titlevalue="Cadastro de Sondagens"
+        @close-modal="showExamCreateModal = false"
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
             <a href="/documentos/instrucoes.pdf" target="_blank">Mais informações sobre ações de intervenção - Escrita</a><br>
             <a href="/documentos/instrucoesLeitura.pdf" target="_blank">Mais informações sobre ações de intervenção - Leitura</a>
 
-            <div class="modal-content-details">
-                <SelectComponent
-                    labelTitle="Nível de leitura"
-                    placeholderValue="Nível de leitura"
-                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                    typeValue="select"
-                    :value="createExamData.reading"
-                    valueField="id"
-                    RightAction="display: none;"
-                    @input="createExamData.reading = $event.target.value"
-                >
-                    <option value="not_reader">Não leitor</option>
-                    <option value="syllable_reader">Leitor de sílabas</option>
-                    <option value="word_reader">Leitor de palavras</option>
-                    <option value="sentence_reader">Leitor de frases</option>
-                    <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
-                    <option value="fluent_text_reader">Leitor de texto com fluência</option>
-                    <option value="missed">Faltou</option>
-                    <option value="transferred">Transferido</option>
-                </SelectComponent>
+            <div class="modal-content-div">
+                <div class="modal-content-div-error-div mobile">
+                    <SelectComponent
+                        labelTitle="Nível de leitura"
+                        placeholderValue="Nível de leitura"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.reading"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.reading = $event.target.value"
+                    >
+                        <option value="not_reader">Não leitor</option>
+                        <option value="syllable_reader">Leitor de sílabas</option>
+                        <option value="word_reader">Leitor de palavras</option>
+                        <option value="sentence_reader">Leitor de frases</option>
+                        <option value="no_fluent_text_reader">Leitor de texto sem fluência</option>
+                        <option value="fluent_text_reader">Leitor de texto com fluência</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.reading">
+                        <span class="error-span font-medium">O campo nível de leitura é obrigatório</span>
+                    </div>
+                </div>
 
-                <SelectComponent
-                    labelTitle="Nível de escrita"
-                    placeholderValue="Nível de escrita"
-                    icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
-                    typeValue="select"
-                    :value="createExamData.writing"
-                    valueField="id"
-                    RightAction="display: none;"
-                    @input="createExamData.writing = $event.target.value"
-                >
-                    <option value="pre_syllabic">Pré silábico</option>
-                    <option value="syllabic">Silábico</option>
-                    <option value="alphabetical_syllabic">Silábico alfabético</option>
-                    <option value="alphabetical">Alfabético</option>
-                    <option value="missed">Faltou</option>
-                    <option value="transferred">Transferido</option>
-                </SelectComponent>
+                <div class="modal-content-div-error-div mobile">
+                    <SelectComponent
+                        labelTitle="Nível de escrita"
+                        placeholderValue="Nível de escrita"
+                        icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
+                        typeValue="select"
+                        :value="createExamData.writing"
+                        valueField="id"
+                        RightAction="display: none;"
+                        @input="createExamData.writing = $event.target.value"
+                    >
+                        <option value="pre_syllabic">Pré silábico</option>
+                        <option value="syllabic">Silábico</option>
+                        <option value="alphabetical_syllabic">Silábico alfabético</option>
+                        <option value="alphabetical">Alfabético</option>
+                        <option value="missed">Faltou</option>
+                        <option value="transferred">Transferido</option>
+                    </SelectComponent>
+                    <div class="alert alert-danger" role="alert" v-if="hasErrors.writing">
+                        <span class="error-span font-medium">O campo nível de escrita é obrigatório</span>
+                    </div>
+                </div>
 
-                <span class="textarea-wrapper">
+                <span class="textarea-wrapper mobile">
                     <h3>Ações de Intervenção</h3>
                     <textarea
                         :value="createExamData.action"
@@ -662,10 +804,21 @@ const submitIntervention = async () => {
                         rows="12"
                     ></textarea>
                 </span>
+
+                <div v-if="classData.type === 'preschool'" v-for="(literacyParameter, index) in literacyParameters" :key="index" class="mobile">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :isChecked="selectedLiteracyParameters.includes(value.id)"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="modal-end">
-            <a class="close-modal" @click="showExamCreateModal = false">
+        <div class="modal-end mobile">
+            <a class="close-modal btn" @click="showExamCreateModal = false">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -678,7 +831,7 @@ const submitIntervention = async () => {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitPollCreated">
+            <a class="school-add btn" @click="submitPollCreated">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -692,16 +845,18 @@ const submitIntervention = async () => {
                 Adicionar sondagem
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
 
-    <Modal
+    <CreateExamModal
+        @close-modal="showExamViewModal = false"
         v-if="showExamViewModal"
         Titlevalue="Cadastro de Sondagens"
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <SelectComponent
+                    class="mobile"
                     disabled
                     labelTitle="Nível de leitura"
                     placeholderValue="Nível de leitura"
@@ -722,6 +877,7 @@ const submitIntervention = async () => {
                 </SelectComponent>
 
                 <SelectComponent
+                    class="mobile"
                     disabled
                     labelTitle="Nível de escrita"
                     placeholderValue="Nível de escrita"
@@ -739,7 +895,7 @@ const submitIntervention = async () => {
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
 
-                <span class="textarea-wrapper">
+                <span class="textarea-wrapper mobile">
                     <h3>Ações de Intervenção</h3>
                     <textarea
                         disabled
@@ -747,6 +903,18 @@ const submitIntervention = async () => {
                         rows="12"
                     ></textarea>
                 </span>
+
+                <div v-if="classData.type === 'preschool'" class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :disabled="true"
+                            :isChecked="examLiteracyParameters.indexOf(value.id) !== -1"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-end">
@@ -764,16 +932,18 @@ const submitIntervention = async () => {
                 Fechar
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
 
-    <Modal
+    <CreateExamModal
         v-if="showExamUpdateModal"
         Titlevalue="Cadastro de Sondagens"
+        @close-modal="showExamUpdateModal=false"
     >
         <div class="modal-body-size">
             <h2>Detalhes da sondagem</h2>
-            <div class="modal-content-details">
+            <div class="modal-content-div">
                 <SelectComponent
+                    class="mobile"
                     labelTitle="Nível de leitura"
                     placeholderValue="Nível de leitura"
                     icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -794,6 +964,7 @@ const submitIntervention = async () => {
                 </SelectComponent>
 
                 <SelectComponent
+                    class="mobile"
                     labelTitle="Nível de escrita"
                     placeholderValue="Nível de escrita"
                     icon="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l293.1 0c-3.1-8.8-3.7-18.4-1.4-27.8l15-60.1c2.8-11.3 8.6-21.5 16.8-29.7l40.3-40.3c-32.1-31-75.7-50.1-123.9-50.1l-91.4 0zm435.5-68.3c-15.6-15.6-40.9-15.6-56.6 0l-29.4 29.4 71 71 29.4-29.4c15.6-15.6 15.6-40.9 0-56.6l-14.4-14.4zM375.9 417c-4.1 4.1-7 9.2-8.4 14.9l-15 60.1c-1.4 5.5 .2 11.2 4.2 15.2s9.7 5.6 15.2 4.2l60.1-15c5.6-1.4 10.8-4.3 14.9-8.4L576.1 358.7l-71-71L375.9 417z"
@@ -811,7 +982,7 @@ const submitIntervention = async () => {
                     <option value="transferred">Transferido</option>
                 </SelectComponent>
 
-                <span class="textarea-wrapper">
+                <span class="textarea-wrapper mobile">
                     <h3>Ações de Intervenção</h3>
                     <textarea
                         :value="updateExamData.action"
@@ -819,10 +990,22 @@ const submitIntervention = async () => {
                         rows="12"
                     ></textarea>
                 </span>
+
+                <div v-if="classData.type === 'preschool'" class="mobile" v-for="(literacyParameter, index) in literacyParameters" :key="index">
+                    <h3>{{literacyParameterTranslator(literacyParameter.literacy_parameter)}}</h3>
+                    <div v-for="(value, index) in literacyParameter.values" :key="index">
+                        <Checkbox
+                            :disabled="false"
+                            :isChecked="examLiteracyParameters.indexOf(value.id) !== -1"
+                            :label="value.name_to_show"
+                            @change="() => updateLiteracyValue(value.id)"
+                        />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-end">
-            <a class="close-modal" @click="showExamUpdateModal = false">
+            <a class="close-modal btn" @click="showExamUpdateModal = false">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -835,7 +1018,7 @@ const submitIntervention = async () => {
                 </svg>
                 Cancelar
             </a>
-            <a class="school-add" @click="submitExamUpdate">
+            <a class="school-add btn" @click="submitExamUpdate">
                 <svg
                     width="20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -849,7 +1032,7 @@ const submitIntervention = async () => {
                 Adicionar sondagem
             </a>
         </div>
-    </Modal>
+    </CreateExamModal>
     <Modal
         v-if="showInterventionModal"
         :Titlevalue="`Aluno ${{
@@ -863,7 +1046,7 @@ const submitIntervention = async () => {
         >
         <div class="modal-body-size">
             <h2 style="text-align: center;">Intervenções sugeridas ao professor(a)</h2>
-                <div id="custom-modal-check" class="modal-content-details">
+                <div id="custom-modal-check" class="modal-content-div">
                     <div v-if="interventions.length">
                         <div v-for="intervention in interventions" :key="intervention.id">
                             <Checkbox
@@ -893,6 +1076,89 @@ const submitIntervention = async () => {
 </template>
 
 <style scoped>
+
+.btn {
+    width: 15rem !important;
+}
+
+.mobile {
+    margin-bottom: 0;
+}
+
+.alert {
+    position: relative;
+    padding: 5px 20px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content-div-error-div {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+.error-span {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.modal-content-div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+@media (max-width: 950px) {
+    .modal-content-div {
+        display: block;
+    }
+
+    .mobile{
+        margin-bottom: 20px;
+    }
+
+    .modal-end {
+        justify-content: center;
+        justify-items: center;
+    }
+
+    .school-add{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+    .close-modal{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+
+}
+
+@media (max-width: 700px) {
+    .school-add{
+        margin-right: 32px;
+        margin-left: 32px;
+    }
+
+    .close-modal{
+        margin-right: 32px !important;
+        margin-left: 32px !important;
+    }
+
+
+}
+
 .school-register {
     display: flex;
     height: 100vh;
@@ -963,12 +1229,6 @@ const submitIntervention = async () => {
     }
 }
 
-.teacher-comments-content {
-    display: flex;
-    flex-direction: column;
-    width: 84%;
-}
-
 textarea {
     width: 100%;
     background-color: transparent;
@@ -1008,11 +1268,15 @@ textarea {
     border: 2px solid var(--secondary-color);
     text-align: center;
     border-radius: 4rem;
-    background-color: transparent;
     color: var(--secondary-color);
     padding: 0.6rem 1.6rem;
     background-color: #fff;
     font-weight: 700;
+}
+
+.create-test:hover {
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
 }
 
 
@@ -1154,7 +1418,6 @@ textarea {
     border: 2px solid var(--secondary-color);
     text-align: center;
     border-radius: 4rem;
-    background-color: transparent;
     color: var(--secondary-color);
     padding: 0.6rem 1.6rem;
     background-color: #fff;
@@ -1180,9 +1443,42 @@ input[type="number"] {
 #custom-modal-check {
     grid-template-columns: 1fr;
     max-height: 400px;
-    overflow-y: auto;
     overflow-x: hidden;
     padding: 20px;
+}
+
+.tooltip {
+    position: absolute;
+    margin-top: -50px;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+.tooltip-delete {
+    position: absolute;
+    margin-top: -120px;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+.d-none {
+    display: none;
+}
+
+.d-flex{
+    display: flex;
 }
 
 </style>

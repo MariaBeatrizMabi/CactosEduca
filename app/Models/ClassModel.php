@@ -14,7 +14,8 @@ class ClassModel extends Model
         'name',
         'year',
         'shift',
-        'school_id',            
+        'type',
+        'school_id',
         'teacher_id'
     ];
 
@@ -64,5 +65,5 @@ class ClassModel extends Model
     {
         return $this->belongsTo(Poll::class, 'id');
     }
-    
+
 }
